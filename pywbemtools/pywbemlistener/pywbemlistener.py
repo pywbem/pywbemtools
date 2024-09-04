@@ -17,8 +17,6 @@
 The main function of the pywbemlistener command.
 """
 
-
-import sys
 import warnings
 import click
 
@@ -28,7 +26,7 @@ from ._context_obj import ContextObj
 from . import _config
 from .._click_extensions import PywbemtoolsTopGroup, GENERAL_OPTS_TXT, \
     SUBCMD_HELP_TXT
-from .._utils import pywbemtools_warn, get_terminal_width
+from .._utils import get_terminal_width
 from .._options import add_options, help_option
 from .._output_formatting import OUTPUT_FORMAT_GROUPS, OUTPUT_FORMATS
 
@@ -137,10 +135,3 @@ def cli(ctx, output_format, logdir, verbose, pdb, warn):
     # Since there is no interactive mode, there is never a context object.
     assert ctx.obj is None
     ctx.obj = ContextObj(output_format, logdir, verbose, pdb, warn)
-
-    _python_nm = sys.version_info[0:2]
-    if _python_nm in ((2, 7),):  # TODO:  py 2.7 warning should be removed
-        pywbemtools_warn("Pywbemlistener support for Python "
-                         f"{_python_nm[0]}.{_python_nm[1]} is deprecated "
-                         "and will be removed in a future version",
-                         DeprecationWarning)

@@ -31,6 +31,10 @@ Released: not yet
 
 **Cleanup:**
 
+* Remove code and tests that depends on the differences between python 3.8+ and
+  on differences between pywbem 1.0.0 and earlier versions of python.
+  (issue #1405)
+
 **Known issues:**
 
 * See `list of open issues`_.

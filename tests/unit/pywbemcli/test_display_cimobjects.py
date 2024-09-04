@@ -20,14 +20,12 @@ API, not a test of pywbemcli commands.
 """
 
 
-import sys
 from datetime import datetime
 from collections import OrderedDict
-from packaging.version import parse as parse_version
 import pytest
 
 from pywbem import CIMProperty, CIMInstance, CIMInstanceName, Uint32, Uint64, \
-    Sint32, CIMDateTime, __version__
+    Sint32, CIMDateTime
 
 from pywbemtools.pywbemcli._display_cimobjects import \
     _format_instances_as_rows, _display_instances_as_table
@@ -48,19 +46,6 @@ SKIP = False  # mark tests that are to be skipped.
 DATETIME1_DT = datetime(2014, 9, 22, 10, 49, 20, 524789)
 DATETIME1_OBJ = CIMDateTime(DATETIME1_DT)
 DATETIME1_STR = '"20140922104920.524789+000"'
-
-# Click (as of 7.1.2) raises UnsupportedOperation in click.echo() when
-# the pytest capsys fixture is used. That happens only on Windows.
-# See Click issue https://github.com/pallets/click/issues/1590. This
-# run condition skips the testcases on Windows.
-CLICK_ISSUE_1590 = sys.platform == 'win32'
-
-_PYWBEM_VERSION = parse_version(__version__)
-# pywbem 1.0.0b1 or later
-PYWBEM_1_0_0B1 = _PYWBEM_VERSION.release >= (1, 0, 0) and \
-    _PYWBEM_VERSION.dev is None
-# pywbem 1.0.0 (dev, beta, final) or later
-PYWBEM_1_0_0 = _PYWBEM_VERSION.release >= (1, 0, 0)
 
 
 # NOTE: The following methods are testcase parameters.  They define instances
@@ -631,7 +616,7 @@ false  true   "20140922104920.524"        99      9999  "Test String"
 """,
 
         ),
-        None, None, not CLICK_ISSUE_1590
+        None, None, True
     ),
     (
         "Verify print of simple instance to table with col limit",
@@ -647,7 +632,7 @@ false  true   "201409221"      9999  -2147483648  "Test "   4294967295
               "789+000"
 """,
         ),
-        None, None, not CLICK_ISSUE_1590
+        None, None, True
     ),
 
     (
@@ -664,7 +649,7 @@ false  true   "201409221"      9999  -2147483648  "Test "   4294967295
               "789+000"
 """,
         ),
-        None, None, not CLICK_ISSUE_1590
+        None, None, True
     ),
 
     (
@@ -679,11 +664,11 @@ Pbf           Pbt         Pdt                                                   
 false, false  true, true  "20140922104920.524789+000", "20140922104920.524789+000"  9999, 9999  -2147483648, -2147483648  "Test String", "Test String"  4294967295, 4294967295
 """,   # noqa: E501
         ),
-        None, None, not CLICK_ISSUE_1590
+        None, None, True
     ),
 
     # The following test fails apparently in an issue in the capsys so marked
-    # fail until we sort out issu es when a second instance is added. Did same
+    # fail until we sort out issues when a second instance is added. Did same
     # ctest above with very largeell size and another with single instance
     # and that works.  TODO
     (
@@ -705,7 +690,7 @@ false  true   "2014092"      9999  -2147483648  "Test "   4294967295
               "+000"
 """,
         ),
-        None, None, FAIL  # WAS not CLICK_ISSUE_1590
+        None, None, FAIL  # WAS True
     ),
 
     (
@@ -729,7 +714,7 @@ P
 "/:REF_CLN.k1=\\"v1\\",k2=32"
 """,
         ),
-        None, None, not CLICK_ISSUE_1590 and PYWBEM_1_0_0B1
+        None, None, OK
     ),
 ]
 

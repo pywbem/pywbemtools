@@ -18,11 +18,9 @@ Tests the commands in the server command group.
 
 
 import os
-from packaging.version import parse as parse_version
 import pytest
-from pywbem import __version__ as pywbem_version
 
-from .cli_test_extensions import CLITestsBase, FAKEURL_STR, PYWBEM_0
+from .cli_test_extensions import CLITestsBase, FAKEURL_STR
 
 from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_HELP_HELP_LINE, CMD_OPTION_SUMMARY_HELP_LINE, \
@@ -46,11 +44,6 @@ from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
 
 # pylint: disable=use-dict-literal
 
-
-_PYWBEM_VERSION = parse_version(pywbem_version)
-# pywbem 1.0.0 or later
-PYWBEM_1_0_0 = _PYWBEM_VERSION.release >= (1, 0, 0)
-
 TEST_DIR = os.path.dirname(__file__)
 TEST_DIR_REL = os.path.relpath(TEST_DIR)
 
@@ -59,10 +52,7 @@ ASSOC_MOCK_FILE = 'simple_assoc_mock_model.mof'
 ALLTYPES_MOCK_FILE = 'all_types.mof'
 QUALIFIER_FILTER_MODEL = 'qualifier_filter_model.mof'
 
-INVOKE_METHOD_MOCK_FILE_0 = 'simple_mock_invokemethod_v0.py'
-INVOKE_METHOD_MOCK_FILE_1 = 'simple_mock_invokemethod_v1old.py'
-INVOKE_METHOD_MOCK_FILE = INVOKE_METHOD_MOCK_FILE_0 if PYWBEM_0 else \
-    INVOKE_METHOD_MOCK_FILE_1
+INVOKE_METHOD_MOCK_FILE = 'simple_mock_invokemethod_v1old.py'
 
 COMPLEX_ASSOC_MODEL = "complex_assoc_model.mof"
 
@@ -94,8 +84,7 @@ MOCK_PROMPT_PICK_RESPONSE_12_FILE = 'mock_prompt_pick_response_12.py'
 MOCK_CONFIRM_Y_FILE = "mock_confirm_y.py"
 MOCK_CONFIRM_N_FILE = "mock_confirm_n.py"
 
-ALLTYPES_INVOKEMETHOD_MOCK_FILE = 'all_types_method_mock_v0.py' if PYWBEM_0 \
-    else 'all_types_method_mock_v1old.py'
+ALLTYPES_INVOKEMETHOD_MOCK_FILE = 'all_types_method_mock_v1old.py'
 
 THREE_NS_MOCK_FILE = 'simple_three_ns_mock_script.py'
 
@@ -1429,14 +1418,7 @@ Instances: TST_Person
      {'stderr': ["CIMError:", "CIM_ERR_INVALID_CLASS"],
       'rc': 1,
       'test': 'innows'},
-     SIMPLE_MOCK_FILE, PYWBEM_1_0_0],
-
-    ['Verify instance enumerate error, invalid classname fails pywbem 0.x',
-     ['enumerate', 'CIM_Foox'],
-     {'stderr': ["CIMError:", "CIM_ERR_NOT_FOUND"],
-      'rc': 1,
-      'test': 'innows'},
-     SIMPLE_MOCK_FILE, not PYWBEM_1_0_0],
+     SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance enumerate error, no classname fails',
      ['enumerate'],

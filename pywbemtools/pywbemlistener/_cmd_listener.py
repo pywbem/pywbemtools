@@ -38,7 +38,7 @@ from pywbem import WBEMListener, ListenerError, CIMInstance, CIMProperty, \
     Uint16, WBEMConnection, Error
 
 from .._click_extensions import PywbemtoolsCommand, CMD_OPTS_TXT, \
-    TabCompleteArgument, click_completion_item
+    click_completion_item
 from .._options import add_options, help_option, validate_required_arg
 from .._output_formatting import format_table
 
@@ -401,7 +401,6 @@ def listener_start(context, name, **options):
 @click.argument('name',
                 type=str,
                 metavar='NAME',
-                cls=TabCompleteArgument,
                 shell_complete=listener_name_completer,
                 required=True)
 @add_options(help_option)
@@ -425,7 +424,6 @@ def listener_stop(context, name):
 @click.argument('name',
                 type=str,
                 metavar='NAME',
-                cls=TabCompleteArgument,
                 shell_complete=listener_name_completer,
                 required=True)
 @add_options(help_option)
@@ -460,7 +458,6 @@ def listener_list(context):
 @click.argument('name',
                 type=str,
                 metavar='NAME',
-                cls=TabCompleteArgument,
                 shell_complete=listener_name_completer,
                 required=False)
 @click.option('-c', '--count', type=int, metavar='INT',
@@ -759,8 +756,7 @@ arguments:
   This keyword argument can also be used for accessing its Python object
   attributes in the format specifier (e.g. '{dt.hour}').
 
-* 'tz' - Timezone name of the local timezone. On Python versions before 3.6,
-  the empty string.
+* 'tz' - Timezone name of the local timezone.
 
 * 'h' - Host name or IP address of the host that sent the indication.
 

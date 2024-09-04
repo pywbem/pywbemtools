@@ -1,16 +1,22 @@
 """
 Test mock script that installs a test method provider for CIM method
-method1() in CIM class CIM_Foo, using the old setup approach
-with global variables.
+method1() in CIM class CIM_Foo, using the old-style setup approach
+with global variables. This interface is deprecated and will be removed in
+a future version of pywbemtools. It is retained here only for testing.
 
 Note: This script and its method provider perform checks because their purpose
 is to test the provider dispatcher. A real mock script with a real method
 provider would not need to perform any of these checks.
+
+Do not use this old-style mock script interface in developing pywbemtools
+mock scripts.
+
 """
 
 import pywbem
 import pywbem_mock
 
+# assert that the old style mock script interface globals exist.
 assert "CONN" in globals()
 assert 'SERVER' in globals()
 assert 'VERBOSE' in globals()

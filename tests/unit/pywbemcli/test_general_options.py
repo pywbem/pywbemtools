@@ -24,11 +24,10 @@ NOTE: The --log options are tested in a separate file.
 import os
 import sys
 import pytest
-import pywbem
 
 from pywbemtools._utils import CONNECTIONS_FILENAME
 
-from .cli_test_extensions import CLITestsBase, PYWBEM_0, PYWBEM_1
+from .cli_test_extensions import CLITestsBase
 from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE
 from ..utils import CLICK_VERSION
 
@@ -312,17 +311,6 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['Verify invalid server port definition fails. pywbem version 0.x',
-     {'general': ['-s', 'http://blah:abcd'],
-      'cmdgrp': 'class',
-      'args': ['get', 'blah']},
-     {'stderr': ['Error:', 'ConnectionError',
-                 'Failed to parse'
-                 if getattr(pywbem, 'PYWBEM_USES_REQUESTS', False)
-                 else 'Socket error'],
-      'rc': 1,
-      'test': 'regex'},
-     None, PYWBEM_0],
 
     ['Verify invalid server port definition fails. pywbem version 1',
      {'general': ['-s', 'http://blah:abcd'],
@@ -332,7 +320,7 @@ TEST_CASES = [
                  "'http://blah:abcd'"],
       'rc': 1,
       'test': 'innows'},
-     None, PYWBEM_1],
+     None, OK],
 
 
     ['Verify valid --use-pull option parameter yes.',
@@ -591,10 +579,10 @@ TEST_CASES = [
      {'general': ['-m', BAD_MOF_FILE_PATH],
       'cmdgrp': 'class',
       'args': ['enumerate']},
-     {'stdout': "^^^^^^^^^^" if PYWBEM_0 else "",
+     {'stdout': "",
       'stderr': ['MOF compile failed:',
                  BAD_MOF_FILE_PATH,
-                 "^^^^^^^^^^" if PYWBEM_1 else "(see above)",
+                 "(see above)",
                  'Aborted!'],
       'rc': 1,
       'test': 'innows'},
