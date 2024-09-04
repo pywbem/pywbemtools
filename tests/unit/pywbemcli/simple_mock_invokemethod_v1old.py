@@ -1,4 +1,15 @@
 """
+
+*Deprecated* - This test script uses the old-style mock script interface and
+is therefore deprecated and will be removed in a future version of
+pywbem tools.
+
+See simple_mock_invokemethod_v1new.py for a corresponding example of the
+new-style mock script interface with a setup(...) script.
+
+Do not use this old-style mock script interface in developing pywbemtools
+mock scripts as this interface will be removed in a future pywbem version.
+
 Test mock script that installs a test method provider for CIM method
 method1() in CIM class CIM_Foo, using the old-style setup approach
 with global variables. This interface is deprecated and will be removed in
@@ -9,8 +20,7 @@ is to test the provider dispatcher. A real mock script with a real method
 provider would not need to perform any of these checks.
 
 Do not use this old-style mock script interface in developing pywbemtools
-mock scripts.
-
+mock scripts as this interface will be removed in a future pywbem version.
 """
 
 import pywbem

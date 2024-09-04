@@ -97,6 +97,9 @@ def setup_script(file_path, conn, server, verbose):
       SetupNotSupportedError (py<3.5): New-style setup in mock script not
         supported.
       NotCacheable (py<3.5): Mock environment is not cacheable.
+      DeprecatedSetupWarning: Old-style setup mock script. This is a
+        warning that this style is deprecated and will be removed in a
+        future version of pywbemtools
     """
     modpath = get_modpath(file_path)
     spec = importlib.util.spec_from_file_location(modpath, file_path)
@@ -105,6 +108,9 @@ def setup_script(file_path, conn, server, verbose):
     # We cannot find out whether the script has a setup() function before
     # executing it, so we have to set the global variables for the old
     # setup approach in any case.
+    # Deprecated: These global variables have been deprecated will be removed
+    # in a future version of pywbemtools, They are retained because users may
+    # have defined scripts that use this old-style interface.
     module.CONN = conn
     module.SERVER = server
     module.VERBOSE = verbose

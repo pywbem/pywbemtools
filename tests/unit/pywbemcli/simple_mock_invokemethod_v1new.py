@@ -6,6 +6,8 @@ function.
 Note: This script and its method provider perform checks because their purpose
 is to test the provider dispatcher. A real mock script with a real method
 provider would not need to perform any of these checks.
+
+This script uses the new-style mock script interface with a setup(...) function.
 """
 
 import pywbem

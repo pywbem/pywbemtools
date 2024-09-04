@@ -296,7 +296,7 @@ class BuildMockenvMixin:
     """
     Mixin class for pywbem_mock.FakedWBEMConnection that adds the ability to
     build the mock environment of a connection from a connection definition in
-    a connections file.
+    a connections file and input files that define the model and mock setup.
     """
 
     def build_mockenv(self, server, file_path_list, connections_file,
@@ -335,9 +335,10 @@ class BuildMockenvMixin:
 
               verbose (bool): Verbose flag from the command line.
 
-          * via global variables made available to the mock script. This
-            approach prevents caching. The following global variables are
-            made available:
+          * via global variables (*Deprecated*) made available to the mock
+            script. This approach prevents caching and will be removed in a
+            futiure version of pywbemtools. The
+            following global variables are made available ():
 
               CONN (pywbem_mock.FakedWBEMConnection): The mock connection.
 

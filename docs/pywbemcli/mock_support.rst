@@ -11,30 +11,27 @@ Mock WBEM server overview
 -------------------------
 
 `pywbemcli` implements an in-process Mock WBEM Server using the pywbem
-:ref:`pywbem:Mock WBEM server` which defines the mock environment. The mock
-sever provides WBEM server responses to pywbmcli commands. The configuration
-and contents of the mock server are defined by the pywbemcli
-:ref:`--mock-server general option`.
+:ref:`pywbem:Mock WBEM server` which defines a local in server WBEM server environment.
+The mock sever provides WBEM server responses to pywbmcli commands. The
+configuration and contents of the mock server are defined by the pywbemcli
+:ref:`--mock-server general option` and the mock WBEM server configuration
+can be saved as a named connection.
 
 Pywbemcli starts the mock WBEM server when either the pywbemcli
 :ref:`--mock-server general option` or the :ref:`--name general option`
 defining a mock environment is executed.  The mock server and its CIM
-repository are in the pywbemcli process in the pywbemcli process so its
-life-cycle is the life-cycle of a single pywbemcli execution (command line or
-interactive session) and it must be recreated or restored from cache using the
-:ref:`--name general option` (if the connection definition was saved)
+repository are in the pywbemcli process so its life-cycle is the life-cycle of
+a single pywbemcli execution (command line or interactive session) and it must
+be recreated or restored from a pywbemcli provided cache (see: TODO) using the :ref:`--name
+general option` (if the connection definition was saved).
 
-The mock server environment can include CIM namespaces, CIM
+The mock WBEM server environment can include CIM namespaces, CIM
 classes, CIM instances, CIM qualifier declarations, CIM instances, and mock CIM
 providers. This allows executing pywbemcli commands against the mock WBEM server
-that is created in pywbemcli rather than a real WBEM server.
-
-The :ref:`--mock-server general option` is mutually exclusive with the
-:ref:`--server general option` and :ref:`--name general option`, since each
-defines a target WBEM server.
+created in pywbemcli rather than a real WBEM server.
 
 The created mock WBEM server has an in-memory repository for the
-CIM objects defined by the MOF/script (qualifier declarations, classes, and
+CIM objects defined by the mock script (qualifier declarations, classes, and
 instances) and supports CIM namespaces. The operations performed against the
 mock WBEM server cause that mock repository to be inspected (ex. ``class
 enumerate``) or manipulated (ex.``instance create ....``) accordingly.
@@ -43,15 +40,17 @@ The mock repository can be defined and created with CIM objects from files
 specified as an argument to the :ref:`--mock-server general option`. Each use
 of the option specifies one file path. The option may be used
 multiple times and each specified file is processed sequentially, in the
-sequence of the options on the command line.
+sequence of the options on the command line. The  :ref:`--mock-server general option`
+is mutually exclusive with the :ref:`--server general option` and
+:ref:`--name general option`, since each defines a target WBEM server.
 
 pywbemcli supports the following file types for the ``--mock-server`` option:
 
-.. index:: pair: MOF; server mock
+.. index:: pair: MOF; WBEM server mock
 .. index:: pair: compile_string(); mock setup methods
 
 * **MOF files**: If the file extension is ``.mof``, the file is considered a
-  :term:`MOF` file and must be compilable with the :ref:`pywbem MOF compiler
+  :term:`MOF` file and must be compatible with the :ref:`pywbem MOF compiler
   <pywbem:MOF Compiler>` and the MOF syntax defined by the DMTF in
   :term:`DSP0004`. Pywbemcli compiles the MOF in the file and adds the
   resulting :ref:`pywbem CIM objects<pywbem:CIM objects>` to the mock repository.
@@ -70,6 +69,8 @@ pywbemcli supports the following file types for the ``--mock-server`` option:
         Scope(reference),
         Flavor(DisableOverride, ToSubclass);
         EOT
+
+        # start pywbemcli with the mof script and it displays the qualifiers
 
         pywbemcli -m qualdecl.mof qualifier enumerate
 
@@ -95,14 +96,18 @@ pywbemcli supports the following file types for the ``--mock-server`` option:
 
 .. index:: triple: Python files; server mock; add_cimobjects()
 
-* **Mock scripts**: If the file extension is ``.py``, the file is considered
+* **Mock scripts (Python)**: If the file extension is ``.py``, the file is considered
   a Python script and the script is executed as part of the startup of pywbemcli
   in the command line mode or upon the first command executed that communicates
   with a WBEM server in the interactive mode.
 
-  Mock scripts can for example create Python objects of type
-  :class:`~pywbem.CIMQualifierDeclaration`, :class:`~pywbem.CIMClass` and
-  :class:`~pywbem.CIMInstance` for representing CIM objects, and add them to
+  Mock scripts can, for example, create Python objects of type:
+
+  * :class:`~pywbem.CIMQualifierDeclaration`,
+  * :class:`~pywbem.CIMClass` and
+  * :class:`~pywbem.CIMInstance`
+
+  for representing CIM objects, and add them to
   the mock repository via calls to
   :meth:`~pywbem_mock.FakedWBEMConnection.add_cimobjects`.
 
@@ -112,15 +117,16 @@ pywbemcli supports the following file types for the ``--mock-server`` option:
 
   .. index:: pair: mock-server cache; cache mock-server
 
-  Since the mock repository created by mock scripts and MOF files can be
-  cached, pywbemcli can also make the decision on pywbemcli with the
-  :ref:`--name general option` whether the script is to retrieved from the
-  cache or recreated from the named connection definition.  To do this, it
-  needs knowledge of whether the files that make up  the script have been
-  modified since the cache of the repository was created. To do this the files
-  that are used in the script have to be registered with the pywbem
-  provider_dependent_registry. using
-  :meth:`~pywbem_mock:provider_dependent_registry.add_dependents`
+  Since the mock repository created by mock scripts and MOF files can be cached
+  (see :ref:`pywbemcli mock WBEM server cache`), pywbemcli can also make the decision
+  in start-up with the :ref:`--name general option` whether the script is to
+  retrieved from the cache or recreated from the named connection mock script
+  definition.  To do this, it needs knowledge of whether the files that make up
+  the script have been modified since the cache of the repository was created.
+  To do this the files that are used in the script have to be registered with
+  the pywbem provider_dependent_registry. using
+  :meth:`~pywbem_mock:provider_dependent_registry.add_dependents`. This
+  information is saved in the cache.
 
   Finally, mock scripts can be used to add or update CIM objects in the mock
   CIM repository. This is an alternative to specifying MOF files, and can be
@@ -142,8 +148,8 @@ with the mock support. Since the pywbem mock support does not use HTTP(S), only 
 .. _`Creating files for the mock repository`:
 .. _`Setting up the mock WBEM server with a MOF file`:
 
-Setting up the mock WBEM server with a MOF file
------------------------------------------------
+Defining the mock WBEM server with a MOF file
+---------------------------------------------
 
 If the :ref:`--mock-server general option` defines a MOF file, The file
 most consist of DMTF MOF definitions of CIM qualifier declarations, CIM
@@ -225,11 +231,12 @@ Creating a python script provides additional flexibility in defining mock
 environments over just installing MOF files including:
 
 1. The ability to install instance providers to control the processing of
-   specific instance operations (create, modify, delete) on specific classes. This
-   is similar to the definition of providers in WBEM servers such as OpenPegasus
-   which process requests and generate responses to the client in the WBEM server
-   for specific request types and CIM classes.  pywbem provides several prebuilt
-   instance providers that can be installed with the setup script.
+   specific instance operations (create, modify, delete) on specific classes.
+   This is similar to the definition of providers in WBEM servers such as
+   OpenPegasus which process requests and generate responses to the client in
+   the WBEM server for specific request types and CIM classes.  pywbem provides
+   several prebuilt instance providers that can be installed with the setup
+   script.
 
 2. The ability to install CIM qualifier declarations and CIM classes from
    DMTF schemas rather than simply from local MOF files. See
@@ -391,7 +398,7 @@ CIM instances can be created in the mock repository by either:
 .. _`Installing required mock CIM Method providers`:
 
 Installing required mock CIM Method
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Installing any mock CIM Methods that may be required.  Pywbem provides
 support for user-defined mock CIM Methods that that would provide specific
@@ -501,8 +508,10 @@ For example:
 
 .. _`Defining up the startup script interface from pywbemcli`:
 
-Defining the startup script interface from pywbemcli
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Defining the pywbemcli mock script interface
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. index:: single: mock script
 
 Mock scripts can be used for any kind of setup of the mock WBEM server, for
 example for creating namespaces, implementing and registering providers, or
@@ -517,10 +526,13 @@ should operate on depending on the Python version:
     pair: connection definition; cache
     pair: mock-server cache; cache mock-server
     pair: --mock-server; General option
+    pair: mock script; old-style
+    pair: mock script; new-style
 
-1. New-style(Python >=3.5): The mock script has a ``setup()`` function.  This avoids
-   the messiness of using globals and also enables the mock environment of a
-   connection definition to be cached.
+
+1. New-style(Python >=3.5): The mock script has a ``setup()`` function.  This
+   function provides the mock script with information on the mock environment and
+   avoids the messiness of using globals.
 
    New-style mock scripts are imported as a Python module into Python namespace
    ``pywbemtools.pywbemcli.mockscripts.<mock-script-name>`` and their
@@ -633,7 +645,7 @@ default_namespace from a MOF file.
     register_dependents(conn, this_file_path, mof_file)
 
 
-    # Interface from pywbemcli for both old and new interfaces
+    # Interface from pywbemcli for both old-style and new-style interfaces
     if sys.version_info >= (3, 5):
         # New-style setup
 
@@ -655,6 +667,64 @@ default_namespace from a MOF file.
 
         # pylint: disable=undefined-variable
         _setup(CONN, SERVER, VERBOSE)  # noqa: F821
+
+
+.. _`pywbemcli mock WBEM server cache`:
+
+pywbemcli mock WBEM server cache
+--------------------------------
+
+.. index::
+    pair: mock cache; cache
+    pair: mock WBEM server; cache
+
+Pywbemcli provides for caching the mock WBEM server once it has been created
+by the mock script. NOTE: Only mock servers defined for the default connection
+file are saved(i.e. where the the general option  ``-C connection-file-name``
+is **not** used.)
+
+Caching significantly improves the load speed of mock WBEM servers because the
+repository is saved in binary form and any MOF is not recompiled.
+
+Caching is accomplished by the the command
+``pywbemcli connection save <save name>`` that caches the repository, providers,
+etc. defined for the mock script after it has loaded/created.  The optional argument
+<save name> defines the name to be set into the current connection file for
+the cached script. For example, the following command builds a mock WBEM
+server from a mock script and saves it as the name ``mytestserver`` and the
+second pywbemcli execution loads the cached script and displays the
+classes in the default namespace.
+
+.. code-block:: text
+
+    $ pywbemcli --server https://srv1 connection save mytestserver
+
+    $ pywbemcli -n mytestserver class enumerate
+
+    ... Display output of classes in the default namespace
+
+
+Mock server caches for each named connection are saved in the directory ``.pywbemcli_mockcache``
+each in its own subdirectory that includes the connection name.
+
+.. code-block:: text
+
+    $ ls - ltr ~/.pywbemcli_mockcache/
+
+    drwxrwxr-x 2 userblah userblah 4096 Jan  7  2024 6048a3da1a34a3ec605825a1493c7bb5.mockassoc
+    drwxrwxr-x 2 userblah userblah 4096 Jan 12  2024 6048a3da1a34a3ec605825a1493c7bb5.mock1
+
+
+The cache can be deleted at any time without losing information about the cached
+mock WBEM servers since the script and its dependent files must be maintained
+and if the cache does not exist, the mock wbem server definition is used
+to recreate the cache.  NOTE: Therefore it is very important to define all of
+the file dependencies in the mock script.
+
+If any of the dependent files defined in the mock WBEM server script have been
+modified the next execution of pywbemcli updates the cache.
+
+.. index:: pair: examples; mock script
 
 Examples of pywbemcli startup python script
 -------------------------------------------
@@ -759,8 +829,81 @@ The following is an example of the new-style version of mock script
         if verbose:
             conn.display_repository()
 
+This MOF would be used to create a mock WBEM server and save it with the
+command:
+
+.. code-block:: text
+
+    $ pywbemcli -m tst_script.py connection save tst_script
+
+Example setup script new-style with MOF class definition
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The following new-style mock script defines and registers a method provider
+for CIM method "CIM_Foo.Method1()" that modifies property "Property1"
+of the target CIM instance and returns that property in an output parameter
+"OutputParam1":
+
+.. code-block:: python
+
+    from pywbem import CIMInstanceName, CIMError, \\
+        CIM_ERR_INVALID_PARAMETER, CIM_ERR_METHOD_NOT_AVAILABLE
+    from pywbem_mock import MethodProvider
+
+    class CIM_Foo_MethodProvider(MethodProvider):
+
+        provider_classname = 'CIM_Foo'
+
+        def InvokeMethod(self, methodname, localobject, params):
+
+            if methodname.lower() == 'method1':
+                if isinstance(localobject, CIMClassName):
+                    raise CIMError(
+                        CIM_ERR_INVALID_PARAMETER,
+                        f"CIM method {methodname} must be invoked on a "
+                        "CIM instance")
+                return self.Method1(localobject, params)
+            else:
+                raise CIMError(CIM_ERR_METHOD_NOT_AVAILABLE)
+
+        def Method1(self, localobject, params):
+
+            namespace = localobject.namespace
+            instance_store = self.cimrepository.get_instance_store(namespace)
+
+            # Get the instance the method was invoked on, from the CIM
+            # repository (as a copy)
+            instance = instance_store.get(localobject.path)  # a copy
+
+            # Modify a property value in the local copy of the instance
+            if 'Property1' not in instance.properties:
+                instance.properties['Property1'] = 'new'
+            instance.properties['Property1'] += '+'
+
+            # Update the instance in the CIM repository from the changed
+            # local instance
+            instance_store.update(localobject.path, instance)
+
+            # Return the property value in the output parameter
+            outputparam1 = instance.properties['Property1']
+            out_params = [
+                CIMParameter('OutputParam1', type='string', value=outputparam1),
+            ]
+
+            # Set the return value of the CIM method
+            return_value = 0
+
+            return (return_value, out_params)
+
+    def setup(conn, server, verbose):
+        provider = CIM_Foo_MethodProvider(conn.cimrepository)
+        conn.register_provider(provider, conn.default_namespace, verbose=verbose)
+
 Example setup script old-style with MOF file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+NOTE: This old-style script interface is deprecated and will be removed in a
+future version of pywbemtools
 
 The following is a  old-style(deprecated) mock script named ``tst_script.py`` that will add
 the same CIM objects as MOF file ``tst_file.mof`` to the mock repository using
@@ -771,6 +914,8 @@ mock repository will be displayed:
 .. code-block:: python
 
     #!/usr/bin/env python
+
+    # NOTE: old-style script (Deprecated)
 
     from pywbem import CIMQualifierDeclaration, CIMQualifier, CIMClass, \
         CIMProperty, CIMMethod, CIMParameter, CIMInstance, CIMInstanceName, Uint32
@@ -867,7 +1012,6 @@ mock repository will be displayed:
     if __name__ == '__builtin__':
         main()
 
-
 The pywbemcli command to use this mock script, and then to enumerate its
 CIM class names is::
 
@@ -877,70 +1021,6 @@ CIM class names is::
 As you can see, adding CIM objects with a MOF file is more compact than
 doing that in a mock script, but the mock script can contain logic,
 and it allows defining providers.
-
-Example setup script new-style with MOF file
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The following new-style mock script defines and registers a method provider
-for CIM method "CIM_Foo.Method1()" that modifies property "Property1"
-of the target CIM instance and returns that property in an output parameter
-"OutputParam1":
-
-.. code-block:: python
-
-    from pywbem import CIMInstanceName, CIMError, \\
-        CIM_ERR_INVALID_PARAMETER, CIM_ERR_METHOD_NOT_AVAILABLE
-    from pywbem_mock import MethodProvider
-
-    class CIM_Foo_MethodProvider(MethodProvider):
-
-        provider_classname = 'CIM_Foo'
-
-        def InvokeMethod(self, methodname, localobject, params):
-
-            if methodname.lower() == 'method1':
-                if isinstance(localobject, CIMClassName):
-                    raise CIMError(
-                        CIM_ERR_INVALID_PARAMETER,
-                        f"CIM method {methodname} must be invoked on a "
-                        "CIM instance")
-                return self.Method1(localobject, params)
-            else:
-                raise CIMError(CIM_ERR_METHOD_NOT_AVAILABLE)
-
-        def Method1(self, localobject, params):
-
-            namespace = localobject.namespace
-            instance_store = self.cimrepository.get_instance_store(namespace)
-
-            # Get the instance the method was invoked on, from the CIM
-            # repository (as a copy)
-            instance = instance_store.get(localobject.path)  # a copy
-
-            # Modify a property value in the local copy of the instance
-            if 'Property1' not in instance.properties:
-                instance.properties['Property1'] = 'new'
-            instance.properties['Property1'] += '+'
-
-            # Update the instance in the CIM repository from the changed
-            # local instance
-            instance_store.update(localobject.path, instance)
-
-            # Return the property value in the output parameter
-            outputparam1 = instance.properties['Property1']
-            out_params = [
-                CIMParameter('OutputParam1', type='string', value=outputparam1),
-            ]
-
-            # Set the return value of the CIM method
-            return_value = 0
-
-            return (return_value, out_params)
-
-    def setup(conn, server, verbose):
-        provider = CIM_Foo_MethodProvider(conn.cimrepository)
-        conn.register_provider(provider, conn.default_namespace, verbose=verbose)
-
 
 The pywbemtools github tests/unit/pywbemcli directory includes several good
 examples of pywbemcli startup scripts that are used for testing including:
@@ -962,7 +1042,6 @@ examples of pywbemcli startup scripts that are used for testing including:
    installing the namespace provider and subscription providers,
    and installing sample profiles, central classes, and the
    association classes for profile traversing.
-
 
 .. index::
     pair: mock WBEM server; cache mock WBEM server
