@@ -26,7 +26,7 @@ with the particular subject.
 
 import click
 
-from .._click_extensions import GENERAL_OPTS_TXT, TabCompleteArgument
+from .._click_extensions import GENERAL_OPTS_TXT
 
 from .pywbemlistener import cli
 from .._options import add_options, help_option
@@ -50,7 +50,6 @@ def help_arg_subject_shell_completer(ctx, param, incomplete):
 @cli.command('help', options_metavar=GENERAL_OPTS_TXT)
 @click.argument('subject', type=str,
                 metavar='SUBJECT',
-                cls=TabCompleteArgument,
                 shell_complete=help_arg_subject_shell_completer,
                 required=False)  # pylint: disable=no-member
 @add_options(help_option)

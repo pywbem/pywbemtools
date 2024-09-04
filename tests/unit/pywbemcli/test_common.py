@@ -18,19 +18,16 @@
 Tests for _common.py functions.
 """
 
-
-import sys
 import os
 from unittest.mock import patch
 
-from packaging.version import parse as parse_version
 import click
 from nocaselist import NocaseList
 import pytest
 
 from pywbem import CIMClass, CIMProperty, CIMQualifier, CIMInstance, \
     CIMQualifierDeclaration, CIMInstanceName, Uint8, \
-    CIMClassName, CIMMethod, CIMParameter, __version__, MOFCompiler, \
+    CIMClassName, CIMMethod, CIMParameter, MOFCompiler, \
     ToleratedSchemaIssueWarning
 
 from pywbem._mof_compiler import MOFWBEMConnection
@@ -56,19 +53,6 @@ OK = True     # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 SKIP = False  # mark tests that are to be skipped.
-
-# Click (as of 7.1.2) raises UnsupportedOperation in click.echo() when
-# the pytest capsys fixture is used. That happens only on Windows.
-# See Click issue https://github.com/pallets/click/issues/1590. This
-# run condition skips the testcases on Windows.
-CLICK_ISSUE_1590 = sys.platform == 'win32'
-
-_PYWBEM_VERSION = parse_version(__version__)
-# pywbem 1.0.0b1 or later
-PYWBEM_1_0_0B1 = _PYWBEM_VERSION.release >= (1, 0, 0) and \
-    _PYWBEM_VERSION.dev is None
-# pywbem 1.0.0 (dev, beta, final) or later
-PYWBEM_1_0_0 = _PYWBEM_VERSION.release >= (1, 0, 0)
 
 # A mof file that defines basic qualifier decls, classes, and instances
 # but not tied to the DMTF classes.

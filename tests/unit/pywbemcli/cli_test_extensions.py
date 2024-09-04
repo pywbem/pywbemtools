@@ -10,28 +10,15 @@ from contextlib import contextmanager
 import yaml
 import pytest
 
-# import pkgs to determine pywbem version
-import packaging.version
-import pywbem
 from pywbem_mock import FakedWBEMConnection
 
 from ..utils import execute_command, assert_rc, assert_patterns, assert_lines
 
 TEST_DIR = os.path.dirname(__file__)
 
-# Boolean Variable that can be in individual tests to determine tests are to
-# be executed.  Returns True if the pywbem >=1.0.0 is use. Otherwise returns
-# False. These variables can be applied to tests that are specific to one
-# version of pywbem or the other
-PYWBEM_VERSION = packaging.version.parse(pywbem.__version__)
-PYWBEM_1 = PYWBEM_VERSION.release >= (1, 0, 0)
-PYWBEM_0 = not PYWBEM_1
 
-
-# This variable defines the url returned from some of the commands.  Since it
-# is changed with pywbem 1.0.0 to include the port number, we must dynamically
-# create it for the tests depending on pywbem version
-FAKEURL_STR = '//FakedUrl:5988' if PYWBEM_1 else '//FakedUrl'
+# This variable defines the url returned from some of the commands.
+FAKEURL_STR = '//FakedUrl:5988'
 
 
 class CLITestsBase:

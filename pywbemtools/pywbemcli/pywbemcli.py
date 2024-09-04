@@ -1038,14 +1038,6 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
         display_click_context(ctx, msg="DIAGNOSTICS-NEWCTX: Initial context:",
                               display_attrs=True)
 
-    # FIXIT Remove this since py 2.7
-    _python_nm = sys.version_info[0:2]
-    if _python_nm in ((2, 7),):
-        pywbemtools_warn(
-            f"Pywbemcli support for Python {_python_nm[0]}.{_python_nm[1]} is "
-            "deprecated and will be removed in a future version",
-            DeprecationWarning)
-
     # If no invoked_subcommand, there is no command to execute this flag
     # causes us to start interactive mode
     if ctx.invoked_subcommand is None:

@@ -20,11 +20,10 @@ fold_strings which is in test_tableformat.py.
 """
 
 
-from packaging.version import parse as parse_version
 import click
 import pytest
 
-from pywbem import CIMInstanceName, Uint8, __version__
+from pywbem import CIMInstanceName, Uint8
 try:
     from pywbem import MissingKeybindingsWarning
 except ImportError:
@@ -36,10 +35,6 @@ from pywbemtools._output_formatting import validate_output_format, \
 from .pytest_extensions import simplified_test_function
 
 # pylint: disable=use-dict-literal
-
-_PYWBEM_VERSION = parse_version(__version__)
-# pywbem 1.0.0 (dev, beta, final) or later
-PYWBEM_1_0_0 = _PYWBEM_VERSION.release >= (1, 0, 0)
 
 
 TESTCASES_VALID_OUTPUT_FORMAT = [
@@ -310,18 +305,7 @@ TESTCASES_FORMAT_KEYS = [
           width=100,
           exp_rtn='Boolean=FALSE,Name="Foo",Number=42,'
           'Ref="/:CIM_Bar.Chicken=\\"Ham\\""'),
-     None, None, PYWBEM_1_0_0),
-
-    ('Verify multiple unsorted keys binding multiple key types, pywbem <1.0',
-     dict(kb=[('Name', 'Foo'),
-              ('Number', Uint8(42)),
-              ('Boolean', False),
-              ('Ref', CIMInstanceName('CIM_Bar',
-                                      keybindings={'Chicken': 'Ham'}))],
-          width=100,
-          exp_rtn='Name="Foo",Number=42,Boolean=FALSE,'
-          'Ref="/:CIM_Bar.Chicken=\\"Ham\\""'),
-     None, None, not PYWBEM_1_0_0),
+     None, None, True),
 
     ('Verify mutliple keys that fold into multiple lines',
      dict(kb=[('kEY1', 'Ham'), ('key2', 3)],
