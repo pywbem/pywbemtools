@@ -244,14 +244,14 @@ def connection_test(context, **options):
 @click.argument('name', type=str, metavar='NAME', required=True)
 @click.option('-f', '--set-default', is_flag=True,
               default=False,
-              help="Set this definition as the default definition "
-              "that will be loaded upon pywbemcli startup if no server or name "
-              "is included on the command line.")
+              help="Set this definition as the default definition. "
+              "That connection will be loaded upon pywbemcli startup if no "
+              "server or name is included on the command line.")
 @add_options(help_option)
 @click.pass_obj
 def connection_save(context, name, **options):
     """
-    Save the current connection to a new WBEM connection definition.
+    Save the current connection parameters to a named WBEM connection.
 
     Save the current connection to the connections file as a connection
     definition named NAME. The NAME argument is required.
