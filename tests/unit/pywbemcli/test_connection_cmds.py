@@ -88,15 +88,16 @@ CONNECTION_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] connection COMMAND [ARGS] [COMMAND-OPTIONS]',  # noqa: E501
     'Command group for WBEM connection definitions.',
     CMD_OPTION_HELP_HELP_LINE,
-    'delete  Delete a WBEM connection definition.',
     'export  Export the current connection.',
-    'list    List the WBEM connection definitions.',
-    'save    Save the current connection to a new WBEM connection',
-    'select  Select a WBEM connection definition as current or default.',
     'show    Show a WBEM connection definition or the current connection.',
+    'delete  Delete a WBEM connection definition.',
+    'select  Select a WBEM connection definition as current or default.',
     'test    Test the current connection with a predefined WBEM request.',
+    'save    Save the current connection parameters to a named WBEM connection.',  # noqa: E501
+    'list    List the WBEM connection definitions.',
     'set-default Set a connection as the default connection.'
 ]
+
 
 CONNECTION_DELETE_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] connection delete NAME '
@@ -120,7 +121,7 @@ CONNECTION_LIST_HELP_LINES = [
 
 CONNECTION_SAVE_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] connection save NAME [COMMAND-OPTIONS]',
-    'Save the current connection to a new WBEM connection definition.',
+    'Save the current connection parameters to a named WBEM connection.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 

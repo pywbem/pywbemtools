@@ -359,6 +359,17 @@ This documentation uses a few special terms to refer to Python types:
       <ALT-f> will insert the first word of the suggestion.  This capability is
       implemented only in the interactive mode of pywbemcli.
 
+   WBEM provider
+      A WBEM provider has two possible definitions.  SNIA defines a WBEM
+      provider as a WBEM server environment that includes all the elements of a
+      WBEM server server infrastructure, server repository for CIM objects,
+      elements that generate responses for particular CIM classes, etc.).
+      However, DMTF defines a WBEM provider as a component of a WBEM server
+      that manages the objects and generates responses for a particular CIM
+      class. Thus you would have a provider for the CIM_Namespace class as a
+      component of a WBEM server. In this document a WBEM provider is
+      considered the provider for a single WBEM class.
+
 
 .. _`Profile advertisement methodologies`:
 

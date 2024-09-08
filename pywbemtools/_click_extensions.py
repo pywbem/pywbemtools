@@ -98,7 +98,7 @@ class PywbemtoolsTopGroup(click.Group):
         This happens only for the top level commands/groups because this is the
         class override for click.Group ONLY with the top group.
         """
-        # Sort because thier is no particular order for the groups
+        # Sort because their is no particular order for the groups
         cmd_list = sorted(self.commands.keys())
         # Reorder commands list so the move_to_end list commands are at bottom
         #  of list. This displays them at the bottom of the list of commands in

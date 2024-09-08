@@ -296,7 +296,7 @@ class BuildMockenvMixin:
     """
     Mixin class for pywbem_mock.FakedWBEMConnection that adds the ability to
     build the mock environment of a connection from a connection definition in
-    a connections file.
+    a connections file and input files that define the model and mock setup.
     """
 
     def build_mockenv(self, server, file_path_list, connections_file,
