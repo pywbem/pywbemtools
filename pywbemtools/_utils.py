@@ -26,7 +26,14 @@ import inspect
 from datetime import datetime
 from unittest import mock
 
+from click import Abort
+
 __all__ = []
+
+
+# Env var that, if it exists, defines an alternate directory in which
+# the default connection file and connection cache directory are defined.
+ALT_FILES_DIR_ENVVAR = 'PYWBEMCLI_ALT_FILES_HOME_DIR'
 
 # Env var for overriding the terminal width
 TERMWIDTH_ENVVAR = 'PYWBEMTOOLS_TERMWIDTH'
@@ -52,14 +59,43 @@ CONNECTIONS_FILENAME = '.pywbemcli_connections.yaml'
 B08_CONNECTIONS_FILENAME = 'pywbemcli_connection_definitions.yaml'
 
 # Path name of default connections file directory.
-DEFAULT_CONNECTIONS_DIR = os.path.expanduser("~")
 
+
+# Dynamically build the directory name for the directory that will contain the
+# default connections file and the mockcache directory based on an environment
+# variable. Save the result in variable DEFAULT_CONNECTIONS_DIR.
+#
+# Gets the directory name from the environment variable value or if the env var
+# does not exist, it gets the user home directory.
+# This environment varvariable provides an tool to define an alternate
+# location for the directory containing the default connection file and
+# connection cache and is used in pywbemcli unit test. If no directory exists
+# it builds an empty directory.
+DEFAULT_CONNECTIONS_DIR = None
+if os.getenv(ALT_FILES_DIR_ENVVAR):
+
+    alt_home_dir_path = os.getenv(ALT_FILES_DIR_ENVVAR)
+    if os.path.isdir(alt_home_dir_path):
+        DEFAULT_CONNECTIONS_DIR = alt_home_dir_path
+    else:
+        try:
+            os.makedirs(alt_home_dir_path)
+        except OSError as oe:
+            raise Abort(f"Alternate files home path: {alt_home_dir_path} "
+                        "defined by envvar "
+                        f"{ALT_FILES_DIR_ENVVAR} failed. Exception {oe}")
+else:
+    DEFAULT_CONNECTIONS_DIR = os.path.expanduser("~")
+
+assert DEFAULT_CONNECTIONS_DIR is not None  # TODO remove this
 # Path name of default connections file
 # The B08_* path name was used before pywbemcli 0.8.
 DEFAULT_CONNECTIONS_FILE = os.path.join(DEFAULT_CONNECTIONS_DIR,
                                         CONNECTIONS_FILENAME)
 B08_DEFAULT_CONNECTIONS_FILE = os.path.join(DEFAULT_CONNECTIONS_DIR,
                                             B08_CONNECTIONS_FILENAME)
+MOCKCACHE_ROOT_DIR = os.path.join(DEFAULT_CONNECTIONS_DIR,
+                                  '.pywbemcli_mockcache')
 
 
 def ensure_bytes(obj):

@@ -24,8 +24,6 @@ renamed for the test and restored at the end of the test.
 import os
 import pytest
 
-from pywbemtools._utils import CONNECTIONS_FILENAME
-
 from .cli_test_extensions import CLITestsBase
 from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE
 
@@ -51,7 +49,9 @@ def GET_TEST_PATH_STR(filename):  # pylint: disable=invalid-name
 
 
 # Test connections file used in some testcases
-TEST_CONNECTIONS_FILE_PATH = 'tmp_general_options.yaml'
+TEST_CONNECTIONS_FILE_NAME = 'tmp_general_options.yaml'
+TEST_CONNECTIONS_FILE_PATH = str(os.path.join(TEST_DIR_REL,
+                                              TEST_CONNECTIONS_FILE_NAME))
 TEST_CONNECTIONS_FILE_DICT = {
     'connection_definitions': {
         'blah': {
@@ -78,10 +78,11 @@ TEST_CONNECTIONS_FILE_DICT = {
 
 MOCK_DEFINITION_ENVVAR = 'PYWBEMCLI_STARTUP_SCRIPT'
 MOCK_PROMPT_0_FILE = "mock_prompt_0.py"
+MOCK_PROMPT_0_FILE_PATH = os.path.join(TEST_DIR_REL, MOCK_PROMPT_0_FILE)
 
 # Get the relative path to the current directory.  This presumes that the
 # test was run from the pywbemtools directory
-MOCK_FILE_PATH = os.path.join(TEST_DIR_REL, SIMPLE_MOCK_FILE)
+SIMPLE_MOCK_FILE_PATH = os.path.join(TEST_DIR_REL, SIMPLE_MOCK_FILE)
 
 CONNECTION_HELP_LINES = [
     # pylint: disable=line-too-long
@@ -307,7 +308,8 @@ TEST_CASES = [
      None, OK],
 
     ['Verify --mock-server and --server together fail.',
-     {'general': ['--mock-server', MOCK_FILE_PATH, '--server', 'http://blah'],
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+                  '--server', 'http://blah'],
       'args': ['list']},
      {'stderr': ["Conflicting options: `mock-server` is mutually exclusive "
                  "with options: (--name, --server)"],
@@ -829,7 +831,7 @@ ca-certs
     # Begin of sequence - repository is empty.
 
     ['Verify mock connection exists. SEQ 3.1',
-     {'general': ['--mock-server', MOCK_FILE_PATH],
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH],
       'args': ['save', 'mocktest']},
      {'stdout': "",
       'test': 'lines',
@@ -865,7 +867,7 @@ ca-certs
     ['Verify connection command select mocktest with prompt. SEQ 3.4',
      {'general': [],
       'args': ['select'],
-      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PROMPT_0_FILE)}},
+      'env': {MOCK_DEFINITION_ENVVAR: MOCK_PROMPT_0_FILE_PATH}},
      {'stdout': "",
       'test': 'in',
       'file': {'before': 'exists', 'after': 'exists'}},
@@ -874,7 +876,7 @@ ca-certs
     ['Verify connection command show with prompt. SEQ 3.5',
      {'general': [],
       'args': ['show', '?'],
-      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PROMPT_0_FILE)}},
+      'env': {MOCK_DEFINITION_ENVVAR: MOCK_PROMPT_0_FILE_PATH}},
      {'stdout': ['name mocktest'],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
@@ -884,14 +886,14 @@ ca-certs
      'SEQ 3.6',
      {'general': [],
       'args': ['delete'],
-      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PROMPT_0_FILE)}},
+      'env': {MOCK_DEFINITION_ENVVAR: MOCK_PROMPT_0_FILE_PATH}},
      {'stdout': ['Deleted connection "mocktest"'],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'none'}},
      None, OK],
 
     ['Verify Add mock server to empty connections file. SEQ 3.7',
-     {'general': ['--mock-server', MOCK_FILE_PATH],
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH],
       'args': ['save', 'mocktest']},
      {'stdout': "",
       'test': 'lines',
@@ -935,7 +937,7 @@ ca-certs
     ['Verify save mock server with cmd line params to empty connections file. '
      'SEQ 4.2',
      {'args': ['save', 'mocktest2'],
-      'general': ['--mock-server', MOCK_FILE_PATH,
+      'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
                   '--use-pull', 'no',
                   '--pull-max-cnt', '222',
                   '--default-namespace', 'root/blah', ]},
@@ -1006,7 +1008,8 @@ ca-certs
     ['Verify connection show ? with no server definitions file fails. SEQ 6.2',
      {'general': ['--server', 'http://blah'],
       'args': ['show', "?"]},
-     {'stderr': ["Connections file ", ".pywbemcli_connections.yaml",
+     {'stderr': ["Connections file ",
+                 "tests/unit/pywbemcli/tmp_general_options.yaml",
                  "does not exist"],
       'rc': 1,
       'test': 'innows',
@@ -1055,7 +1058,6 @@ ca-certs
       'general': ['--output-format', 'table', '--server', 'http://blah']},
      {'stdout': ['WBEM server connections(brief): (#: default, *: current)',
                  'file:',
-                 CONNECTIONS_FILENAME,
                  '+------------+-------------+---------------+',
                  '| name       | server      | mock-server   |',
                  '|------------+-------------+---------------|',
@@ -1089,7 +1091,7 @@ ca-certs
      {'stdout': ['not-saved', 'https://blahblahblah'],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
-     None, FAIL],
+     None, OK],
 
     ['Verify connection delete svrtest. SEQ 7.6, last',
      {'args': ['delete', 'svrtest'],
@@ -1206,7 +1208,7 @@ ca-certs
 
     ['Create mock server definition. SEQ 10.1',
      {'args': ['save', 'mocktest3'],
-      'general': ['--mock-server', MOCK_FILE_PATH]},
+      'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH]},
      {'stdout': "",
       'test': 'innows',
       'file': {'before': 'none', 'after': 'exists'}},
@@ -1361,8 +1363,7 @@ class TestSubcmdClass(CLITestsBase):
     @pytest.mark.parametrize(
         "desc, inputs, exp_response, mock, condition",
         TEST_CASES)
-    def test_connection(self, desc, inputs, exp_response, mock, condition,
-                        default_connections_file_path):
+    def test_connection(self, desc, inputs, exp_response, mock, condition):
         """
         Common test method for those commands and options in the
         connection command group that can be tested.  Note the
@@ -1371,8 +1372,8 @@ class TestSubcmdClass(CLITestsBase):
         restore it after the test.
         """
         # Where is this file to be located for tests.  It defines the
-        # default file location and name
-        connections_file = default_connections_file_path
+        # default connections file location and name
+        connections_file = TEST_CONNECTIONS_FILE_PATH
 
         def test_file_existence(file_test):
             """
@@ -1424,7 +1425,8 @@ class TestSubcmdClass(CLITestsBase):
                 test_file_existence(exp_response['file']['after'])
 
 #
-#   Test invalid connection file
+#   Test invalid connection file. Each test creates a connection file with
+#   the yaml defined.
 #
 
 
@@ -1482,9 +1484,8 @@ default_connection_name: THISISBADNAME
 """
 
 # Local connections file to be built for errors test.
-SCRIPT_DIR = os.path.dirname(__file__)
-CONNECTION_REPO_TEST_FILE_PATH = os.path.join(SCRIPT_DIR,
-                                              'tst_connection_cmds.yaml')
+CONNECTION_REPO_TEST_ERR_FILE_PATH = os.path.join(
+    SCRIPT_DIR, 'tst_err_connection_cmds.yaml')
 
 
 @pytest.fixture()
@@ -1492,13 +1493,13 @@ def remove_file_before_after():
     """
     Remove the connections file at beginning and end of test.
     """
-    if os.path.isfile(CONNECTION_REPO_TEST_FILE_PATH):
-        os.remove(CONNECTION_REPO_TEST_FILE_PATH)
+    if os.path.isfile(CONNECTION_REPO_TEST_ERR_FILE_PATH):
+        os.remove(CONNECTION_REPO_TEST_ERR_FILE_PATH)
     # The yield causes the remainder of this fixture to be executed at the
     # end of the test.
     yield
-    if os.path.isfile(CONNECTION_REPO_TEST_FILE_PATH):
-        os.remove(CONNECTION_REPO_TEST_FILE_PATH)
+    if os.path.isfile(CONNECTION_REPO_TEST_ERR_FILE_PATH):
+        os.remove(CONNECTION_REPO_TEST_ERR_FILE_PATH)
 
 
 TEST_CASES_ERROR = [
@@ -1523,10 +1524,10 @@ TEST_CASES_ERROR = [
 
     ['Verify yaml file with key for the connections definitions missing fails',
      {'args': ['show'],
-      'general': [],
+      'general': ['--connections-file', CONNECTION_REPO_TEST_ERR_FILE_PATH],
       'yaml': YAML_NO_CONNECTIONS_KEY},
      {'stderr': ['ConnectionsFileLoadError',
-                 'tst_connection_cmds.yaml',
+                 'tst_err_connection_cmds.yaml',
                  'Missing YAML property',
                  'connection_definitions',
                  'Aborted'],
@@ -1536,10 +1537,10 @@ TEST_CASES_ERROR = [
 
     ['Verify YAML with bad default_connection_name fails',
      {'args': ['show'],
-      'general': [],
+      'general': ['--connections-file', CONNECTION_REPO_TEST_ERR_FILE_PATH],
       'yaml': YAML_BAD_DEFAULT_NAME},
      {'stderr': ['ConnectionsFileLoadError',
-                 'tst_connection_cmds.yaml',
+                 'tst_err_connection_cmds.yaml',
                  'Invalid attribute type in connection definition',
                  'tst1',
                  'timeoutx',
@@ -1551,10 +1552,10 @@ TEST_CASES_ERROR = [
 
     ['Verify YAML with bad attribute name in definition fails',
      {'args': ['show'],
-      'general': [],
+      'general': ['--connections-file', CONNECTION_REPO_TEST_ERR_FILE_PATH],
       'yaml': YAML_BAD_ATTRIBUTE_NAME},
      {'stderr': ['ConnectionsFileLoadError',
-                 'tst_connection_cmds.yaml',
+                 'tst_err_connection_cmds.yaml',
                  'Invalid attribute type in connection definition',
                  'tst1',
                  'unexpected keyword argument',
@@ -1564,7 +1565,6 @@ TEST_CASES_ERROR = [
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
-
 ]
 
 
@@ -1588,11 +1588,11 @@ class TestSubcmdClassError(CLITestsBase):
         restore it after the test.
         """
         # Create the connection file from the yaml
-        with open(CONNECTION_REPO_TEST_FILE_PATH, "w", encoding='utf-8') \
+        connections_file = CONNECTION_REPO_TEST_ERR_FILE_PATH
+
+        with open(connections_file, "w", encoding='utf-8') \
                 as repo_file:
             repo_file.write(inputs['yaml'])
-
-        connections_file = CONNECTION_REPO_TEST_FILE_PATH
 
         def test_file_existence(file_test):
             """
@@ -1618,6 +1618,7 @@ class TestSubcmdClassError(CLITestsBase):
         if not condition:
             pytest.skip("Condition for test case not met")
 
+        # test locally because we are testing for file existence here
         if condition == 'pdb':
             import pdb  # pylint: disable=import-outside-toplevel
             pdb.set_trace()  # pylint: disable=forgotten-debug-statement
@@ -1625,12 +1626,6 @@ class TestSubcmdClassError(CLITestsBase):
         if 'file' in exp_response:
             if 'before' in exp_response['file']:
                 test_file_existence(exp_response['file']['before'])
-        if 'general' in inputs:
-            inputs['general'].extend(['--connections-file', connections_file])
-        else:
-            inputs = {"args": inputs}
-            inputs['general'] = ['--connections-file', connections_file]
-        assert '--connections-file' in inputs['general']
 
         self.command_test(desc, self.command_group, inputs, exp_response,
                           mock, condition)

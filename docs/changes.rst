@@ -39,6 +39,10 @@ Released: not yet
   on differences between pywbem 1.0.0 and earlier versions of python.
   (issue #1405)
 
+* Refactor pywbemcli tests to avoid hiding the default connection file.
+  An environment variable defines an alternate directory
+  for the connection file and mockcache during pywbemcli tests. (issue # 1423)
+
 **Known issues:**
 
 * See `list of open issues`_.

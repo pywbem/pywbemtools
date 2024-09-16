@@ -16,9 +16,15 @@ from ..utils import execute_command, assert_rc, assert_patterns, assert_lines
 
 TEST_DIR = os.path.dirname(__file__)
 
-
 # This variable defines the url returned from some of the commands.
 FAKEURL_STR = '//FakedUrl:5988'
+
+# This variable defines the name of the environment variable that defines
+# the alternate directory used in place of user home for the default connection
+# file and mockcache directory for testing.  This eliminates the possible
+# overwrite of user default connection file and modification of any user
+# mockcache unit tests.
+PYWBEMCLI_ALT_FILES_HOME_DIR = 'PYWBEMCLI_ALT_FILES_HOME_DIR'
 
 
 class CLITestsBase:
@@ -27,9 +33,14 @@ class CLITestsBase:
         Defines methods to execute tests on pywbemcli.
 
     """
+    # Define the location of the directory containing default connection file
+    # and mockcache root directory for pywbemcli tests.
+    test_data_files_dir = os.path.join(TEST_DIR, PYWBEMCLI_ALT_FILES_HOME_DIR)
+
     def command_test(self, desc, command_grp, inputs, exp_response, mock_files,
                      condition, verbose=False):
         # pylint: disable=line-too-long, no-self-use
+        # pylint: disable=too-many-positional-arguments
         """
         Test method to execute test on pywbemcli by calling the executable
         pywbemcli for the command defined by command with arguments defined
@@ -198,6 +209,7 @@ class CLITestsBase:
         stdin = None
         general_args = None
         connections_file_args = (None, None)
+
         if isinstance(inputs, dict):
             connections_file_args = inputs.get(
                 "connections_file_args", (None, None))
@@ -261,10 +273,17 @@ class CLITestsBase:
         if not verbose:
             verbose = condition == 'verbose'
 
+        # Set env var that defines the location of the test default connections
+        # file and corresponding cache directory
+        os.environ['PYWBEMCLI_ALT_FILES_HOME_DIR'] = \
+            CLITestsBase.test_data_files_dir
+
         with connections_file(*connections_file_args):
             rc, stdout, stderr = execute_command(
                 'pywbemcli', cmd_line, env=env, stdin=stdin, verbose=verbose,
                 capture=capture)
+
+        assert PYWBEMCLI_ALT_FILES_HOME_DIR in os.environ
 
         exp_rc = exp_response['rc'] if 'rc' in exp_response else 0
         assert_rc(exp_rc, rc, stdout, stderr, desc)

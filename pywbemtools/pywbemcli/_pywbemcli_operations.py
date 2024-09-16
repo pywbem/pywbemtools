@@ -37,7 +37,8 @@ import pywbem
 import pywbem_mock
 
 from .config import DEFAULT_MAXPULLCNT
-from .._utils import ensure_bytes, ensure_unicode, DEFAULT_CONNECTIONS_FILE
+from .._utils import ensure_bytes, ensure_unicode, DEFAULT_CONNECTIONS_FILE, \
+    MOCKCACHE_ROOT_DIR
 from . import mockscripts
 
 PYWBEM_VERSION = packaging.version.parse(pywbem.__version__)
@@ -384,12 +385,11 @@ class BuildMockenvMixin:
         # which is required for caching.
         if connections_file == DEFAULT_CONNECTIONS_FILE:
 
-            cache_rootdir = mockcache_rootdir()
-            if not os.path.isdir(cache_rootdir):
-                os.mkdir(cache_rootdir)
+            if not os.path.isdir(MOCKCACHE_ROOT_DIR):
+                os.mkdir(MOCKCACHE_ROOT_DIR)
 
             cache_dir = mockcache_cachedir(
-                cache_rootdir, connections_file, connection_name)
+                MOCKCACHE_ROOT_DIR, connections_file, connection_name)
             if not os.path.isdir(cache_dir):
                 os.mkdir(cache_dir)
 
@@ -712,14 +712,6 @@ class PYWBEMCLIFakedConnection(BuildMockenvMixin,
         super().__init__(*args, **kwargs)
 
 
-def mockcache_rootdir():
-    """
-    Return the directory path of the mock cache root directory.
-    """
-    dir_path = os.path.join(os.path.expanduser('~'), '.pywbemcli_mockcache')
-    return dir_path
-
-
 def mockcache_cachedir(rootdir, connections_file, connection_name):
     """
     Return the directory path of the mock cache directory for a connection.
@@ -758,7 +750,7 @@ def delete_mock_cache(connections_file, connection_name):
       OSError: Mock cache cannot be deleted.
     """
     cache_dir = mockcache_cachedir(
-        mockcache_rootdir(), connections_file, connection_name)
+        MOCKCACHE_ROOT_DIR, connections_file, connection_name)
     if os.path.isdir(cache_dir):
         file_list = glob.glob(os.path.join(cache_dir, '*'))
         for _file in file_list:
