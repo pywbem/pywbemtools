@@ -26,7 +26,14 @@ import inspect
 from datetime import datetime
 from unittest import mock
 
+from click import echo, Abort
+
 __all__ = []
+
+
+# Env var that, if it exists, defines an alternate directory in which
+# the default connection file and connection cache directory are defined.
+ALT_FILES_DIR_ENVVAR = 'PYWBEMCLI_ALT_FILES_HOME_DIR'
 
 # Env var for overriding the terminal width
 TERMWIDTH_ENVVAR = 'PYWBEMTOOLS_TERMWIDTH'
@@ -53,6 +60,40 @@ B08_CONNECTIONS_FILENAME = 'pywbemcli_connection_definitions.yaml'
 
 # Path name of default connections file directory.
 DEFAULT_CONNECTIONS_DIR = os.path.expanduser("~")
+
+# def get_default_connections_dir():
+"""
+Get base directory for connection file and connection cache directory.
+This either gets the directory from the defined env var or if the
+env var does not exist, it gets the user home directory.
+
+The env var providesan alternative definition of the directory for connection
+file and connection cache based on the value in the env var to allow testing
+pywbemcli in a spearate file environment. Note that the alternate directory
+must exist.
+"""
+if os.getenv(ALT_FILES_DIR_ENVVAR):
+    alt_home_dir_path = os.getenv(ALT_FILES_DIR_ENVVAR)
+    if os.path.isdir(alt_home_dir_path):
+        # echo(f"Using directory {alt_home_dir_path} as home for files")
+
+        # return alt_home_dir_path
+        DEFAULT_CONNECTIONS_DIR = alt_home_dir_path
+    elif os.path.isfile(alt_home_dir_path):
+        raise Abort(
+            f"Alt files home path: {alt_home_dir_path} defined by envvar "
+            f"{ALT_FILES_DIR_ENVVAR} is a file.")
+    else:
+        try:
+            os.makedirs(alt_home_dir_path)
+            # return alt_home_dir_path
+        except OSError as oe:
+            raise Abort(f"Alternate files home path: {alt_home_dir_path} "
+                        "defined by envvar "
+                        f"{ALT_FILES_DIR_ENVVAR} failed. Exception {oe}")
+
+    # return os.path.expanduser("~")
+
 
 # Path name of default connections file
 # The B08_* path name was used before pywbemcli 0.8.

@@ -30,8 +30,7 @@ import pytest
 import pywbem
 
 from pywbemtools.pywbemcli._pywbemcli_operations import PYWBEMCLIFakedConnection
-from pywbemtools._utils import ensure_unicode, \
-    DEFAULT_CONNECTIONS_FILE
+from pywbemtools._utils import ensure_unicode, DEFAULT_CONNECTIONS_FILE
 from pywbemtools.pywbemcli.mockscripts import DeprecatedSetupWarning, \
     SetupNotSupportedError
 
