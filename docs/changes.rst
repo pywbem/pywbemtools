@@ -20,6 +20,10 @@ Released: not yet
 
 * Fixed new issues reported by Pylint 3.2.
 
+* Test: Fixed the issue that coveralls was not found in the test workflow on MacOS
+  with Python 3.9-3.11, by running it without login shell. Added Python 3.11 on
+  MacOS to the normal tests.
+
 * For Python 3.6 and 3.7, changed macos-latest back to macos-12 because
   macos-latest got upgraded from 12 to 14 and no longer supports Python 3.6
   and 3.7.
