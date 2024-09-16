@@ -24,6 +24,10 @@ Released: not yet
 
 * Fixed new issues reported by Pylint 3.2.
 
+* Test: Fixed the issue that coveralls was not found in the test workflow on MacOS
+  with Python 3.9-3.11, by running it without login shell. Added Python 3.11 on
+  MacOS to the normal tests.
+
 **Enhancements:**
 
 * Development: Changed release process to use a GitHub Actions workflow
