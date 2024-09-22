@@ -18,7 +18,7 @@ Released: not yet
 
 * Addressed safety issues up to 2024-08-18.
 
-* Fixed new issues reported by Pylint 3.2.
+* Fixed new issues reported by Pylint 3.2 and 3.3.
 
 * Test: Fixed the issue that coveralls was not found in the test workflow on MacOS
   with Python 3.9-3.11, by running it without login shell. Added Python 3.11 on
