@@ -39,6 +39,9 @@ Released: not yet
   on differences between pywbem 1.0.0 and earlier versions of python.
   (issue #1405)
 
+* add too-many-positional-arguments to list of ignored pylint messages at least
+  temporarily.
+
 **Known issues:**
 
 * See `list of open issues`_.
