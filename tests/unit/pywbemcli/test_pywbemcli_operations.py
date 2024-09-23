@@ -52,11 +52,6 @@ PYWBEM_VERSION = packaging.version.parse(pywbem.__version__)
 
 URLLIB3_VERSION = packaging.version.parse(urllib3.__version__)
 
-# Click (as of 7.1.2) raises UnsupportedOperation in click.echo() when
-# the pytest capsys fixture is used. That happens only on Windows.
-# See Click issue https://github.com/pallets/click/issues/1590. This
-# run condition skips the testcases on Windows.
-CLICK_ISSUE_1590 = sys.platform == 'win32'
 
 SCRIPT_DIR = os.path.dirname(__file__)
 USER_CONNECTIONS_FILE = os.path.join(SCRIPT_DIR, '.user_connections_file.yaml')
@@ -503,7 +498,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_stdout_lines_all=False,
             exp_stderr_lines=[],
         ),
-        None, DeprecatedSetupWarning, not CLICK_ISSUE_1590
+        None, DeprecatedSetupWarning, OK
     ),
     (
         "Mock env with MOF file and old-style mock script, "
@@ -528,7 +523,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_stdout_lines_all=False,
             exp_stderr_lines=[],
         ),
-        None, DeprecatedSetupWarning, not CLICK_ISSUE_1590
+        None, DeprecatedSetupWarning, OK
     ),
     (
         "Mock env with MOF file and old-style mock script, "
@@ -553,8 +548,7 @@ TESTCASES_BUILD_MOCKENV = [
         # preparation for executing the code to be tested. If the mock env is
         # not cached, there is no pkl file that can be removed, so this
         # testcase is skipped when the mock env cannot be cached.
-        None, DeprecatedSetupWarning,
-        NEWSTYLE_SUPPORTED and not CLICK_ISSUE_1590
+        None, DeprecatedSetupWarning, OK
     ),
     (
         "Mock env with MOF file and old-style mock script, "
@@ -580,7 +574,7 @@ TESTCASES_BUILD_MOCKENV = [
         # not cached, there is no md5 file that can be removed, so this
         # testcase is skipped when the mock env cannot be cached.
         None, DeprecatedSetupWarning,
-        NEWSTYLE_SUPPORTED and not CLICK_ISSUE_1590
+        NEWSTYLE_SUPPORTED
     ),
     (
         "Mock env with MOF file and old-style mock script, "
@@ -606,7 +600,7 @@ TESTCASES_BUILD_MOCKENV = [
         # not cached, there is no dep file that can be removed, so this
         # testcase is skipped when the mock env cannot be cached.
         None, DeprecatedSetupWarning,
-        NEWSTYLE_SUPPORTED and not CLICK_ISSUE_1590
+        NEWSTYLE_SUPPORTED
     ),
     (
         "Mock env with MOF file and old-style mock script, "
@@ -632,7 +626,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_stdout_lines_all=False,
             exp_stderr_lines=[],
         ),
-        None, DeprecatedSetupWarning, not CLICK_ISSUE_1590
+        None, DeprecatedSetupWarning, OK
     ),
     (
         "Mock env with MOF file and old-style mock script, "
@@ -658,7 +652,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_stdout_lines_all=False,
             exp_stderr_lines=[],
         ),
-        None, DeprecatedSetupWarning, not CLICK_ISSUE_1590
+        None, DeprecatedSetupWarning, OK
     ),
     (
         "Mock env with MOF file and new-style mock script, "
@@ -680,8 +674,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_stderr_lines=[],
         ),
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
-        DeprecationWarning if RETRY_DEPRECATION else None,
-        not CLICK_ISSUE_1590
+        DeprecationWarning if RETRY_DEPRECATION else None, OK
 
     ),
     (
@@ -703,8 +696,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_stderr_lines=[],
         ),
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
-        DeprecationWarning if RETRY_DEPRECATION else None,
-        not CLICK_ISSUE_1590
+        DeprecationWarning if RETRY_DEPRECATION else None, OK
     ),
     (
         "Mock env with MOF file and new-style mock script, "
@@ -726,8 +718,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_stderr_lines=[],
         ),
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
-        DeprecationWarning if RETRY_DEPRECATION else None,
-        not CLICK_ISSUE_1590
+        DeprecationWarning if RETRY_DEPRECATION else None, OK
     ),
     (
         "Mock env with MOF file and new-style mock script, "
@@ -749,8 +740,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_stderr_lines=[],
         ),
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
-        DeprecationWarning if RETRY_DEPRECATION else None,
-        not CLICK_ISSUE_1590
+        DeprecationWarning if RETRY_DEPRECATION else None, OK
     ),
     (
         "Mock env with MOF file and new-style mock script, "
@@ -773,8 +763,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_stderr_lines=[],
         ),
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
-        DeprecationWarning if RETRY_DEPRECATION else None,
-        not CLICK_ISSUE_1590
+        DeprecationWarning if RETRY_DEPRECATION else None, OK
     ),
     (
         "Mock env with MOF file and new-style mock script, "
@@ -797,8 +786,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_stderr_lines=[],
         ),
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
-        DeprecationWarning if RETRY_DEPRECATION else None,
-        not CLICK_ISSUE_1590
+        DeprecationWarning if RETRY_DEPRECATION else None, OK
     ),
 
     # Testcases with non-cacheable user-specified connections file
@@ -825,7 +813,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_stdout_lines_all=False,
             exp_stderr_lines=[],
         ),
-        None, DeprecatedSetupWarning, not CLICK_ISSUE_1590
+        None, DeprecatedSetupWarning, OK
     ),
 
     # Testcases with standalone mock script that has dependents
@@ -848,8 +836,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_stderr_lines=[],
         ),
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
-        DeprecationWarning if RETRY_DEPRECATION else None,
-        not CLICK_ISSUE_1590
+        DeprecationWarning if RETRY_DEPRECATION else None, OK
     ),
     (
         "Mock env with standalone mock script with deps; change dependent file",
@@ -870,9 +857,9 @@ TESTCASES_BUILD_MOCKENV = [
             exp_stdout_lines_all=False,
             exp_stderr_lines=[],
         ),
+        # See issue #1440 failure of this test with windows
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
-        DeprecationWarning if RETRY_DEPRECATION else None,
-        not CLICK_ISSUE_1590
+        DeprecationWarning if RETRY_DEPRECATION else None, not "win32"
     ),
 
 ]

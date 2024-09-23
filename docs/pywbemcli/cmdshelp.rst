@@ -659,7 +659,7 @@ Help text for ``pywbemcli connection`` (see :ref:`connection command group`):
       delete       Delete a WBEM connection definition.
       select       Select a WBEM connection definition as current or default.
       test         Test the current connection with a predefined WBEM request.
-      save         Save the current connection parameters to a named WBEM connection.
+      save         Save the current connection parameters to a named connection.
       list         List the WBEM connection definitions.
       set-default  Set a connection as the default connection.
 
@@ -762,7 +762,7 @@ Help text for ``pywbemcli connection save`` (see :ref:`connection save command`)
 
     Usage: pywbemcli [GENERAL-OPTIONS] connection save NAME [COMMAND-OPTIONS]
 
-      Save the current connection parameters to a named WBEM connection.
+      Save the current connection parameters to a named connection.
 
       Save the current connection to the connections file as a connection definition named NAME. The NAME argument is
       required. If a connection definition with that name already exists, it is overwritten without warning.

@@ -467,8 +467,7 @@ class PywbemServer:
 
         Used to copy PywbemServer so that a deep copy is not applied to
         conn which would cause the repository to be copied in the
-        case of FakedWBEMConnection, and possible exceptions
-        with pywbem 2.7
+        case of FakedWBEMConnection.
         """
         cpy = PywbemServer(
             server=self.server,
