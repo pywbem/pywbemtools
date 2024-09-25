@@ -20,36 +20,8 @@ security:
     #     reason: {text}    # optional: Reason for ignoring it. Will be reported in the Safety reports
     #     expires: {date}   # optional: Date when this ignore will expire
     ignore-vulnerabilities:
-        37765:
-            reason: Psutil, found in; 5.6.5, affected; <=5.6.5,
         39611:
-            reason: PyYAML full_load method or FullLoader is not used
-        40291:
-            reason: Pip, found in;10.0.1, affected; <19.2, Fixed Pip version requires Python>=3.6 and is used there
-        42559:
-            reason: Fixed Pip version requires Python>=3.6 and is used there; Pip is not shipped with this package
-        47833:
-            reason: Fixed Click version requires Python>=3.6 and is used there
-        51499:
-            reason: Fixed Wheel version requires Python>=3.7 and is used there; Risk is on Pypi side
-        52365:
-            reason: Fixed Certifi version requires Python>=3.6 and is used there
-        52495:
-            reason: Fixed Setuptools version requires Python>=3.7 and is used there; Risk is on Pypi side
-        58755:
-            reason: Fixed requests version 2.31.0 requires Python>=3.7 and is used there
-        59956:
-            reason: Fixed certifi version 2023.07.22 requires Python>=3.6 and is used there
-        62044:
-            reason: Fixed pip version 23.3 requires Python>=3.7 and is used there
-        62817:
-            reason: Fixed prompt-toolkit version 3.0.13 requires Python>=3.6 and is used there
-        67599:
-            reason: There is no fixed pip version
-        67895:
-            reason: Fixed idna version 3.7 requires requests>=2.26.0 which requires Python>=3.6 and is used there
-        71064:
-            reason: Fixed requests version 2.32.2 requires Python>=3.8 and is used there
+            reason: Fixed version PyYAML 5.4.0 (and 6.0.0) fails to install since Cython 3 was released; No risk since full_load method and FullLoader are not used
 
     # Continue with exit code 0 when vulnerabilities are found.
     continue-on-vulnerability-error: False
