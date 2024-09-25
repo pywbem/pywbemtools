@@ -16,6 +16,10 @@ Released: not yet
 
 * Removed support for Python 2.7, 3.6, and 3.7. (issue #1390)
 
+* Removed setup.py and therefore the possibility to run setup.py as a command,
+  for example to install or test pywbemtools. Running setup.py as a command has
+  been deprecated by Python.
+
 **Deprecations:**
 
 **Bug fixes:**
@@ -32,6 +36,24 @@ Released: not yet
 
 * Development: Changed release process to use a GitHub Actions workflow
   add as documented in DEVELOP.md. (issue #1395)
+
+* Development: Migrated from setup.py to pyproject.toml since that is the
+  recommended direction for Python packages. The make targets have not changed.
+  The content of the wheel and source distribution archives has not changed.
+
+  Some files have been renamed:
+  - minimum-constraints.txt to minimum-constraints-develop.txt
+  - .safety-policy-all.yml to .safety-policy-develop.yml
+
+  Removed pywbem/_version_scm.py from git tracking, because it is now
+  dynamically created when building the distribution.
+
+* Development: The pywbem version during development now uses an automatically
+  calculated dev number and the git commit hash, e.g. ``1.4.0a1.dev9+gad875911``.
+  Note that the pywbem version numbers for packages released to Pypi is
+  unchanged: M.N.U.
+  Updated the release description in DEVELOP.md to no longer edit the version
+  file.
 
 **Cleanup:**
 

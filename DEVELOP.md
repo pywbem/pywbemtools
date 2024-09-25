@@ -76,15 +76,7 @@ local clone of the `pywbem/pywbemtools` Git repo.
         git pull
         git checkout -b release_${MNU}
 
-3.  Edit the version file:
-
-        vi pywbemtools/_version.py
-
-    and set the ``__version__`` variable to the version that is being released:
-
-        __version__ = 'M.N.U'
-
-4.  Edit the change log:
+3.  Edit the change log:
 
         vi docs/changes.rst
 
@@ -100,7 +92,7 @@ local clone of the `pywbem/pywbemtools` Git repo.
       add text for any known issues you want users to know about.
     * Remove all empty list items.
 
-5.  Run the Safety tool:
+4.  Run the Safety tool:
 
     .. code-block:: sh
 
@@ -113,12 +105,12 @@ local clone of the `pywbem/pywbemtools` Git repo.
     If the safety run fails, you need to fix the safety issues that are
     reported.
 
-6.  Commit your changes and push the topic branch to the remote repo:
+5.  Commit your changes and push the topic branch to the remote repo:
 
         git commit -asm "Release ${MNU}"
         git push --set-upstream origin release_${MNU}
 
-7.  On GitHub, create a Pull Request for branch ``release_M.N.U``. This will
+6.  On GitHub, create a Pull Request for branch ``release_M.N.U``. This will
     trigger the CI runs.
 
     Important: When creating Pull Requests, GitHub by default targets the
@@ -131,18 +123,18 @@ local clone of the `pywbem/pywbemtools` Git repo.
     tests for all defined environments, since it discovers by the branch name
     that this is a PR for a release.
 
-8.  On GitHub, close milestone ``M.N.U``.
+7.  On GitHub, close milestone ``M.N.U``.
 
     Verify that the milestone has no open items anymore. If it does have open
     items, investigate why and fix.
 
-9.  On GitHub, once the checks for the Pull Request for branch ``start_M.N.U``
+8.  On GitHub, once the checks for the Pull Request for branch ``start_M.N.U``
     have succeeded, merge the Pull Request (no review is needed). This
     automatically deletes the branch on GitHub.
 
     If the PR did not succeed, fix the issues.
 
-10. Publish the package
+9.  Publish the package
 
         git checkout ${BRANCH}
         git pull
@@ -156,7 +148,7 @@ local clone of the `pywbem/pywbemtools` Git repo.
     and finally creates a new stable branch on Github if the master branch was
     released.
 
-11. Verify the publishing
+10. Verify the publishing
 
     Wait for the "publish" workflow for the new release to have completed:
     https://github.com/pywbem/pywbemtools/actions/workflows/publish.yml
@@ -236,23 +228,14 @@ local clone of the `pywbem/pywbemtools` Git repo.
         git pull
         git checkout -b start_${MNU}
 
-3.  Edit the version file:
-
-        vi pywbemtools/_version.py
-
-    and update the version to a draft version of the version that is being
-    started:
-
-        __version__ = 'M.N.U.dev1'
-
-4.  Edit the change log:
+3.  Edit the change log:
 
         vi docs/changes.rst
 
     and insert the following section before the top-most section:
 
-        pywbemtools M.N.U.dev1
-        ----------------------
+        pywbemtools M.N.U.dev
+        ---------------------
 
         This version contains all fixes up to version M.N-1.x.
 
@@ -274,32 +257,42 @@ local clone of the `pywbem/pywbemtools` Git repo.
 
         .. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
 
-5.  Commit your changes and push them to the remote repo:
+4.  Commit your changes and push them to the remote repo:
 
         git commit -asm "Start ${MNU}"
         git push --set-upstream origin start_${MNU}
 
-6.  On GitHub, create a Pull Request for branch ``start_M.N.U``.
+5.  On GitHub, create a Pull Request for branch ``start_M.N.U``.
 
     Important: When creating Pull Requests, GitHub by default targets the
     ``master`` branch. When starting a version based on a stable branch, you
     need to change the target branch of the Pull Request to ``stable_M.N``.
 
-7.  On GitHub, create a milestone for the new version ``M.N.U``.
+6.  On GitHub, create a milestone for the new version ``M.N.U``.
 
     You can create a milestone in GitHub via Issues -> Milestones -> New
     Milestone.
 
-8.  On GitHub, go through all open issues and pull requests that still have
+7.  On GitHub, go through all open issues and pull requests that still have
     milestones for previous releases set, and either set them to the new
     milestone, or to have no milestone.
 
-9.  On GitHub, once the checks for the Pull Request for branch ``start_M.N.U``
+8.  On GitHub, once the checks for the Pull Request for branch ``start_M.N.U``
     have succeeded, merge the Pull Request (no review is needed). This
     automatically deletes the branch on GitHub.
 
-10. Update and clean up the local repo:
+9.  Add release start tag and clean up the local repo:
+
+    Note: An initial tag is necessary because the automatic version calculation
+    done by setuptools-scm uses the most recent tag in the commit history and
+    increases the least significant part of the version by one, without
+    providing any controls to change that behavior.
+
+    .. code-block:: sh
 
         git checkout ${BRANCH}
         git pull
         git branch -D start_${MNU}
+        git branch -D -r origin/start_${MNU}
+        git tag -f ${MNU}a0
+        git push -f --tags
