@@ -6,14 +6,11 @@
 # packages.
 
 
-# Note: The included file is processed by Pip but ignored by the Safety tool.
-# Thus, safety with the 'all' profile actually only checks development packages,
-# but that's ok since the 'install' profile checks the install packages.
--c minimum-constraints-install.txt
-
-
 # Direct dependencies for development and indirect dependencies for development
 # that are needed for some reason (must be consistent with dev-requirements.txt)
+
+# Build distribution archive
+build==1.1.1
 
 # Unit test (imports into testcases):
 # pytest 4.3.1 solves an issue on Python 3 with minimum package levels
