@@ -33,7 +33,12 @@ Released: not yet
   with Python 3.9-3.11, by running it without login shell. Added Python 3.11 on
   MacOS to the normal tests.
 
+* Increased minimum versions of PyYAML to 6.0.2 and psutil to 6.0.0, to fix
+  install errors with Python 3.13 on Windows. (related to issue #3225)
+
 **Enhancements:**
+
+* Added support for and testing on Python 3.13.0-rc.1. (issue #1429)
 
 * Development: Changed release process to use a GitHub Actions workflow
   add as documented in DEVELOP.md. (issue #1395)
