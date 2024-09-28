@@ -26,10 +26,12 @@ import click
 import pywbem
 from pywbem import WBEMServer, configure_loggers_from_string
 
-from . import mockscripts
 from .config import DEFAULT_URL_SCHEME, DEFAULT_CONNECTION_TIMEOUT, \
     DEFAULT_NAMESPACE, MAX_TIMEOUT, DEFAULT_MAXPULLCNT
-from ._pywbemcli_operations import PYWBEMCLIConnection, PYWBEMCLIFakedConnection
+from ._pywbemcli_operations import PYWBEMCLIConnection, \
+    PYWBEMCLIFakedConnection
+
+from . import mockscripts
 
 WBEM_SERVER_OBJ = None
 

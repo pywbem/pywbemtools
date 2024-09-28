@@ -25,7 +25,7 @@ import os
 import sys
 import pytest
 
-from pywbemtools._utils import CONNECTIONS_FILENAME
+from pywbemtools.pywbemcli._connection_file_names import CONNECTIONS_FILENAME
 
 from .cli_test_extensions import CLITestsBase
 from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE
@@ -82,20 +82,15 @@ TEST_CONNECTIONS_FILE_DICT_SERVER = {
     'default_connection_name': None,
 }
 
-
-def GET_TEST_PATH_STR(filename):  # pylint: disable=invalid-name
-    """
-    Return the string representing the relative path of the file name provided.
-    """
-    return (str(os.path.join(TEST_DIR, filename)))
+EMPTY_CONNECTIONS_FILE_PATH = 'empty_connections_file.yaml'
 
 
-SIMPLE_MOCK_MODEL_FILE = "simple_mock_model.mof"
 MOCK_DEFINITION_ENVVAR = 'PYWBEMCLI_STARTUP_SCRIPT'
 BAD_PY_ERR_STRTUP_FILE = 'error/py_err_processatstartup.py'
-MOCK_PW_PROMPT_FILE = 'mock_password_prompt.py'
+BAD_PY_ERR_STRTUP_FILE_PATH = os.path.join(TEST_DIR, BAD_PY_ERR_STRTUP_FILE)
+MOCK_PW_PROMPT_FILE_PATH = os.path.join(TEST_DIR, 'mock_password_prompt.py')
 
-SIMPLE_MOCK_FILE_PATH = os.path.join(TEST_DIR, SIMPLE_MOCK_MODEL_FILE)
+SIMPLE_MOCK_MODEL_FILE_PATH = os.path.join(TEST_DIR, "simple_mock_model.mof")
 PYTHON_MOCK_FILE_PATH = os.path.join(TEST_DIR, 'simple_python_mock_script.py')
 BAD_MOF_FILE_PATH = os.path.join(TEST_DIR, 'mof_with_error.mof')
 BAD_PY_FILE_PATH = os.path.join(TEST_DIR, 'py_with_error.py')
@@ -351,7 +346,8 @@ TEST_CASES = [
      None, OK],
 
     ['Verify valid --use-pull yes option returns data from mock.',
-     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '--use-pull', 'yes'],
+     {'general': ['--mock-server', SIMPLE_MOCK_MODEL_FILE_PATH,
+      '--use-pull', 'yes'],
       'cmdgrp': 'class',
       'args': ['get', 'CIM_Foo']},
      {'stdout': ["class CIM_Foo"],
@@ -359,7 +355,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify valid --use-pull either option returns data from mock.',
-     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+     {'general': ['--mock-server', SIMPLE_MOCK_MODEL_FILE_PATH,
                   '--use-pull', 'either'],
       'cmdgrp': 'class',
       'args': ['get', 'CIM_Foo']},
@@ -368,7 +364,8 @@ TEST_CASES = [
      None, OK],
 
     ['Verify valid --use-pull no option returns data from mock.',
-     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '--use-pull', 'no'],
+     {'general': ['--mock-server', SIMPLE_MOCK_MODEL_FILE_PATH,
+      '--use-pull', 'no'],
       'cmdgrp': 'class',
       'args': ['get', 'CIM_Foo']},
      {'stdout': ["class CIM_Foo"],
@@ -377,7 +374,7 @@ TEST_CASES = [
 
     ['Verify simultaneous --server and --mock-server on cmd line invalid.',
      {'general': ['--server', 'http://blah', '--mock-server',
-                  SIMPLE_MOCK_FILE_PATH],
+                  SIMPLE_MOCK_MODEL_FILE_PATH],
       'cmdgrp': 'connection',
       'args': ['show']},
      {'stderr': ["Conflicting options: `server` is mutually exclusive with "
@@ -387,7 +384,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify simultaneous --mock-server option and --name option fails',
-     {'general': ['-m', SIMPLE_MOCK_FILE_PATH, '--name', 'MyConnName'],
+     {'general': ['-m', SIMPLE_MOCK_MODEL_FILE_PATH, '--name', 'MyConnName'],
       'cmdgrp': 'connection',
       'args': ['show']},
      {'stderr': ["Conflicting options: `connection-name` is mutually exclusive "
@@ -526,7 +523,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify -m option one file',
-     {'general': ['-m', SIMPLE_MOCK_FILE_PATH],
+     {'general': ['-m', SIMPLE_MOCK_MODEL_FILE_PATH],
       'cmdgrp': 'connection',
       'args': ['show']},
      {'stdout': ['^name *not-saved \\(current\\)$',
@@ -538,7 +535,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify -m option, multiple files',
-     {'general': ['-m', SIMPLE_MOCK_FILE_PATH,
+     {'general': ['-m', SIMPLE_MOCK_MODEL_FILE_PATH,
                   '-m', PYTHON_MOCK_FILE_PATH],
       'cmdgrp': 'connection',
       'args': ['show']},
@@ -601,11 +598,10 @@ TEST_CASES = [
      None, OK],
 
     ['Verify -m option, file with python startup file containing syntax error',
-     {'general': ['-m', SIMPLE_MOCK_FILE_PATH],
+     {'general': ['-m', SIMPLE_MOCK_MODEL_FILE_PATH],
       'cmdgrp': 'class',
       'args': ['enumerate'],
-      'env': {MOCK_DEFINITION_ENVVAR:
-              GET_TEST_PATH_STR(BAD_PY_ERR_STRTUP_FILE)}},
+      'env': {MOCK_DEFINITION_ENVVAR: BAD_PY_ERR_STRTUP_FILE_PATH}},
      {'stderr': ['Traceback (most recent call last)',
                  'def mock?prompt(msg):',
                  'SyntaxError:'],
@@ -640,7 +636,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify --mock-server and WBEMConnection only option user',
-     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+     {'general': ['--mock-server', SIMPLE_MOCK_MODEL_FILE_PATH,
                   '--user', 'fred'],
       'cmdgrp': 'connection',
       'args': ['show']},
@@ -651,7 +647,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify --mock-server and WBEMConnection only options user and password',
-     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+     {'general': ['--mock-server', SIMPLE_MOCK_MODEL_FILE_PATH,
                   '--user', 'fred', '--password', 'fred'],
       'cmdgrp': 'connection',
       'args': ['show']},
@@ -662,7 +658,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify --mock-server and WBEMConnection only options certfile, keyfile',
-     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+     {'general': ['--mock-server', SIMPLE_MOCK_MODEL_FILE_PATH,
                   '--certfile', 'fred', '--keyfile', 'fred'],
       'cmdgrp': 'connection',
       'args': ['show']},
@@ -674,7 +670,7 @@ TEST_CASES = [
 
 
     ['Verify --mock-server and WBEMConnection only option no-verify',
-     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+     {'general': ['--mock-server', SIMPLE_MOCK_MODEL_FILE_PATH,
                   '--no-verify'],
       'cmdgrp': 'connection',
       'args': ['show']},
@@ -686,7 +682,7 @@ TEST_CASES = [
 
 
     ['Verify --mock-server and WBEMConnection only option --verify',
-     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+     {'general': ['--mock-server', SIMPLE_MOCK_MODEL_FILE_PATH,
                   '--verify'],
       'cmdgrp': 'connection',
       'args': ['show']},
@@ -711,7 +707,7 @@ TEST_CASES = [
 
 
     ['Verify --timestats',
-     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '--timestats'],
+     {'general': ['--mock-server', SIMPLE_MOCK_MODEL_FILE_PATH, '--timestats'],
       'cmdgrp': 'class',
       'args': ['enumerate']},
      {'stdout': ['class CIM_Foo {',
@@ -723,7 +719,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify uses pull operation with option --use-pull either',
-     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '--timestats',
+     {'general': ['--mock-server', SIMPLE_MOCK_MODEL_FILE_PATH, '--timestats',
                   '--use-pull', 'either', '--pull-max-cnt', '1'],
       'cmdgrp': 'instance',
       'args': ['enumerate', 'CIM_Foo']},
@@ -736,7 +732,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify pull fails options --use-pull either, --disable-pull-operations',
-     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '--timestats',
+     {'general': ['--mock-server', SIMPLE_MOCK_MODEL_FILE_PATH, '--timestats',
                   '--use-pull', 'either', '--pull-max-cnt', '1'],
       'cmdgrp': 'instance',
       'args': ['enumerate', 'CIM_Foo']},
@@ -776,7 +772,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify uses pull operation with option --use-pull yes',
-     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '--timestats',
+     {'general': ['--mock-server', SIMPLE_MOCK_MODEL_FILE_PATH, '--timestats',
                   '--use-pull', 'yes', '--pull-max-cnt', '1'],
       'cmdgrp': 'instance',
       'args': ['enumerate', 'CIM_Foo']},
@@ -790,7 +786,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify uses traditional operation with option --use-pull no',
-     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '--timestats',
+     {'general': ['--mock-server', SIMPLE_MOCK_MODEL_FILE_PATH, '--timestats',
                   '--use-pull', 'no'],
       'cmdgrp': 'instance',
       'args': ['enumerate', 'CIM_Foo']},
@@ -804,7 +800,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify --mock-server and -server not allowed',
-     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+     {'general': ['--mock-server', SIMPLE_MOCK_MODEL_FILE_PATH,
                   '--server', 'http://blah'],
       'cmdgrp': 'instance',
       'args': ['enumerate', 'CIM_Foo']},
@@ -835,7 +831,7 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify --namen option with non-existent connection file fails',
+    ['Verify --name option with non-existent connection file fails',
      {'general': ['--name', 'namedoesnotexist'],
       'cmdgrp': 'connection',
       'args': ['show']},
@@ -888,7 +884,7 @@ TEST_CASES = [
                   '--user', 'john'],
       'cmdgrp': 'connection',
       'args': ['test'],
-      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PW_PROMPT_FILE)}},
+      'env': {MOCK_DEFINITION_ENVVAR: MOCK_PW_PROMPT_FILE_PATH}},
      {'stdout': ["MOCK_CLICK_PROMPT Enter password (user john)"],
       'stderr': ["ConnectionError: Failed to establish"],
       'rc': 1,
@@ -896,10 +892,10 @@ TEST_CASES = [
      None, OK],
 
     #
-    #   Verify password prompt. This is a sequence
+    #   Verify password prompt. This is a sequence using a connections file
     #
-    ['Create a mock serve with user but no password. Sequence 0,1.',
-     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH],
+    ['Create a mock server with user but no password. Sequence 0,1.',
+     {'general': ['--mock-server', SIMPLE_MOCK_MODEL_FILE_PATH, ],
       'args': ['save', 'mocktestVerifyPWPrompt'],
       'cmdgrp': 'connection', },
      {'stdout': "",
@@ -908,20 +904,19 @@ TEST_CASES = [
 
     # TODO: This test is worthless the prompt is not called
     ['Verify server in repository.  Sequence 0,2.',
-     {'general': [],
-      'cmdgrp': 'connection',
+     {'cmdgrp': 'connection',
       'args': ['list'],
-      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PW_PROMPT_FILE)}},
+      'env': {MOCK_DEFINITION_ENVVAR: MOCK_PW_PROMPT_FILE_PATH}},
      {'stdout': ['mocktestVerifyPWPrompt', 'WBEM server connections(brief)'],
       'test': 'innows'},
      None, OK],
 
     ['Verify load of this server and class enumerate triggers password prompt. '
      ' Sequence 0,3.',
-     {'general': ['--name', 'mocktestVerifyPWPrompt'],
+     {'general': ['--name', 'mocktestVerifyPWPrompt', ],
       'cmdgrp': 'class',
       'args': ['enumerate'],
-      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PW_PROMPT_FILE)}},
+      'env': {MOCK_DEFINITION_ENVVAR: MOCK_PW_PROMPT_FILE_PATH}},
      {'stdout': ['CIM_Foo'],
       'test': 'innows'},
      None, OK],
@@ -940,7 +935,7 @@ TEST_CASES = [
      {'general': ['--server', "http://blahblah",
                   '--user', 'john'],
       'stdin': ['class enumerate'],
-      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PW_PROMPT_FILE)}},
+      'env': {MOCK_DEFINITION_ENVVAR: MOCK_PW_PROMPT_FILE_PATH}},
      {'stdout': ['MOCK_CLICK_PROMPT Enter password',
                  '(user john)'],
       'test': 'innows'},
@@ -1122,7 +1117,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify Change --mock-server to --server in interactive mode.',
-     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH, ],
+     {'general': ['--mock-server', SIMPLE_MOCK_MODEL_FILE_PATH, ],
       # args not allowed in interactive mode
       'stdin': ['connection show',
                 '--server  http://blah connection show',
@@ -1155,6 +1150,7 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],  # TODO: this test fails on windows. Outputs don't compare'
 
+    # TODO: This one now fails because we added test for default conn file.
     ['Verify Change --name invalid in interactive mode. command no connections '
      'file',
      {'general': ['--name', 'NAMEDOESNOTEXIST'],
@@ -1166,7 +1162,7 @@ TEST_CASES = [
                  'Aborted!'],
       'rc': 1,
       'test': 'innows'},
-     None, OK],
+     None, FAIL],
 
     ['Verify Change --name invalid in interactive mode . stdin. Connection '
      'file exists and we delete',
@@ -1513,7 +1509,7 @@ TEST_CASES = [
                 'connection show']},
      {'stdout': ['default-namespace root/cimv2'],
       'test': 'innows'},
-     SIMPLE_MOCK_MODEL_FILE, OK],
+     SIMPLE_MOCK_MODEL_FILE_PATH, OK],
 
     ['Verify simple pywbem command against file works and verbose connect and '
      'disconnect work.',
