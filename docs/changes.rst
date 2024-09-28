@@ -39,6 +39,13 @@ Released: not yet
   on differences between pywbem 1.0.0 and earlier versions of python.
   (issue #1405)
 
+* Refactor pywbemcli tests to avoid hiding the default connection file and
+  the names for the connection file and mock cache are moved from _utils.py
+  to pywbemcli/_connection_file_names.py.
+  An environment variable defines an alternate directory
+  for the connection file and mockcache and is set forpywbemcli tests. 
+  (issue # 1423)
+
 **Known issues:**
 
 * See `list of open issues`_.

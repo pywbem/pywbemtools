@@ -51,12 +51,13 @@ from ._pywbem_server import PywbemServer
 from .config import DEFAULT_NAMESPACE, PYWBEMCLI_PROMPT, \
     PYWBEMCLI_HISTORY_FILE, DEFAULT_MAXPULLCNT, DEFAULT_CONNECTION_TIMEOUT, \
     MAX_TIMEOUT, USE_AUTOSUGGEST
+from ._connection_file_names import CONNECTIONS_FILENAME, \
+    DEFAULT_CONNECTIONS_FILE
 from ._connection_repository import ConnectionRepository, \
     ConnectionsFileError
 from .._click_extensions import PywbemtoolsTopGroup, GENERAL_OPTS_TXT, \
     SUBCMD_HELP_TXT, MutuallyExclusiveOption, click_completion_item
-from .._utils import pywbemtools_warn, get_terminal_width, \
-    CONNECTIONS_FILENAME, DEFAULT_CONNECTIONS_FILE, debug_log
+from .._utils import pywbemtools_warn, get_terminal_width, debug_log
 from .._options import add_options, help_option
 from .._output_formatting import OUTPUT_FORMAT_GROUPS, OUTPUT_FORMATS
 

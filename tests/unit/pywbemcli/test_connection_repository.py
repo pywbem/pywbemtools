@@ -30,8 +30,10 @@ import pytest
 import pywbemtools.pywbemcli._connection_repository
 from pywbemtools.pywbemcli._connection_repository import ConnectionRepository, \
     ConnectionsFileLoadError, ConnectionsFileWriteError
-from pywbemtools._utils import B08_DEFAULT_CONNECTIONS_FILE, \
-    DEFAULT_CONNECTIONS_FILE
+
+from pywbemtools.pywbemcli._connection_repository import \
+    B08_DEFAULT_CONNECTIONS_FILE, DEFAULT_CONNECTIONS_FILE
+
 from pywbemtools.pywbemcli._pywbem_server import PywbemServer
 
 from ..pytest_extensions import simplified_test_function
