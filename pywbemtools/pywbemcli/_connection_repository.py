@@ -27,13 +27,12 @@ import os
 from contextlib import contextmanager
 import yaml
 import yamlloader
-import click
+from click import echo
 
 from ._pywbem_server import PywbemServer
 from ._pywbemcli_operations import delete_mock_cache
-from .._utils import DEFAULT_CONNECTIONS_FILE, B08_DEFAULT_CONNECTIONS_FILE
-
-BAK_FILE_SUFFIX = 'bak'
+from ._connection_file_names import DEFAULT_CONNECTIONS_FILE, \
+    B08_DEFAULT_CONNECTIONS_FILE, BAK_FILE_SUFFIX
 
 
 class ConnectionsFileError(Exception):
@@ -457,9 +456,9 @@ class ConnectionRepository:
                     f'Error migrating old connections file '
                     f'"{B08_DEFAULT_CONNECTIONS_FILE}": {exc}')
 
-            click.echo(f"Migrated old connections file "
-                       f"{B08_DEFAULT_CONNECTIONS_FILE!r} to "
-                       f"{DEFAULT_CONNECTIONS_FILE!r}")
+            echo(f"Migrated old connections file "
+                 f"{B08_DEFAULT_CONNECTIONS_FILE!r} to "
+                 f"{DEFAULT_CONNECTIONS_FILE!r}")
 
         # If the file does not exist, the connection repo still has the
         # initial state at this point, and it remains empty.
@@ -521,7 +520,7 @@ class ConnectionRepository:
                     self._pywbemcli_servers[name] = server
                 self._loaded = True
                 if self._verbose:
-                    click.echo(
+                    echo(
                         f"Connections file loaded: {self._connections_file}")
 
         except OSError as exc:
@@ -634,7 +633,7 @@ class ConnectionRepository:
         # Create bak file and then rename tmp file
         try:
             if os.path.isfile(self._connections_file):
-                bakfile = f'{self._connections_file}.{BAK_FILE_SUFFIX}'
+                bakfile = self._connections_file + BAK_FILE_SUFFIX
                 if os.path.isfile(bakfile):
                     os.remove(bakfile)
                 if os.path.isfile(self._connections_file):
@@ -654,4 +653,4 @@ class ConnectionRepository:
                 f'Error renaming temporary file "{tmpfile}" to connections '
                 f'file "{self._connections_file}": {exc}')
         if self._verbose:
-            click.echo(f"Connections file saved: {self._connections_file}")
+            echo(f"Connections file saved: {self._connections_file}")

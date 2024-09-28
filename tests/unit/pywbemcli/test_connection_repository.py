@@ -27,11 +27,11 @@ from contextlib import contextmanager
 from unittest.mock import patch
 import pytest
 
+from pywbemtools.pywbemcli._connection_file_names import \
+    DEFAULT_CONNECTIONS_FILE, B08_DEFAULT_CONNECTIONS_FILE, BAK_FILE_SUFFIX
 import pywbemtools.pywbemcli._connection_repository
 from pywbemtools.pywbemcli._connection_repository import ConnectionRepository, \
     ConnectionsFileLoadError, ConnectionsFileWriteError
-from pywbemtools._utils import B08_DEFAULT_CONNECTIONS_FILE, \
-    DEFAULT_CONNECTIONS_FILE
 from pywbemtools.pywbemcli._pywbem_server import PywbemServer
 
 from ..pytest_extensions import simplified_test_function
@@ -45,8 +45,8 @@ from ..pytest_extensions import simplified_test_function
 CLICK_ISSUE_1590 = sys.platform == 'win32'
 
 SCRIPT_DIR = os.path.dirname(__file__)
-CONNECTION_REPO_TEST_FILE_PATH = os.path.join(SCRIPT_DIR,
-                                              'tst_connection_repository.yaml')
+CONNECTION_REPO_TEST_FILE_PATH = os.path.join(
+    SCRIPT_DIR, 'tmp_tst_connection_repository.yaml')
 
 YAML_GOOD_TWO_DEFS = """connection_definitions:
     tst1:
@@ -175,26 +175,26 @@ def remove_file_before_after():
     Remove the connections file at beginning and end of test.
     """
     file = CONNECTION_REPO_TEST_FILE_PATH
+    bakfilesuffix = f"'.' + {BAK_FILE_SUFFIX}"
+    bakfile = CONNECTION_REPO_TEST_FILE_PATH + bakfilesuffix
+    tmpfile = CONNECTION_REPO_TEST_FILE_PATH + '.tmp'
+
     if os.path.isfile(file):
         os.remove(file)
-    file = CONNECTION_REPO_TEST_FILE_PATH + '.bak'
-    if os.path.isfile(file):
-        os.remove(file)
-    file = CONNECTION_REPO_TEST_FILE_PATH + '.tmp'
-    if os.path.isfile(file):
-        os.remove(file)
+    if os.path.isfile(bakfile):
+        os.remove(bakfile)
+    if os.path.isfile(tmpfile):
+        os.remove(tmpfile)
     # The yield causes the remainder of this fixture to be executed at the
     # end of the test.
     yield
     file = CONNECTION_REPO_TEST_FILE_PATH
     if os.path.isfile(file):
         os.remove(file)
-    file = CONNECTION_REPO_TEST_FILE_PATH + '.bak'
-    if os.path.isfile(file):
-        os.remove(file)
-    file = CONNECTION_REPO_TEST_FILE_PATH + '.tmp'
-    if os.path.isfile(file):
-        os.remove(file)
+    if os.path.isfile(bakfile):
+        os.remove(bakfile)
+    if os.path.isfile(tmpfile):
+        os.remove(tmpfile)
 
 
 # The real functions before they get patched

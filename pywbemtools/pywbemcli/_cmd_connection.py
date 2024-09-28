@@ -251,7 +251,7 @@ def connection_test(context, **options):
 @click.pass_obj
 def connection_save(context, name, **options):
     """
-    Save the current connection parameters to a named WBEM connection.
+    Save the current connection parameters to a named connection.
 
     Save the current connection to the connections file as a connection
     definition named NAME. The NAME argument is required.
@@ -824,7 +824,6 @@ def cmd_connection_save(context, name, options):
     connection must exist.
     The save function allows overwriting existing names
     """
-
     current_connection = context.pywbem_server
     if not current_connection:
         raise click.ClickException('No current connection connection. Use '
@@ -845,6 +844,11 @@ def cmd_connection_save(context, name, options):
 
     if options['set_default']:
         _set_default_connection(context.connections_repo, name, verify=False)
+    if context.verbose:
+        click.echo(f"Connection name: {name} added to named connections in "
+                   f"connections file {connections.connections_file}")
+        if options['set_default']:
+            click.echo(f"Default connection name set to {name}")
 
 
 def cmd_connection_list(context, options):

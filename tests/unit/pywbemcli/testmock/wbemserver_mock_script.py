@@ -21,9 +21,8 @@ in pywbemcli so that other dictionary definitions of the mock can be created.
 
 This script has the DMTF model itself as a dependent but we are not
 registering the pieces of the model as a dependent because we don't really
-know what changes in the model.
+know what changes are in the model.
 """
-
 
 import os
 

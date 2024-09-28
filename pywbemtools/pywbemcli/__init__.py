@@ -31,6 +31,7 @@ from ._common import *                # noqa: F403,F401
 from ._pywbem_server import *         # noqa: F403,F401
 from ._warnings import *              # noqa: F403,F401
 
+from ._connection_file_names import *  # noqa: F403,F401
 from ._cmd_class import *             # noqa: F403,F401
 from ._cmd_instance import *          # noqa: F403,F401
 from ._cmd_qualifier import *         # noqa: F403,F401
