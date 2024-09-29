@@ -308,12 +308,12 @@ dist_dependent_files_all := \
     README.md \
     README_PYPI.md \
     requirements.txt \
-		pyproject.toml \
+    pyproject.toml \
     $(wildcard $( package_name)/*.py) \
     $(wildcard $(package_name)/*/*.py) \
     $(wildcard $(package_name)/*/*/*.py) \
 
-# The actually used dependency list, which removes the version file. Reason is that the
+# The dependency list actually used, which removes the version file. Reason is that the
 # version file is rebuilt during build.
 dist_dependent_files := $(filter-out $(version_file), $(dist_dependent_files_all))
 

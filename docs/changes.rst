@@ -16,9 +16,10 @@ Released: not yet
 
 * Removed support for Python 2.7, 3.6, and 3.7. (issue #1390)
 
-* Removed setup.py and therefore the possibility to run setup.py as a command,
-  for example to install or test pywbemtools. Running setup.py as a command has
-  been deprecated by Python.
+* The migration from setup.py to pyproject.toml removed the possibility to run
+  setup.py as a command, for example to install or test pywbemtools. Note that
+  running setup.py as a command has been deprecated by the Python setuptools
+  team.
 
 **Deprecations:**
 
@@ -50,8 +51,7 @@ Released: not yet
 
 * Development: The pywbem version during development now uses an automatically
   calculated dev number and the git commit hash, e.g. ``1.4.0a1.dev9+gad875911``.
-  Note that the pywbem version numbers for packages released to Pypi is
-  unchanged: M.N.U.
+  The pywbem version numbers for packages released to Pypi are unchanged: M.N.U.
   Updated the release description in DEVELOP.md to no longer edit the version
   file.
 
