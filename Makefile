@@ -238,6 +238,13 @@ doc_dependent_files := \
 # the help in test cases.
 pywbemtools_termwidth := 120
 
+# PYWBEMCLI_TST_FILE_DIR; location where default pywbemcli connection file will be
+# placed for tests. This env var used in pywbemtools/_connection_repository.py with
+# value of directory where pywbemcli files stored during unit tests.
+# Env var name is defined in PYWBEMCLI_FILES_DIR_ENVVAR variable in
+#   pywbemtools/pywbemcli/_connection_file_names.py
+PYWBEMCLI_TST_FILE_DIR="tests/unit/pywbemcli/pywbemcli_tst_file_dir/"
+
 # PyLint config file
 pylint_rc_file := pylintrc
 
@@ -736,9 +743,9 @@ endif
 test: $(done_dir)/develop_$(pymn)_$(PACKAGE_LEVEL).done $(doc_utility_help_files)
 	@echo "Makefile: Running unit and function tests"
 ifeq ($(PLATFORM),Windows_native)
-	cmd /c "set PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) & py.test --color=yes $(pytest_cov_opts) $(pytest_warning_opts) $(pytest_opts) tests/unit -s"
+	cmd /c "set PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) & set PYWBEMCLI_FILES_DIR=$(PYWBEMCLI_TST_FILE_DIR) & py.test --color=yes $(pytest_cov_opts) $(pytest_warning_opts) $(pytest_opts) tests/unit -s"
 else
-	PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) py.test --color=yes $(pytest_cov_opts) $(pytest_warning_opts) $(pytest_opts) tests/unit -s
+	PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) PYWBEMCLI_FILES_DIR=$(PYWBEMCLI_TST_FILE_DIR) py.test --color=yes $(pytest_cov_opts) $(pytest_warning_opts) $(pytest_opts) tests/unit -s
 endif
 	@echo "Makefile: Done running tests"
 
@@ -756,7 +763,7 @@ endif
 end2endtest: $(done_dir)/develop_$(pymn)_$(PACKAGE_LEVEL).done
 	@echo "Makefile: Running end2end tests"
 ifeq ($(PLATFORM),Windows_native)
-	cmd /c "set TEST_SERVER_IMAGE=$(TEST_SERVER_IMAGE) & py.test --color=yes $(pytest_end2end_warning_opts) $(pytest_end2end_opts) tests/end2endtest -s"
+	cmd /c "set TEST_SERVER_IMAGE=$(TEST_SERVER_IMAGE) & set PYWBEMCLI_FILES_DIR=$(PYWBEMCLI_TST_FILE_DIR) & py.test --color=yes $(pytest_end2end_warning_opts) $(pytest_end2end_opts) tests/end2endtest -s"
 else
 	TEST_SERVER_IMAGE=$(TEST_SERVER_IMAGE) py.test --color=yes $(pytest_end2end_warning_opts) $(pytest_end2end_opts) tests/end2endtest -s
 endif
