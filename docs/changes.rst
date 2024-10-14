@@ -38,7 +38,7 @@ Released: not yet
 
 **Enhancements:**
 
-* Added support for and testing on Python 3.13.0-rc.1. (issue #1429)
+* Added support for and testing on Python 3.13. (issue #1429)
 
 * Development: Changed release process to use a GitHub Actions workflow
   add as documented in DEVELOP.md. (issue #1395)
