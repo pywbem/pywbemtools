@@ -18,7 +18,6 @@
 Unit tests for _pywbemcli_operations module.
 """
 
-
 import sys
 import os
 import glob
@@ -30,8 +29,10 @@ import pytest
 import pywbem
 
 from pywbemtools.pywbemcli._pywbemcli_operations import PYWBEMCLIFakedConnection
-from pywbemtools._utils import ensure_unicode, \
-    DEFAULT_CONNECTIONS_FILE
+from pywbemtools._utils import ensure_unicode
+from pywbemtools.pywbemcli._connection_file_names import \
+    MOCKCACHE_ROOT_DIR, DEFAULT_CONNECTIONS_DIR, DEFAULT_CONNECTIONS_FILE, \
+    BAK_FILE_SUFFIX
 from pywbemtools.pywbemcli.mockscripts import DeprecatedSetupWarning, \
     SetupNotSupportedError
 
@@ -61,8 +62,7 @@ SCRIPT_DIR = os.path.dirname(__file__)
 USER_CONNECTIONS_FILE = os.path.join(SCRIPT_DIR, '.user_connections_file.yaml')
 
 # Backup of default connections file
-DEFAULT_CONNECTIONS_FILE_BAK = DEFAULT_CONNECTIONS_FILE + \
-    '.test_pywbemcli_operations.bak'
+DEFAULT_CONNECTIONS_FILE_BAK = DEFAULT_CONNECTIONS_FILE + BAK_FILE_SUFFIX
 
 # Flag indicating that the new-style setup approach() with a setup() function
 # is supported.
@@ -111,12 +111,12 @@ def get_mockcache_dir(connection_name):
 
     We assume the connection name is unique across all connection files.
     """
-    mockcache_rootdir = os.path.join(os.path.expanduser('~'),
-                                     '.pywbemcli_mockcache')
-    if os.path.isdir(mockcache_rootdir):
-        for _dir in os.listdir(mockcache_rootdir):
+    if not os.path.isdir(MOCKCACHE_ROOT_DIR):
+        os.mkdir(MOCKCACHE_ROOT_DIR)
+    if os.path.isdir(DEFAULT_CONNECTIONS_DIR):
+        for _dir in os.listdir(MOCKCACHE_ROOT_DIR):
             if _dir.endswith('.' + connection_name):
-                dir_path = os.path.join(mockcache_rootdir, _dir)
+                dir_path = os.path.join(MOCKCACHE_ROOT_DIR, _dir)
                 return dir_path
     raise ValueError
 

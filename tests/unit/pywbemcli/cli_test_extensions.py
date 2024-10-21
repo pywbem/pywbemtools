@@ -12,10 +12,12 @@ import pytest
 
 from pywbem_mock import FakedWBEMConnection
 
+from pywbemtools.pywbemcli._connection_file_names import \
+    PYWBEMCLI_ALT_HOME_DIR_ENVVAR, DEFAULT_CONNECTIONS_FILE
+
 from ..utils import execute_command, assert_rc, assert_patterns, assert_lines
 
 TEST_DIR = os.path.dirname(__file__)
-
 
 # This variable defines the url returned from some of the commands.
 FAKEURL_STR = '//FakedUrl:5988'
@@ -30,6 +32,7 @@ class CLITestsBase:
     def command_test(self, desc, command_grp, inputs, exp_response, mock_files,
                      condition, verbose=False):
         # pylint: disable=line-too-long, no-self-use
+        # pylint: disable=too-many-positional-arguments
         """
         Test method to execute test on pywbemcli by calling the executable
         pywbemcli for the command defined by command with arguments defined
@@ -63,7 +66,9 @@ class CLITestsBase:
               - 'connections_file_args': tuple(conn_file, conn_content) that can
                 specify a connections file to be prepared for the test.
                 The tuple items are passed as arguments to the
-                'connections_file()' context manager. See there for details.
+                'connections_file()' context manager.  The defined connections
+                file is created within a context for each test and removed at
+                the end of the test. See there for details.
 
               - 'args': String or tuple/list of strings with local
                 (command-level) options that will be added to the command
@@ -164,6 +169,27 @@ class CLITestsBase:
                'rc' expected exit_code from pywbemcli.  If None, code 0
                is expected.
 
+
+             'file' - If this key exists it defines a dictionary containing two
+               required keys {'before": value, 'after': value} and one optional
+               key {'filepath': path_to_file}. These keys and their values
+               define a test on the existence of the file before and after the
+               call to pywbemcli:
+
+               'before' test for file existence is run before the execution of
+               pywbemcli.
+
+               'after' test for file existence is run after the execution of
+               pywbemcli.
+
+               'filepath' optional key that defines the path of the file to
+               be tested. If this key does not exist the file path is the
+               DEFAULT_CONNECTIONS_FILE.
+
+               'value' must be either 'exists'(file must exist) or 'none'
+               (file must not exist).
+
+
           mock_files (:term:`string` or list of string or None):
             If this is a string, this test will be executed using the
             --mock-server pywbemcl option with this file as the name of the
@@ -261,15 +287,28 @@ class CLITestsBase:
         if not verbose:
             verbose = condition == 'verbose'
 
+        if 'file' in exp_response:
+            if 'before' in exp_response['file']:
+                CLITestsBase.validate_file_existence(
+                    desc,
+                    'before',
+                    exp_response['file']['before'])
+
         with connections_file(*connections_file_args):
             rc, stdout, stderr = execute_command(
                 'pywbemcli', cmd_line, env=env, stdin=stdin, verbose=verbose,
                 capture=capture)
 
+        # The following env var must be in all tests to avoid
+        # using a users connections file and mockcache in local testing.
+        # It is set in pywbemtools Makefile tests target.
+        # FUTURE: Can be removed in future because tests exist in conftest.py
+        assert PYWBEMCLI_ALT_HOME_DIR_ENVVAR in os.environ
+
         exp_rc = exp_response['rc'] if 'rc' in exp_response else 0
         assert_rc(exp_rc, rc, stdout, stderr, desc)
 
-        if exp_response['test']:
+        if 'test' in exp_response and exp_response['test']:
             test_definition = exp_response['test']
         else:
             test_definition = None
@@ -285,6 +324,13 @@ class CLITestsBase:
         else:
             assert False, 'Expected "stdout" or "stderr" key. One of these ' \
                           'keys required in exp_response.'
+
+        if 'file' in exp_response:
+            if 'after' in exp_response['file']:
+                CLITestsBase.validate_file_existence(
+                    desc,
+                    'after',
+                    exp_response['file']['after'])
 
         if test_definition:
             if 'test' in exp_response:
@@ -404,6 +450,41 @@ class CLITestsBase:
                         f"Test validation {test_definition!r} is invalid in "
                         f"test:\n{desc}\n")
 
+    @staticmethod
+    def validate_file_existence(desc, test_name, exp_rslt, file_path=None):
+        """
+        Test if the file defined by the file_path argument exists or
+        notfile_test ['before', 'after']
+        """
+        c_file_path = file_path if file_path else DEFAULT_CONNECTIONS_FILE
+
+        # debug_log(f"validate_file_existence:\n  {desc=}\n  {test_name=}\n
+        #          {DEFAULT_CONNECTIONS_FILE=}\n  {c_file_path=}\n{exp_rslt=}")
+
+        if exp_rslt.lower() == 'exists':
+            assert os.path.isfile(c_file_path) and \
+                os.path.getsize(c_file_path) > 0, \
+                f'File: {c_file_path} must exist {test_name} pywbemcli ' \
+                'called but is missing.'
+
+        elif exp_rslt.lower() == 'none':
+            contents = ''
+            if os.path.isfile(c_file_path):
+                with open(c_file_path, encoding='utf-8') \
+                        as fin:
+                    contents = fin.read()
+
+            assert not os.path.isfile(c_file_path), \
+                f'Desc: {desc}\n' \
+                f'File: {c_file_path} must not exist {test_name} ' \
+                'pywbemcli called but does exist.  File contents: ---------\n' \
+                f'{contents}\n----------------'
+
+        else:
+            assert False, f"Desc: {desc}\n" \
+                          f"File test option name {test_name} invalid. " \
+                          "Must be 'before' or 'after'."
+
 
 def remove_ws(inputs, join=False):
     """
@@ -479,9 +560,9 @@ def setup_mock_connection(mock_items, namespace):
 def connections_file(conn_file, conn_content):
     """
     Context mannager that creates a connections file upon entry and removes
-    it again, and also its backup file, upon exit.
+    it and its backup file, upon exit.
 
-    A previously existing connections file with the same name and its backup
+    Any previously existing connections file with the same name and its backup
     file will be saved away and restored.
 
     Parameters:

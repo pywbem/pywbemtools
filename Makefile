@@ -238,6 +238,14 @@ doc_dependent_files := \
 # the help in test cases.
 pywbemtools_termwidth := 120
 
+# PYWBEMCLI_ALT_HOME_DIR; Env var defining alternate directory where default
+# pywbemcli connection file will be placed for tests rather than the deault '~'
+# connection file ane mock caches are placed in this directory.
+# This env var value used in pywbemcli/_connection_file_names.py to build these
+# filenames with value of directory where pywbemcli files stored during unit
+# tests. This is set in this makefile for all tests.
+PYWBEMCLI_ALT_HOME_DIR=tmp_tst_pywbemcli_alt_home
+
 # PyLint config file
 pylint_rc_file := pylintrc
 
@@ -736,9 +744,9 @@ endif
 test: $(done_dir)/develop_$(pymn)_$(PACKAGE_LEVEL).done $(doc_utility_help_files)
 	@echo "Makefile: Running unit and function tests"
 ifeq ($(PLATFORM),Windows_native)
-	cmd /c "set PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) & py.test --color=yes $(pytest_cov_opts) $(pytest_warning_opts) $(pytest_opts) tests/unit -s"
+	cmd /c "set PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) & set PYWBEMCLI_ALT_HOME_DIR=$(PYWBEMCLI_ALT_HOME_DIR) & py.test --color=yes $(pytest_cov_opts) $(pytest_warning_opts) $(pytest_opts) tests/unit -s"
 else
-	PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) py.test --color=yes $(pytest_cov_opts) $(pytest_warning_opts) $(pytest_opts) tests/unit -s
+	PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) PYWBEMCLI_ALT_HOME_DIR=$(PYWBEMCLI_ALT_HOME_DIR) py.test --color=yes $(pytest_cov_opts) $(pytest_warning_opts) $(pytest_opts) tests/unit -s
 endif
 	@echo "Makefile: Done running tests"
 
@@ -756,9 +764,9 @@ endif
 end2endtest: $(done_dir)/develop_$(pymn)_$(PACKAGE_LEVEL).done
 	@echo "Makefile: Running end2end tests"
 ifeq ($(PLATFORM),Windows_native)
-	cmd /c "set TEST_SERVER_IMAGE=$(TEST_SERVER_IMAGE) & py.test --color=yes $(pytest_end2end_warning_opts) $(pytest_end2end_opts) tests/end2endtest -s"
+	cmd /c "set TEST_SERVER_IMAGE=$(TEST_SERVER_IMAGE) & set PYWBEMCLI_ALT_HOME_DIR=$(PYWBEMCLI_ALT_HOME_DIR) & py.test --color=yes $(pytest_end2end_warning_opts) $(pytest_end2end_opts) tests/end2endtest -s"
 else
-	TEST_SERVER_IMAGE=$(TEST_SERVER_IMAGE) py.test --color=yes $(pytest_end2end_warning_opts) $(pytest_end2end_opts) tests/end2endtest -s
+	TEST_SERVER_IMAGE=$(TEST_SERVER_IMAGE) PYWBEMCLI_ALT_HOME_DIR=$(PYWBEMCLI_ALT_HOME_DIR) py.test --color=yes $(pytest_end2end_warning_opts) $(pytest_end2end_opts) tests/end2endtest -s
 endif
 	@echo "Makefile: Done running end2end tests"
 

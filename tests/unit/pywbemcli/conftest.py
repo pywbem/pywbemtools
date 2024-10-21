@@ -3,73 +3,71 @@ Pytest common fixtures
 """
 
 import os
+import shutil
 import pytest
 
-from pywbemtools._utils import CONNECTIONS_FILENAME, \
-    DEFAULT_CONNECTIONS_DIR, DEFAULT_CONNECTIONS_FILE
-
-SCRIPT_DIR = os.path.dirname(__file__)
-
-# Backup file of the default connections file
-BAK_SUFFIX = '.bak'
-CONNECTIONS_BAK_FILENAME = CONNECTIONS_FILENAME + BAK_SUFFIX
-CONNECTIONS_BAK_FILE = os.path.join(DEFAULT_CONNECTIONS_DIR,
-                                    CONNECTIONS_BAK_FILENAME)
-
-# Save files for the default connections file and its backup file
-SAVE_SUFFIX = '.testsavepywbemclitests'
-CONNECTIONS_SAVE_FILENAME = CONNECTIONS_FILENAME + SAVE_SUFFIX
-CONNECTIONS_SAVE_FILE = os.path.join(DEFAULT_CONNECTIONS_DIR,
-                                     CONNECTIONS_SAVE_FILENAME)
-CONNECTIONS_BAK_SAVE_FILENAME = CONNECTIONS_BAK_FILENAME + SAVE_SUFFIX
-CONNECTIONS_BAK_SAVE_FILE = os.path.join(DEFAULT_CONNECTIONS_DIR,
-                                         CONNECTIONS_BAK_SAVE_FILENAME)
-
-
-@pytest.fixture
-def default_connections_file_path():
-    """
-    Fixture to return the path name of the default connections file.
-    """
-    return DEFAULT_CONNECTIONS_FILE
+# from pywbemtools._utils import debug_log
+from pywbemtools.pywbemcli._connection_file_names import \
+    DEFAULT_CONNECTIONS_DIR, PYWBEMCLI_ALT_HOME_DIR_ENVVAR
 
 
 @pytest.fixture(scope='session', autouse=True)
-def save_default_connections_file(request):
+def cleanup_connections_dirs(request):
     """
-    Fixture that saves away an existing default connections file and its backup
-    file at the begining of a test session and restores them at the end of the
-    test session.
+    Fixture that removes existing default connections file, its backup and
+    the mock cache at beginning of module test and removes the complete
+    test connections file directory at end of session test.
 
     This function is called once per test session (i.e. execution of the pytest
-    command) before the first test is executed.
+    command on a file) before the first test is executed.
+    """
+    # validate that test env var exists and get connection files directory
+    test_dir_path = os.getenv(PYWBEMCLI_ALT_HOME_DIR_ENVVAR)
+    if test_dir_path is None:
+        pytest.fail(f"Env var {PYWBEMCLI_ALT_HOME_DIR_ENVVAR} not set.")
+
+    # remove any files in the this directory before test
+    if os.path.exists(test_dir_path):
+        shutil.rmtree(DEFAULT_CONNECTIONS_DIR)
+        os.mkdir(DEFAULT_CONNECTIONS_DIR)
+
+    def cleanup():
+        """
+        Remove the test connections directory and files at end of the test.
+        """
+        if os.path.exists(test_dir_path):
+            shutil.rmtree(DEFAULT_CONNECTIONS_DIR)
+
+    request.addfinalizer(cleanup)
+
+
+@pytest.fixture(scope='module', autouse=True)
+def cleanup_connections_files(request):
+    """
+    Removes existing default connections file its backup file and mock cache at
+    the begining of a module test and at the end of the module test.
+
+    Called once per test module (i.e. execution of the pytest
+    command on a file) before the first test of the sessuib is executed.
     """
 
-    # Save the default connections file and its backup file
-    if os.path.isfile(DEFAULT_CONNECTIONS_FILE):
-        os.rename(DEFAULT_CONNECTIONS_FILE, CONNECTIONS_SAVE_FILE)
-    if os.path.isfile(CONNECTIONS_BAK_FILE):
-        os.rename(CONNECTIONS_BAK_FILE, CONNECTIONS_BAK_SAVE_FILE)
+    test_dir_path = os.getenv(PYWBEMCLI_ALT_HOME_DIR_ENVVAR)
 
-    def teardown():
+    if test_dir_path is None:
+        pytest.fail(f"Env var {PYWBEMCLI_ALT_HOME_DIR_ENVVAR} not set.")
+
+    # remove any files in the this directory before test
+    if os.path.exists(test_dir_path):
+        shutil.rmtree(DEFAULT_CONNECTIONS_DIR)
+        os.mkdir(DEFAULT_CONNECTIONS_DIR)
+
+    def cleanup():
         """
-        Restore the saved default connections file and its saved backup
-        file.
-
-        This function is called once per test session (i.e. execution of the
-        pytest command) after the last test has been executed.
+        Remove the test connections files at end of the test.  Called at end
+        of tests for each module
         """
+        if os.path.exists(test_dir_path):
+            shutil.rmtree(DEFAULT_CONNECTIONS_DIR)
+            os.mkdir(DEFAULT_CONNECTIONS_DIR)
 
-        # Restore the saved default connections file
-        if os.path.isfile(DEFAULT_CONNECTIONS_FILE):
-            os.remove(DEFAULT_CONNECTIONS_FILE)
-        if os.path.isfile(CONNECTIONS_SAVE_FILE):
-            os.rename(CONNECTIONS_SAVE_FILE, DEFAULT_CONNECTIONS_FILE)
-
-        # Restore the saved backup file of the default connections file
-        if os.path.isfile(CONNECTIONS_BAK_FILE):
-            os.remove(CONNECTIONS_BAK_FILE)
-        if os.path.isfile(CONNECTIONS_BAK_SAVE_FILE):
-            os.rename(CONNECTIONS_BAK_SAVE_FILE, CONNECTIONS_BAK_FILE)
-
-    request.addfinalizer(teardown)
+    request.addfinalizer(cleanup)
