@@ -28,6 +28,9 @@ Released: not yet
   macos-latest got upgraded from 12 to 14 and no longer supports Python 3.6
   and 3.7.
 
+* Dev: Fixed pydantic install issue on Pyhton 3.13 by excluding safety-schemas
+  version 0.0.7
+
 **Enhancements:**
 
 **Cleanup:**
