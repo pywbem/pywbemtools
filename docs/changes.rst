@@ -36,6 +36,9 @@ Released: not yet
 * Increased minimum versions of PyYAML to 6.0.2 and psutil to 6.0.0, to fix
   install errors with Python 3.13 on Windows. (related to issue #3225)
 
+* Dev: Fixed pydantic install issue on Pyhton 3.13 by excluding safety-schemas
+  version 0.0.7
+
 **Enhancements:**
 
 * Added support for and testing on Python 3.13. (issue #1429)
