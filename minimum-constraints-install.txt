@@ -67,7 +67,8 @@ wcwidth==0.1.7
 
 # nocaselist 2.0 requires typing-extensions>=3.10 (on py>=3.6,py<=3.9)
 # safety 3.0 requires typing-extensions>=4.7.1 (used on py>=3.7)
-typing-extensions==4.7.1
+# pydantic 2.8.0 requires typing-extensions>=4.12.2 on Python>=3.13
+typing-extensions==4.12.2
 
 # requests 2.31 requires idna>=2.5,<4
 # idna>3 requires using requests >=2.26.0
