@@ -77,6 +77,9 @@ Released: not yet
   from  pywbemtools/pywbemcli/_utils.py to pywbemcli/_connection_file_names.py.
   (issue # 1423)
 
+* Use click-repl version 3. Currently this is using a forked version since the
+  proposed changes to fix issues (see issue #1441) have not be accepted.
+
 **Known issues:**
 
 * See `list of open issues`_.

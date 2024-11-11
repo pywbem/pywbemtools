@@ -29,6 +29,8 @@ nocasedict==1.0.1
 Click==8.0.2
 click-spinner==0.1.8; python_version <= '3.11'
 click-spinner==0.1.10; python_version >= '3.12'
+# Removed as a constraint while using the fork as the basis for click-repl
+# in requirements.txt
 click-repl==0.2
 asciitree==0.3.3
 tabulate==0.8.2; python_version <= '3.9'
