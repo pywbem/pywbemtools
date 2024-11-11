@@ -1115,4 +1115,7 @@ def repl(ctx):
     if USE_AUTOSUGGEST:
         prompt_kwargs['auto_suggest'] = AutoSuggestFromHistory()
 
-    click_repl.repl(ctx, prompt_kwargs=prompt_kwargs)
+    # set option allow_general_options=True to enable use of general options
+    # in pywbemcli
+    click_repl.repl(ctx, prompt_kwargs=prompt_kwargs,
+                    allow_general_options=True)
