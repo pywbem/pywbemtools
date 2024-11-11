@@ -25,9 +25,16 @@ nocasedict>=1.0.1
 Click>=8.0.2
 click-spinner>=0.1.8; python_version <= '3.11'
 click-spinner>=0.1.10; python_version >= '3.12'
+
 # click-repl 0.2 is needed for compatibility with Click 8.0.
-# click-repl version 3.0 causes test failures. See issue #1312
-click-repl>=0.2,<0.3.0
+# click-repl version 3.0 causes test failures. See issues #1312 and #1441
+# Fix for click repl in forked repo issue #1441. Use our fork of click-repl
+# below which fixes the issue defined in issue #1441
+click-repl @ git+https://github.com/pywbem/click-repl.git@allow-general-options
+# TODO: Update click-repl version when our changes accepted probably
+#       to click-repl>=0.3.1. When this changes, minimum-constraints-install.txt
+#       must also be updated
+
 asciitree>=0.3.3
 # tabulate 0.8.8 fixes ImportError on Python 3.10.
 tabulate>=0.8.2; python_version <= '3.9'
@@ -38,7 +45,8 @@ toposort>=1.6
 psutil>=6.0.0
 
 # prompt-toolkit>=3.0 may cause WinError 995 on py38 on Windows (issue #690).
-prompt-toolkit>=3.0.13
+# version 3.0.36 requirement for click-repl
+prompt-toolkit>=3.0.36
 
 # PyYAML is also pulled in by dparse and python-coveralls
 # PyYAML 6.0 has wheel archives for Python 3.6 - 3.11
