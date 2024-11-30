@@ -58,7 +58,7 @@ more-itertools==5.0.0
 # Virtualenv
 virtualenv==16.1.0; python_version <= '3.6'
 virtualenv==20.21.0; python_version >= '3.7' and python_version <= '3.11'  # requires six<2,>=1.12.0
-virtualenv==20.23.0; python_version >= '3.12'
+virtualenv==20.26.6; python_version >= '3.12'
 
 # Sphinx (no imports, invoked via sphinx-build script):
 # Sphinx is used only on Python>=3.8
@@ -99,7 +99,7 @@ dill==0.3.4; python_version >= '3.6' and python_version <= '3.10'
 dill==0.3.7; python_version >= '3.11'
 platformdirs==2.2.0; python_version == '3.6'
 platformdirs==2.4.0; python_version >= '3.7' and python_version <= '3.11'
-platformdirs==3.2.0; python_version >= '3.12'
+platformdirs==3.9.1; python_version >= '3.12'
 
 # Flake8 and dependents (no imports, invoked via flake8 script):
 flake8==3.8.0; python_version <= '3.9'
@@ -155,7 +155,7 @@ docopt==0.6.1
 enum34==1.1.6; python_version == "2.7"
 filelock==3.2.0; python_version <= '3.6'
 filelock==3.4.1; python_version >= '3.7' and python_version <= '3.11'
-filelock==3.11.0; python_version >= '3.12'
+filelock==3.12.2; python_version >= '3.12'
 functools32==3.2.3.post2; python_version < "3.2"
 # Safety issue #52510 affected <=0.18.2
 future==0.18.3
