@@ -45,7 +45,7 @@ tox==2.5.0
 more-itertools==5.0.0
 
 # Virtualenv
-virtualenv==20.25.0
+virtualenv==20.26.6
 
 # Sphinx (no imports, invoked via sphinx-build script):
 Sphinx==7.1.0; python_version == '3.8'
