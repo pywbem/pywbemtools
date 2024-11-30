@@ -38,7 +38,7 @@ tox==2.5.0
 more-itertools>=4.0.0
 
 # Virtualenv
-virtualenv>=20.25.0
+virtualenv>=20.26.6
 
 # Sphinx (no imports, invoked via sphinx-build script):
 # Sphinx 7.2.0 started requiring Python>=3.9
