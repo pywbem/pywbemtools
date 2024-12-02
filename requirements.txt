@@ -27,7 +27,15 @@ click-spinner>=0.1.8; python_version <= '3.11'
 click-spinner>=0.1.10; python_version >= '3.12'
 # click-repl 0.2 is needed for compatibility with Click 8.0.
 # click-repl version 3.0 causes test failures. See issue #1312
-click-repl>=0.2,<0.3.0
+
+# click-repl>=0.2,<0.3.0  # Old definition
+# Development of fix for click repl in forked repo issue #1441
+# click-repl @ git+https://github.com/kschopmeyer/click-repl.git@ks/allow-general-options
+click-repl @ git+https://github.com/pywbem/click-repl.git@allow-general-options
+# install click-repl with pip for local test
+# pip install /home/kschopmeyer/git-repl/click-repl  -- drop this one.
+# pip install /home/kschopmeyer/git-click-repl/click-repl/click-repl
+
 asciitree>=0.3.3
 # tabulate 0.8.8 fixes ImportError on Python 3.10.
 tabulate>=0.8.2; python_version <= '3.9'
