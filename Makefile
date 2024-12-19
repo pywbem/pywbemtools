@@ -326,7 +326,7 @@ dist_dependent_files_all := \
 dist_dependent_files := $(filter-out $(version_file), $(dist_dependent_files_all))
 
 # Packages whose dependencies are checked using pip-missing-reqs
-check_reqs_packages := pytest coverage coveralls flake8 pylint twine safety sphinx
+check_reqs_packages := pytest coverage coveralls flake8 pylint twine safety sphinx towncrier
 
 # Scripts are required to install the OS-level components of pywbem.
 ifeq ($(PLATFORM),Windows_native)
