@@ -1,0 +1,2 @@
+Development: Increased minimum versions of PyYAML to 6.0.2 and psutil to 6.0.0,
+to fix install errors with Python 3.13 on Windows.

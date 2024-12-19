@@ -1,0 +1,2 @@
+Removed code and tests that depend on the differences between Python 3.8+ and
+on differences between pywbem 1.0.0 and earlier versions of Python.
