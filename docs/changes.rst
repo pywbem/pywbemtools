@@ -4,93 +4,12 @@
 Change log
 ==========
 
-
-pywbemtools 1.4.0.dev1
-----------------------
-
-This version contains all fixes up to version 1.3.x.
-
-Released: not yet
-
-**Incompatible changes:**
-
-* Removed support for Python 2.7, 3.6, and 3.7. (issue #1390)
-
-* The migration from setup.py to pyproject.toml removed the possibility to run
-  setup.py as a command, for example to install or test pywbemtools. Note that
-  running setup.py as a command has been deprecated by the Python setuptools
-  team.
-
-**Deprecations:**
-
-**Bug fixes:**
-
-* Addressed safety issues up to 2024-11-30.
-
-* Fixed new issues reported by Pylint 3.2 and 3.3.
-
-* Test: Fixed the issue that coveralls was not found in the test workflow on MacOS
-  with Python 3.9-3.11, by running it without login shell. Added Python 3.11 on
-  MacOS to the normal tests.
-
-* Increased minimum versions of PyYAML to 6.0.2 and psutil to 6.0.0, to fix
-  install errors with Python 3.13 on Windows. (related to issue #3225)
-
-* Dev: Fixed pydantic install issue on Pyhton 3.13 by excluding safety-schemas
-  version 0.0.7
-
-* Test: Python 3.13 was pinned to 3.13.0 to work around a pylint issue on
-  Python 3.13.1.
-
-**Enhancements:**
-
-* Added support for and testing on Python 3.13. (issue #1429)
-
-* Development: Changed release process to use a GitHub Actions workflow
-  add as documented in DEVELOP.md. (issue #1395)
-
-* Development: Migrated from setup.py to pyproject.toml since that is the
-  recommended direction for Python packages. The make targets have not changed.
-  The content of the wheel and source distribution archives has not changed.
-
-  Some files have been renamed:
-  - minimum-constraints.txt to minimum-constraints-develop.txt
-  - .safety-policy-all.yml to .safety-policy-develop.yml
-
-  Removed pywbem/_version_scm.py from git tracking, because it is now
-  dynamically created when building the distribution.
-
-* Development: The pywbem version during development now uses an automatically
-  calculated dev number and the git commit hash, e.g. ``1.4.0a1.dev9+gad875911``.
-  The pywbem version numbers for packages released to Pypi are unchanged: M.N.U.
-  Updated the release description in DEVELOP.md to no longer edit the version
-  file.
-
-**Cleanup:**
-
-* Remove code and tests that depends on the differences between python 3.8+ and
-  on differences between pywbem 1.0.0 and earlier versions of python.
-  (issue #1405)
-
-* Refactor pywbemcli tests to avoid hiding the default connection file and
-  the names for the connection file and mock cache by moving as part of tests.
-  EnvVar PYWBEMCLI_ALT_HOME_DIR defines alternate directory for connection file
-  and mockcache and is set for all pywbemcli tests. The definition of file
-  names for default connection file and mock cache managed by pywbemcli moved
-  from  pywbemtools/pywbemcli/_utils.py to pywbemcli/_connection_file_names.py.
-  (issue # 1423)
-
-* Use click-repl version 3 forked. Currently this is using a forked version since the
-  proposed changes to fix issues (see issue #1441) have not been incorporated
-  into a released version of click-repl.
-
-**Known issues:**
-
-* See `list of open issues`_.
-
-.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
-
-
+.. ============================================================================
+..
+.. Do not add change records here directly, but create fragment files instead!
+..
+.. ============================================================================
+.. towncrier start
 pywbemtools 1.3.0
 -----------------
 

@@ -7,6 +7,9 @@
 # Build distribution archive
 build>=1.1.1
 
+# Change log
+towncrier>=22.8.0
+
 # Unit test (imports into testcases):
 # pytest 4.3.1 solves an issue on Python 3 with minimum package levels
 pytest>=4.3.1
