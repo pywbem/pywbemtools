@@ -28,6 +28,10 @@ Released: not yet
   macos-latest got upgraded from 12 to 14 and no longer supports Python 3.6
   and 3.7.
 
+* Test: Changed macos-12 to macos-13 since macos-12 was removed in GitHub Actions.
+  Changed ubuntu-latest for Python 3.7 to ubuntu-22.04 because GitHub Actions
+  upgraded ubuntu-latest to be ubuntu-24.04.
+
 **Enhancements:**
 
 **Cleanup:**

@@ -55,6 +55,16 @@ jobs:
                 \"package_level\": \"minimum\" \
               }, \
               { \
+                \"os\": \"ubuntu-latest\", \
+                \"python-version\": \"3.7\", \
+                \"package_level\": \"latest\" \
+              }, \
+              { \
+                \"os\": \"ubuntu-latest\", \
+                \"python-version\": \"3.7\", \
+                \"package_level\": \"minimum\" \
+              }, \
+              { \
                 \"os\": \"macos-latest\", \
                 \"python-version\": \"3.6\", \
                 \"package_level\": \"latest\" \
@@ -99,22 +109,32 @@ jobs:
                 \"package_level\": \"minimum\" \
               }, \
               { \
-                \"os\": \"macos-12\", \
-                \"python-version\": \"3.6\", \
-                \"package_level\": \"latest\" \
-              }, \
-              { \
-                \"os\": \"macos-12\", \
-                \"python-version\": \"3.6\", \
-                \"package_level\": \"minimum\" \
-              }, \
-              { \
-                \"os\": \"macos-12\", \
+                \"os\": \"ubuntu-22.04\", \
                 \"python-version\": \"3.7\", \
                 \"package_level\": \"latest\" \
               }, \
               { \
-                \"os\": \"macos-12\", \
+                \"os\": \"ubuntu-22.04\", \
+                \"python-version\": \"3.7\", \
+                \"package_level\": \"minimum\" \
+              }, \
+              { \
+                \"os\": \"macos-13\", \
+                \"python-version\": \"3.6\", \
+                \"package_level\": \"latest\" \
+              }, \
+              { \
+                \"os\": \"macos-13\", \
+                \"python-version\": \"3.6\", \
+                \"package_level\": \"minimum\" \
+              }, \
+              { \
+                \"os\": \"macos-13\", \
+                \"python-version\": \"3.7\", \
+                \"package_level\": \"latest\" \
+              }, \
+              { \
+                \"os\": \"macos-13\", \
                 \"python-version\": \"3.7\", \
                 \"package_level\": \"minimum\" \
               } \
@@ -149,7 +169,7 @@ jobs:
                 \"package_level\": \"minimum\" \
               }, \
               { \
-                \"os\": \"ubuntu-latest\", \
+                \"os\": \"ubuntu-22.04\", \
                 \"python-version\": \"3.7\", \
                 \"package_level\": \"minimum\" \
               }, \
@@ -159,12 +179,12 @@ jobs:
                 \"package_level\": \"latest\" \
               }, \
               { \
-                \"os\": \"macos-12\", \
+                \"os\": \"macos-13\", \
                 \"python-version\": \"3.6\", \
                 \"package_level\": \"minimum\" \
               }, \
               { \
-                \"os\": \"macos-12\", \
+                \"os\": \"macos-13\", \
                 \"python-version\": \"3.6\", \
                 \"package_level\": \"latest\" \
               }, \
