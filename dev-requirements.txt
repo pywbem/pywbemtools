@@ -89,11 +89,6 @@ entrypoints>=0.3.0
 # Ruff checker
 ruff>=0.3.5
 
-# Twine (no imports, invoked via twine script):
-twine>=2.0.0
-# readme-renderer 23.0 has made cmarkgfm part of extras (it fails on Cygwin)
-readme-renderer>=23.0
-
 # Package dependency management tools
 pipdeptree>=2.2.0
 # pip-check-reqs 2.3.2 is needed to have proper support for pip<=21.3.
