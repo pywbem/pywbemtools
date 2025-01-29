@@ -17,7 +17,6 @@
 #     python (This Makefile uses the active Python environment, virtual Python
 #       environments are supported)
 #     pip (in the active Python environment)
-#     twine (in the active Python environment)
 #   These additional commands are used on Linux, OS-X and on Windows with
 #   UNIX-like environments:
 #     uname
@@ -326,7 +325,7 @@ dist_dependent_files_all := \
 dist_dependent_files := $(filter-out $(version_file), $(dist_dependent_files_all))
 
 # Packages whose dependencies are checked using pip-missing-reqs
-check_reqs_packages := pytest coverage coveralls flake8 pylint twine safety sphinx towncrier
+check_reqs_packages := pytest coverage coveralls flake8 pylint safety sphinx towncrier
 
 # Scripts are required to install the OS-level components of pywbem.
 ifeq ($(PLATFORM),Windows_native)
@@ -375,7 +374,6 @@ help:
 	@echo "               Env.var TEST_SERVER_IMAGE can be used to specify the Docker image with the WBEM server"
 	@echo "  all        - Do all of the above (except buildwin when not on Windows)"
 	@echo "  todo       - Check for TODOs in Python and docs sources"
-	@echo "  upload     - build + Upload the distribution archive files to PyPI"
 	@echo "  clean      - Remove any temporary files"
 	@echo "  clobber    - Remove everything created to ensure clean start - use after setting git tag"
 	@echo "  pip_list   - Display the Python packages as seen by make"
@@ -572,13 +570,6 @@ clean:
 	-$(call RM_FUNC,MANIFEST)
 	-$(call RMDIR_FUNC,build .cache .pytest_cache $(package_name).egg-info .eggs)
 	@echo "Makefile: Done removing temporary build products"
-	@echo "Makefile: Target $@ done."
-
-.PHONY: upload
-upload: _check_version $(dist_files)
-	@echo "Makefile: Uploading to PyPI: $(package_name) $(package_version)"
-	twine upload $(dist_files)
-	@echo "Makefile: Done uploading to PyPI"
 	@echo "Makefile: Target $@ done."
 
 .PHONY: html
