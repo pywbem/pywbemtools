@@ -32,6 +32,11 @@ Released: not yet
   Changed ubuntu-latest for Python 3.7 to ubuntu-22.04 because GitHub Actions
   upgraded ubuntu-latest to be ubuntu-24.04.
 
+* Development: Fix issue with minimum-constraints-develop.txt that causing
+  failure of make check_reqs. Added two pkgs to minimum-constraints-develop.txt:
+  package Levenshtein used by safety and Sphinx and roman-numerals-py used by
+  Sphinx. See PR 1453 for details.
+
 **Enhancements:**
 
 **Cleanup:**
