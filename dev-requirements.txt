@@ -99,4 +99,4 @@ pip-check-reqs>=2.5.1; python_version >= '3.12'
 
 # Jinja2 is used by Sphinx, and pip needs explicit versions for this
 # otherwise indirect dependency.
-Jinja2>=3.1.4
+Jinja2>=3.1.5

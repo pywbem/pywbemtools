@@ -102,7 +102,7 @@ pipdeptree==2.2.0
 pip-check-reqs==2.4.3; python_version <= '3.11'
 pip-check-reqs==2.5.1; python_version >= '3.12'
 
-Jinja2==3.1.4
+Jinja2==3.1.5
 
 
 # Indirect dependencies for development that are not in dev-requirements.txt.
@@ -132,6 +132,7 @@ linecache2==1.0.0
 # Jinja2 3.x requires MarkupSafe>=2.0
 MarkupSafe==2.0.0
 mistune==0.8.1
+nltk==3.9
 pandocfilters==1.4.1
 pathlib2==2.2.1
 pbr==1.8.0
@@ -156,7 +157,7 @@ terminado==0.6
 testpath==0.3
 toml==0.10.0
 tomli==2.0.1
-tornado==6.4.1
+tornado==6.4.2
 tqdm==4.66.3
 traceback2==1.4.0
 traitlets==4.3.1
