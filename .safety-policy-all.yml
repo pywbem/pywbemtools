@@ -89,7 +89,11 @@ security:
         72132:
             reason: Fixed zipp version 3.19.1 requires Python>=3.8 and is used there
         73456:
-            reason: Fixed virtualenv version 20.26.6 is used on Python>=3.12
+            reason: Fixed virtualenv version 20.26.6 requires Python>=3.12 and is used there
+        74439:
+            reason: Fixed tornado version 6.4.2 requires Python>=3.8 and is used there
+        74735:
+            reason: Fixed jinja2 version 3.1.5 requires Python>=3.7 and is used there
 
     # Continue with exit code 0 when vulnerabilities are found.
     continue-on-vulnerability-error: False
