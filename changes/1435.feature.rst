@@ -1,0 +1,6 @@
+Development: Simplified the release of a version and the start of a new
+version by new make targets:
+release_branch
+release_publish
+start_branch
+start_tag
