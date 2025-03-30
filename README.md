@@ -73,14 +73,20 @@ Requirements:
 
 Installation:
 
-- Install the pywbemtools Python package:
+- If not yet available, install the "pipx" command as described in
+  https://pipx.pypa.io/stable/installation/.
+
+- Without having any virtual Python environment active, install the CLI
+  as follows:
 
   ``` bash
-  $ pip install pywbemtools
+  $ pipx install pywbemtools
   ```
 
-For more details, including how to install the needed OS-level packages
-manually, see
+  That makes the `pywbemcli` and `pywbemlistener` commands available in the PATH,
+  without having to activate any virtual Python environment.
+
+For more details, see
 [Installation](https://pywbemtools.readthedocs.io/en/stable/introduction.html#installation).
 
 # Documentation and change history
