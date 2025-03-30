@@ -99,107 +99,127 @@ The pywbemtools package is supported in these environments:
 Installation
 ------------
 
-.. _PyPI: http://pypi.python.org/
+This section describes the installation for users of pywbemtools.
 
-This section describes the complete installation of pywbemtools with all steps
-including prerequisite operating system packages.
+The setup for developers of pywbemtools is described in
+:ref:`Pywbemtools development`.
 
-The easiest way to install the pywbemtools package is using pip. Pip ensures
-that any dependent Python packages also get installed.
+Installation using pipx
+~~~~~~~~~~~~~~~~~~~~~~~
 
-Pip will install the packages into your currently active Python environment
-See section :ref:`Using Python virtual environments` for more information on
-virtual environments.
+The recommended way to use the pywbemtools Python package is by installing it with
+pipx.
 
-If you want to contribute to the pywbem project, you need to set up a
-development and test environment for pywbemtools. That has a larger set of OS-level
-prerequisites and its setup is described in the :ref:`Pywbemtools development` chapter.
+Pipx creates a `virtual Python environment`_ under the covers and installs the
+pywbemtools Python package into that environment and makes the ``pywbemcli``
+and ``pywbemlistener`` commands available in a directory that is in the PATH.
+These commands will be available that way, regardless of whether or not you
+have a virtual Python environment active (that you may need for other purposes).
+
+1.  Prerequisite: Install pipx as an OS-level package
+
+    Follow the steps at https://pipx.pypa.io/stable/installation/ to install
+    pipx as an OS-level package to your local system.
+
+2.  Without having any virtual Python environment active, install pywbemtools using
+    pipx
+
+    To install the latest released version of pywbemtools:
+
+    .. code-block:: bash
+
+        $ pipx install pywbemtools
+
+    To install a specific released version of pywbemtools, e.g. 1.2.0:
+
+    .. code-block:: bash
+
+        $ pipx install pywbemtools==1.2.0
+
+    To install a specific development branch of pywbemtools, e.g. master:
+
+    .. code-block:: bash
+
+        $ pipx install git+https://github.com/pywbem/pywbemtools.git@master
+
+    To install pywbemtools with a non-default Python version, e.g. 3.10:
+
+    .. code-block:: bash
+
+        $ pipx install pywbemtools --python python3.10
+
+Installation into a virtual Python environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In some cases it may be useful to install pywbemtools into your own
+`virtual Python environment`_. That avoids the dependency to pipx, but it
+requires you to activate the virtual environment every time you want to use the
+``pywbemcli`` or ``pywbemlistener`` commands.
+
+There are a number of ways virtual Python environments can be created. This
+documentation describes the use of "virtualenv":
+
+1.  Prerequisite: Install virtualenv into system Python:
+
+    .. code-block:: bash
+
+        $ pip install virtualenv
+
+2.  Create and activate a virtual Python environment:
+
+    .. code-block:: bash
+
+        $ virtualenv ~/.virtualenvs/pywbemtools
+        $ source ~/.virtualenvs/pywbemtools/bin/activate
+
+3.  Install pywbemtools into the virtual Python environment:
+
+    To install the latest released version of pywbemtools so that it uses your
+    default Python version:
+
+    .. code-block:: bash
+
+        (pywbemtools) $ pip install pywbemtools
+
+    To install a specific released version of pywbemtools, e.g. 1.2.0:
+
+    .. code-block:: bash
+
+        (pywbemtools) $ pip install pywbemtools==1.2.0
+
+    To install a specific development branch of pywbemtools, e.g. master:
+
+    .. code-block:: bash
+
+        (pywbemtools) $ pip install git+https://github.com/pywbem/pywbemtools.git@master
+
+Installation into a system Python
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Your system Python version(s) are installed using OS-level packages for all the
+Python functionality.
+
+Adding packages to your system Python using Python packages from Pypi may create
+issues. This is why recent
+versions of pip raise a warning when attempting to install into the system
+Python. Even if you install a Python package from Pypi into your user's space,
+this may create issues.
+
+The main issue is that the more Python packages you install into the system
+Python, the more likely there will be incompatible Python package dependencies.
+
+Another issue is when you replace OS-level packages with Python packages.
+
+In order to avoid these issues, you should install pywbemtools into the system
+Python only in cases where the system has a well-defined scope and you have
+full control over the set of OS-level and Python-level packages, for example
+when building a Docker container.
 
 
-.. _`Installation prerequisites`:
+.. _`Troubleshooting the installation`:
 
-Installation prerequisites
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The Python environment into which you want to install must have the following
-Python packages installed:
-
-- setuptools - http://pypi.python.org/pypi/setuptools
-- wheel
-- pip
-
-Pywbemtools installs the pywbem package.
-
-When using pywbem versions before 1.0.0 on Python 2, pywbem requires a number
-of OS-level packages, and your system must have the following commands
-installed:
-
-* On native Windows:
-
-  - ``choco`` - Chocolatey package manager. The pywbemtools package installation
-    uses Chocolatey to install OS-level software. See https://chocolatey.org/
-    for the installation instructions for Chocolatey.
-
-  - ``wget`` - Download tool. Can be installed with: ``choco install wget``.
-
-* On Linux, OS-X, UNIX-like environments on Windows (e.g. Cygwin):
-
-  - ``wget`` - Download tool. Can be installed using the OS-level package
-    manager for the platform.
-
-.. _`Installation with pip`:
-
-Installation with pip
-^^^^^^^^^^^^^^^^^^^^^
-
-When using pywbem versions before 1.0.0 on Python 2, install the OS-level
-packages needed by the pywbem package as follows:
-
-* On native Windows:
-
-  .. code-block:: bash
-
-      > wget -q https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.bat
-      > pywbem_os_setup.bat
-
-* On Linux, OS-X, UNIX-like environments on Windows (e.g. Cygwin):
-
-  .. code-block:: bash
-
-      $ wget -q https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.sh
-      $ chmod 755 pywbem_os_setup.sh
-      $ ./pywbem_os_setup.sh
-
-  The ``pywbem_os_setup.sh`` script uses sudo internally, so your userid
-  needs to have sudo permission.
-
-If you want to install the needed OS-level packages manually, see
-`pywbem prerequisite OS packages <https://pywbem.readthedocs.io/en/latest/intro.html#prerequisite-operating-system-packages-for-install>`_.
-
-The following command downloads and installs the latest released version of the
-pywbemtools package from `PyPI`_ into the currently active Python environment:
-
-.. code-block:: text
-
-    $ pip install pywbemtools
-
-As an alternative, if you want to install the latest development level of the
-pywbemtools package for some reason, install directly from the ``master``
-branch of the Git repository of the package:
-
-.. code-block:: text
-
-    $ pip install git+https://github.com/pywbem/pywbemtools.git@master#egg=pywbemtools
-
-
-NOTE: Installing with ``setup.py install`` has been deprecated by
-setuptools, as explained in
-`Why you shouldn't invoke setup.py directly <https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html>`_.
-Installation with ``setup.py install`` is no longer supported by this package.
-
-NOTE: pywbemtools may also be installed for development and to include the
-pywbemtools test environment by cloning the pywbemtools git repository as
-documented in :ref:`Pywbemtools development`.
+Troubleshooting the installation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. index:: pair; troubleshooting: pywbem
 

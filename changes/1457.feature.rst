@@ -1,0 +1,1 @@
+Changed installation instructions to recommend the use of pipx.
