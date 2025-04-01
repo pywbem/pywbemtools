@@ -181,6 +181,16 @@ documentation describes the use of "virtualenv":
 
         (pywbemtools) $ pip install pywbemtools
 
+    If you want to use `uv <https://docs.astral.sh/uv/>`_ for installing Python
+    packages, this can be done with:
+
+    .. code-block:: bash
+
+        (pywbemtools) $ uv pip install pywbemtools
+
+    In the remainder of this section, only the installation with "pip" is
+    described, but "uv" can be used as well.
+
     To install a specific released version of pywbemtools, e.g. 1.2.0:
 
     .. code-block:: bash
