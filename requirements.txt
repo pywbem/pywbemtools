@@ -42,7 +42,8 @@ tabulate>=0.8.8; python_version >= '3.10'
 
 toposort>=1.6
 # psutil 6.0.0 fixes an install error on Python 3.13 on Windows
-psutil>=6.0.0
+# safety 3.4.0 depends on psutil~=6.1.0
+psutil~=6.1.0
 
 # prompt-toolkit>=3.0 may cause WinError 995 on py38 on Windows (issue #690).
 # version 3.0.36 requirement for click-repl
