@@ -582,7 +582,7 @@ def success_signal_handler(sig, frame):
     success of startup completion of the 'run' child process.
     """
     # pylint: disable=global-statement,global-variable-not-assigned
-    global RUN_STARTUP_STATUS, RUN_STARTUP_COND
+    global RUN_STARTUP_STATUS, RUN_STARTUP_COND  # noqa: F824
 
     if _config.VERBOSE_PROCESSES_ENABLED:
         print_out("Start process: Handling success signal ({}) from run "
@@ -600,7 +600,7 @@ def failure_signal_handler(sig, frame):
     failure of startup completion of the 'run' child process.
     """
     # pylint: disable=global-statement,global-variable-not-assigned
-    global RUN_STARTUP_STATUS, RUN_STARTUP_COND
+    global RUN_STARTUP_STATUS, RUN_STARTUP_COND  # noqa: F824
 
     if _config.VERBOSE_PROCESSES_ENABLED:
         print_out("Start process: Handling failure signal ({}) from run "
@@ -621,7 +621,7 @@ def wait_startup_completion(child_pid):
         or failed its startup (1).
     """
     # pylint: disable=global-statement,global-variable-not-assigned
-    global RUN_STARTUP_STATUS, RUN_STARTUP_COND
+    global RUN_STARTUP_STATUS, RUN_STARTUP_COND  # noqa: F824
 
     if _config.VERBOSE_PROCESSES_ENABLED:
         print_out("Start process: Waiting for run process {} to complete "
