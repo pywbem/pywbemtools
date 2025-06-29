@@ -43,6 +43,7 @@ typer==0.12.1
 typer-cli==0.12.1
 typer-slim==0.12.1
 # psutil is handled in install
+filelock==3.16.1
 
 # The following used by safety and Sphinx
 Levenshtein==0.25.1
@@ -121,8 +122,6 @@ chardet==3.0.2
 clint==0.5.1
 contextlib2==0.6.0
 docopt==0.6.1
-# safety 3.4.0 requires filelock~=3.16.1
-filelock~=3.16.1
 future==0.18.3
 gitdb==4.0.8
 html5lib==0.999999999
@@ -162,7 +161,6 @@ terminado==0.6
 testpath==0.3
 toml==0.10.0
 tomli==2.0.1
-tornado==6.4.2
 tqdm==4.66.3
 traceback2==1.4.0
 traitlets==4.3.1
