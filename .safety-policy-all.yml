@@ -94,6 +94,8 @@ security:
             reason: Fixed tornado version 6.4.2 requires Python>=3.8 and is used there
         74735:
             reason: Fixed jinja2 version 3.1.5 requires Python>=3.7 and is used there
+        75976:
+            reason: Fixed jinja2 version 3.1.6 requires Python>=3.7 and is used there
 
     # Continue with exit code 0 when vulnerabilities are found.
     continue-on-vulnerability-error: False
