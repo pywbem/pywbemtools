@@ -62,13 +62,14 @@ mock==3.0.0
 # packaging 21.3 requires pyparsing>=2.0.2,!=3.0.5
 pyparsing==2.3.1
 
-urllib3==1.26.19
+urllib3==2.2.3; python_version == '3.8'
+urllib3==2.5.0; python_version >= '3.9'
 
 
 # All other indirect dependencies for install that are not in requirements.txt
 
 ply==3.10
-requests==2.32.2
+requests==2.32.4
 certifi==2024.7.4
 
 # prompt-toolkit 3.0 requires wcwidth
