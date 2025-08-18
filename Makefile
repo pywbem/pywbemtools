@@ -742,14 +742,16 @@ $(sdist_file): pyproject.toml MANIFEST.in $(doc_utility_help_files) $(dist_depen
 	@echo "Makefile: Creating the source distribution archive: $(sdist_file)"
 	-$(call RM_FUNC,MANIFEST)
 	-$(call RMDIR_FUNC,build $(package_name).egg-info-INFO .eggs)
-	$(PYTHON_CMD) -m build --sdist --outdir $(dist_dir) .
+	$(PYTHON_CMD) -m build --no-isolation --sdist --outdir $(dist_dir) .
+	bash -c "ls -l $(sdist_file) || ls -l $(dist_dir) && echo package_level=$(package_level) && $(PYTHON_CMD) -m setuptools_scm"
 	@echo "Makefile: Done creating the source distribution archive: $(sdist_file)"
 
 $(bdist_file) $(version_file): pyproject.toml MANIFEST.in $(doc_utility_help_files) $(dist_dependent_files)
 	@echo "Makefile: Creating the normal wheel distribution archive: $(bdist_file)"
 	-$(call RM_FUNC,MANIFEST)
 	-$(call RMDIR_FUNC,build $(package_name).egg-info-INFO .eggs)
-	$(PYTHON_CMD) -m build --wheel --outdir $(dist_dir) -C--universal .
+	$(PYTHON_CMD) -m build --no-isolation --wheel --outdir $(dist_dir) -C--universal .
+	bash -c "ls -l $(bdist_file) $(version_file) || ls -l $(dist_dir) && echo package_level=$(package_level) && $(PYTHON_CMD) -m setuptools_scm"
 	@echo "Makefile: Done creating the normal wheel distribution archive: $(bdist_file)"
 
 # PyLint status codes:

@@ -59,7 +59,7 @@ PyYAML>=6.0.2
 yamlloader>=0.5.5
 
 # safety 2.3.5 pins packaging to <22.0 and requires >=21.0
-packaging>=22.0
+packaging>=24.1
 
 # See issue #822 about issue in mock 4.0.3.
 mock>=3.0.0
