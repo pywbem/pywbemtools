@@ -226,8 +226,21 @@ def check_output(cmd_args, situation, msg, verbose):
         try:
             out, err = p.communicate(timeout=30)
         except subprocess.TimeoutExpired:
-            p.kill()
-            p.wait()
+            print(f"{situation}: Warning: command '{cmd_args}' timed out, "
+                  "killing it to clean up")
+            try:
+                print(f"Killing process of command '{cmd_args}'")
+                p.kill()
+            except Exception as exc:  # pylint: disable=broad-exception-caught
+                print(f"Error: Killing process of command '{cmd_args}' failed "
+                      f"with: {exc}")
+            try:
+                print(f"Waiting for killing of command '{cmd_args}' to be "
+                      "complete")
+                p.wait()
+            except Exception as exc:  # pylint: disable=broad-exception-caught
+                print(f"Error: Waiting for killing of command '{cmd_args}' "
+                      f"failed with: {exc}")
             raise
         rc = p.poll()
         if rc:
