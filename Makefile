@@ -834,7 +834,7 @@ test: $(done_dir)/develop_$(pymn)_$(PACKAGE_LEVEL).done $(doc_utility_help_files
 ifeq ($(PLATFORM),Windows_native)
 	cmd /c "set PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) & set PYWBEMCLI_ALT_HOME_DIR=$(PYWBEMCLI_ALT_HOME_DIR) & py.test --color=yes $(pytest_cov_opts) $(pytest_warning_opts) $(pytest_opts) tests/unit -s"
 else
-	PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) PYWBEMCLI_ALT_HOME_DIR=$(PYWBEMCLI_ALT_HOME_DIR) py.test --color=yes $(pytest_cov_opts) $(pytest_warning_opts) $(pytest_opts) tests/unit -s
+	PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) PYWBEMCLI_ALT_HOME_DIR=$(PYWBEMCLI_ALT_HOME_DIR) py.test --color=yes $(pytest_cov_opts) $(pytest_warning_opts) $(pytest_opts) tests/unit/pywbemlistener -s
 endif
 	@echo "Makefile: Done running tests"
 
