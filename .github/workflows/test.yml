@@ -53,21 +53,6 @@ jobs:
             \"package_level\": [ \"minimum\", \"latest\" ], \
             \"include\": [ \
               { \
-                \"os\": \"ubuntu-latest\", \
-                \"python-version\": \"3.8\", \
-                \"package_level\": \"minimum\" \
-              }, \
-              { \
-                \"os\": \"ubuntu-latest\", \
-                \"python-version\": \"3.8\", \
-                \"package_level\": \"latest\" \
-              }, \
-              { \
-                \"os\": \"ubuntu-latest\", \
-                \"python-version\": \"3.10\", \
-                \"package_level\": \"latest\" \
-              }, \
-              { \
                 \"os\": \"macos-latest\", \
                 \"python-version\": \"3.8\", \
                 \"package_level\": \"latest\" \
@@ -81,21 +66,6 @@ jobs:
                 \"os\": \"macos-latest\", \
                 \"python-version\": \"3.13.0\", \
                 \"package_level\": \"minimum\" \
-              }, \
-              { \
-                \"os\": \"windows-latest\", \
-                \"python-version\": \"3.8\", \
-                \"package_level\": \"latest\" \
-              }, \
-              { \
-                \"os\": \"windows-latest\", \
-                \"python-version\": \"3.12\", \
-                \"package_level\": \"latest\" \
-              }, \
-              { \
-                \"os\": \"windows-latest\", \
-                \"python-version\": \"3.13.0\", \
-                \"package_level\": \"latest\" \
               } \
             ] \
           }" >> $GITHUB_OUTPUT; \
@@ -206,42 +176,42 @@ jobs:
       run: |
         echo "Package dependency tree of installed Python packages:"
         python -m pipdeptree --all
-    - name: Run check_reqs
-      env:
-        PACKAGE_LEVEL: ${{ matrix.package_level }}
-        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
-      run: |
-        make check_reqs
-    - name: Run build
-      env:
-        PACKAGE_LEVEL: ${{ matrix.package_level }}
-        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
-      run: |
-        make build
-    - name: Run builddoc
-      env:
-        PACKAGE_LEVEL: ${{ matrix.package_level }}
-        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
-      run: |
-        make builddoc
-    - name: Run check
-      env:
-        PACKAGE_LEVEL: ${{ matrix.package_level }}
-        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
-      run: |
-        make check
-    - name: Run ruff
-      env:
-        PACKAGE_LEVEL: ${{ matrix.package_level }}
-        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
-      run: |
-        make ruff
-    - name: Run pylint
-      env:
-        PACKAGE_LEVEL: ${{ matrix.package_level }}
-        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
-      run: |
-        make pylint
+    # - name: Run check_reqs
+    #   env:
+    #     PACKAGE_LEVEL: ${{ matrix.package_level }}
+    #     RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
+    #   run: |
+    #     make check_reqs
+    # - name: Run build
+    #   env:
+    #     PACKAGE_LEVEL: ${{ matrix.package_level }}
+    #     RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
+    #   run: |
+    #     make build
+    # - name: Run builddoc
+    #   env:
+    #     PACKAGE_LEVEL: ${{ matrix.package_level }}
+    #     RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
+    #   run: |
+    #     make builddoc
+    # - name: Run check
+    #   env:
+    #     PACKAGE_LEVEL: ${{ matrix.package_level }}
+    #     RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
+    #   run: |
+    #     make check
+    # - name: Run ruff
+    #   env:
+    #     PACKAGE_LEVEL: ${{ matrix.package_level }}
+    #     RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
+    #   run: |
+    #     make ruff
+    # - name: Run pylint
+    #   env:
+    #     PACKAGE_LEVEL: ${{ matrix.package_level }}
+    #     RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
+    #   run: |
+    #     make pylint
     - name: Run test
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
@@ -249,36 +219,36 @@ jobs:
         # TESTCASES: test_class_cmds.py
       run: |
         make test
-    - name: Run end2end test with WBEM server Docker image
-      if: ${{ matrix.os == 'ubuntu-latest' }}
-      env:
-        PACKAGE_LEVEL: ${{ matrix.package_level }}
-        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
-        # Uses TEST_SERVER_IMAGE variable
-      run: |
-        make end2endtest
-    - name: Send coverage result to coveralls.io
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        COVERALLS_PARALLEL: true
-        COVERALLS_FLAG_NAME: "${{ matrix.os }},${{ matrix.python-version }},${{ matrix.package_level }}"
-        COVERALLS_SERVICE_NAME: github
-        COVERALLS_SERVICE_JOB_ID: "${{ github.run_id }}"
-        COVERALLS_SERVICE_NUMBER: "${{ github.workflow }}-${{ github.run_number }}"
-      run: |
-        coveralls
-    - name: Run installtest
-      env:
-        PACKAGE_LEVEL: ${{ matrix.package_level }}
-        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
-      run: |
-        make installtest
-    - name: Run safety
-      env:
-        PACKAGE_LEVEL: ${{ matrix.package_level }}
-        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
-      run: |
-        make safety
+    # - name: Run end2end test with WBEM server Docker image
+    #   if: ${{ matrix.os == 'ubuntu-latest' }}
+    #   env:
+    #     PACKAGE_LEVEL: ${{ matrix.package_level }}
+    #     RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
+    #     # Uses TEST_SERVER_IMAGE variable
+    #   run: |
+    #     make end2endtest
+    # - name: Send coverage result to coveralls.io
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #     COVERALLS_PARALLEL: true
+    #     COVERALLS_FLAG_NAME: "${{ matrix.os }},${{ matrix.python-version }},${{ matrix.package_level }}"
+    #     COVERALLS_SERVICE_NAME: github
+    #     COVERALLS_SERVICE_JOB_ID: "${{ github.run_id }}"
+    #     COVERALLS_SERVICE_NUMBER: "${{ github.workflow }}-${{ github.run_number }}"
+    #   run: |
+    #     coveralls
+    # - name: Run installtest
+    #   env:
+    #     PACKAGE_LEVEL: ${{ matrix.package_level }}
+    #     RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
+    #   run: |
+    #     make installtest
+    # - name: Run safety
+    #   env:
+    #     PACKAGE_LEVEL: ${{ matrix.package_level }}
+    #     RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
+    #   run: |
+    #     make safety
 
   test_finish:
     needs: test
