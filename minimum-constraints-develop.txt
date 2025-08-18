@@ -101,7 +101,7 @@ entrypoints==0.3.0
 ruff==0.3.5
 
 # Package dependency management tools
-pipdeptree==2.2.0
+pipdeptree==2.24.0
 pip-check-reqs==2.4.3; python_version <= '3.11'
 pip-check-reqs==2.5.1; python_version >= '3.12'
 
