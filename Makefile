@@ -314,6 +314,7 @@ dist_dependent_files_all := \
     LICENSE.txt \
     README.md \
     README_PYPI.md \
+		AUTHORS.md \
     requirements.txt \
     pyproject.toml \
     $(wildcard $( package_name)/*.py) \
@@ -377,6 +378,7 @@ help:
 	@echo "  release_publish - Publish to PyPI when releasing a version (requires VERSION and optionally BRANCH to be set)"
 	@echo "  start_branch - Create a start branch when starting a new version (requires VERSION and optionally BRANCH to be set)"
 	@echo "  start_tag - Create a start tag when starting a new version (requires VERSION and optionally BRANCH to be set)"
+	@echo "  authors    - Generate AUTHORS.md file from git log"
 	@echo "  todo       - Check for TODOs in Python and docs sources"
 	@echo "  clean      - Remove any temporary files"
 	@echo "  clobber    - Remove everything created to ensure clean start - use after setting git tag"
@@ -405,6 +407,9 @@ help:
 	@echo "      Optional, defaults to 'pip'."
 	@echo "  VERSION=... - M.N.U version to be released or started"
 	@echo "  BRANCH=... - Name of branch to be released or started (default is derived from VERSION)"
+
+.PHONY: _always
+_always:
 
 .PHONY: platform
 platform:
@@ -666,6 +671,21 @@ start_tag:
 	rm -f branch.tmp
 	@echo "Done: Pushed the release start tag and cleaned up the release start branch."
 	@echo "Makefile: $@ done."
+
+.PHONY: authors
+authors: AUTHORS.md
+	@echo "Makefile: $@ done."
+
+# Make sure the AUTHORS.md file is up to date but has the old date when it did
+# not change to prevent redoing dependent targets.
+AUTHORS.md: _always
+	echo "# Authors of this project" >AUTHORS.md.tmp
+	echo "" >>AUTHORS.md.tmp
+	echo "Sorted list of authors derived from git commit history:" >>AUTHORS.md.tmp
+	echo '```' >>AUTHORS.md.tmp
+	bash -c "git shortlog --summary --email HEAD | cut -f 2 | LC_ALL=C.UTF-8 sort >>AUTHORS.md.tmp"
+	echo '```' >>AUTHORS.md.tmp
+	bash -c "if ! diff -q AUTHORS.md.tmp AUTHORS.md; then echo 'Updating AUTHORS.md as follows:'; diff AUTHORS.md.tmp AUTHORS.md; mv AUTHORS.md.tmp AUTHORS.md; else echo 'AUTHORS.md was already up to date'; rm AUTHORS.md.tmp; fi"
 
 .PHONY: html
 html: $(doc_build_dir)/html/index.html
