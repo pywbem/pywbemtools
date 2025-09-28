@@ -37,6 +37,9 @@ Released: not yet
   package Levenshtein used by safety and Sphinx and roman-numerals-py used by
   Sphinx. See PR 1453 for details.
 
+* Dev: Circumvented safety issue with import of typer module by pinning typer
+  to <0.17.0.
+
 **Enhancements:**
 
 **Cleanup:**

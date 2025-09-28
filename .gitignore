@@ -33,6 +33,7 @@ wbemcli.log
 /tests/schema/mof*/
 /tests/unit/.flake8
 /pywbemtools/pywbemcli/.flake8
+/pywbemtools/_version_scm.py
 setuptools-*.egg
 setuptools-*.zip
 /tmp_*/
