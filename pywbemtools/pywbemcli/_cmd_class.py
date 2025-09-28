@@ -61,7 +61,7 @@ from .._output_formatting import output_format_is_table, \
 
 no_qualifiers_class_option = [              # pylint: disable=invalid-name
     click.option('--nq', '--no-qualifiers', 'no_qualifiers', is_flag=True,
-                 default=True,
+                 default=False,
                  help=u'Do not include qualifiers in the returned class(es). '
                       'Default: Include qualifiers.')]
 
@@ -597,7 +597,7 @@ def cmd_class_get(context, classname, options):
                 classname,
                 namespace=ns,
                 LocalOnly=options['local_only'],
-                IncludeQualifiers=options['no_qualifiers'],
+                IncludeQualifiers=not options['no_qualifiers'],
                 IncludeClassOrigin=options['include_classorigin'],
                 PropertyList=resolve_propertylist(options['propertylist'])))
 
@@ -677,7 +677,7 @@ def cmd_class_references(context, classname, options):
                     cln,
                     ResultClass=options['result_class'],
                     Role=options['role'],
-                    IncludeQualifiers=options['no_qualifiers'],
+                    IncludeQualifiers=not options['no_qualifiers'],
                     IncludeClassOrigin=options['include_classorigin'],
                     PropertyList=resolve_propertylist(options['propertylist'])))
 
@@ -722,7 +722,7 @@ def cmd_class_associators(context, classname, options):
                     Role=options['role'],
                     ResultClass=options['result_class'],
                     ResultRole=options['result_role'],
-                    IncludeQualifiers=options['no_qualifiers'],
+                    IncludeQualifiers=not options['no_qualifiers'],
                     IncludeClassOrigin=options['include_classorigin'],
                     PropertyList=resolve_propertylist(options['propertylist'])))
 

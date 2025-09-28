@@ -364,7 +364,7 @@ def enumerate_classes_filtered(context, namespace, classname, options):
 
     names_only = options.get('names_only', False)
 
-    iq = options.get('no_qualifiers', True)
+    iq = not options.get('no_qualifiers', False)
 
     # Force IncludeQualifier true if results are to be filtered since
     # the filter requires that qualifiers exist.

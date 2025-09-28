@@ -40,6 +40,9 @@ Released: not yet
 * Dev: Circumvented safety issue with import of typer module by pinning typer
   to <0.17.0.
 
+* Fixed that the --nq, --no-qualifiers option was ignored for class operations,
+  and qualifiers were always included.
+
 **Enhancements:**
 
 **Cleanup:**
