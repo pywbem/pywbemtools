@@ -10,6 +10,7 @@
 *.log
 *.tmp
 tmp.*
+tmp_*
 *~
 .*~
 pywbem_os_setup.sh
