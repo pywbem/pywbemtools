@@ -1,0 +1,1 @@
+Increased version of pywbem package to 1.8.0 to pick up fixes and new functions.

@@ -6,7 +6,7 @@
 
 # Direct dependencies for install (must be consistent with minimum-constraints-install.txt)
 
-pywbem>=1.7.2
+pywbem>=1.8.0
 # When using the GitHub master branch of pywbem, comment out the line above,
 # activate the GitHub link based dependency below.
 # In that case, some of the install tests need to be disabled by setting
