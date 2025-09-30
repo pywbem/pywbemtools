@@ -107,6 +107,8 @@ The setup for developers of pywbemtools is described in
 Installation using pipx
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _virtual Python environment: https://docs.python-guide.org/en/latest/dev/virtualenvs/
+
 The recommended way to use the pywbemtools Python package is by installing it with
 pipx.
 
