@@ -371,8 +371,13 @@ START_TESTCASES = [
             rc=1,
             stderr=[r"Cannot import module nomodule: "
                     r"No module named .?nomodule.?"],
-            test='all',
+            test='in',
         ),
+        # The SystemExit raised in the exit handler causes pytest to warn
+        # about an unraisable exception ("Exception ignored in ..."). According
+        # to the pytest docs, this warning can be silenced (e.g. with
+        # "-p no:threadexception"), but that did not work. Therefore, we use
+        # test='in' to tolerate the warning on stderr.
         RUN_NO_WIN,
     ),
     (
@@ -387,8 +392,13 @@ START_TESTCASES = [
             rc=1,
             stderr=[r"Function nofunction\(\) not found in module "
                     r"tests\.unit\.pywbemlistener\.indicall_display"],
-            test='all',
+            test='in',
         ),
+        # The SystemExit raised in the exit handler causes pytest to warn
+        # about an unraisable exception ("Exception ignored in ..."). According
+        # to the pytest docs, this warning can be silenced (e.g. with
+        # "-p no:threadexception"), but that did not work. Therefore, we use
+        # test='in' to tolerate the warning on stderr.
         RUN_NO_WIN,
     ),
     (
@@ -403,8 +413,13 @@ START_TESTCASES = [
             rc=1,
             stderr=[r"Cannot import module tests\.unit\.pywbemlistener\."
                     r"indicall_importerror: ImportError"],
-            test='all',
+            test='in',
         ),
+        # The SystemExit raised in the exit handler causes pytest to warn
+        # about an unraisable exception ("Exception ignored in ..."). According
+        # to the pytest docs, this warning can be silenced (e.g. with
+        # "-p no:threadexception"), but that did not work. Therefore, we use
+        # test='in' to tolerate the warning on stderr.
         RUN_NO_WIN,
     ),
     (
