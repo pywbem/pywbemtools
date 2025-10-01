@@ -1,0 +1,3 @@
+Test: Fixed that listener unit test module test_start_cmd.py failed with
+additional lines. These lines were pytest warnings about unraisable exception
+SystemExit that is (correctly) raised in the exit handler.
