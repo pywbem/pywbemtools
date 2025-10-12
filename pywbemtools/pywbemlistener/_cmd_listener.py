@@ -64,6 +64,9 @@ except AttributeError:
     SIGNAL_RUN_STARTUP_SUCCESS = signal.SIGBREAK
 SIGNAL_RUN_STARTUP_FAILURE = signal.SIGINT
 
+# Event for stopping the 'run' process in its signal handler.
+RUN_STOP_EVENT = threading.Event()
+
 # Status and condition used to communicate the startup completion status of the
 # 'run' process between the signal handlers and other functions in the
 # 'start' process.
@@ -912,8 +915,8 @@ def run_term_signal_handler(sig, frame):
     if _config.VERBOSE_PROCESSES_ENABLED:
         print_out(f"Run process: Received termination signal ({sig})")
 
-    # This triggers the registered exit handler run_exit_handler()
-    raise SystemExit(1)
+    # This causes the main loop of the 'run' process to end
+    RUN_STOP_EVENT.set()
 
 
 def transpose(headers, rows):
@@ -1156,17 +1159,23 @@ def cmd_listener_run(context, name, options):
                       f"{start_pid}")
         os.kill(start_pid, SIGNAL_RUN_STARTUP_SUCCESS)  # Sends the signal
 
-    try:
-        while True:
-            sleep(60)
-    except (KeyboardInterrupt, SystemExit) as exc:
-        if _config.VERBOSE_PROCESSES_ENABLED:
-            print_out(f"Run process: Caught exception {type(exc)}: {exc}")
-        # Note: SystemExit occurs only due to being raised in the signal handler
-        # that was registered.
+    # Wait for stop event to be set or KeyboardInterrupt to happen
+    exc = None
+    while not RUN_STOP_EVENT.is_set():
+        try:
+            RUN_STOP_EVENT.wait(1)
+        except KeyboardInterrupt as exc:
+            break
 
-        listener.stop()
-        click.echo(f"Shut down listener {name} running at {url}")
+    if _config.VERBOSE_PROCESSES_ENABLED:
+        if exc:
+            print_out(f"Run process: Caught exception {type(exc)}: {exc}")
+        else:
+            print_out(f"Run process: Got stop event")
+
+    # Cleanup
+    click.echo(f"Shutting down listener {name} running at {url}")
+    listener.stop()
 
 
 def cmd_listener_start(context, name, options):
