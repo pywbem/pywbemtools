@@ -43,6 +43,8 @@ Released: not yet
 * Fixed that the --nq, --no-qualifiers option was ignored for class operations,
   and qualifiers were always included.
 
+* Test: Fixed new issues raised by pylint 4.0.0.
+
 **Enhancements:**
 
 **Cleanup:**
