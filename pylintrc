@@ -183,7 +183,7 @@ confidence=
 #       any code issues we will ignore this warning.
 # Note: "consider-using-set-comprehension" not allowed in python 2.6 so we
 #       ignore it as long as we are using 2.7
-disable=I0011, bad-option-value,
+disable=I0011, bad-option-value, unrecognized-option,
         too-many-locals, too-many-branches, too-many-statements,
         too-many-lines, too-many-public-methods,
         too-many-nested-blocks, too-many-return-statements, too-many-arguments,
