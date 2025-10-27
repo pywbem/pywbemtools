@@ -25,7 +25,8 @@ pluggy==0.13.0
 colorama==0.3.9; python_version == '2.7'
 colorama==0.4.5; python_version >= '3.6'
 importlib-metadata==2.1.3; python_version <= '3.5'
-importlib-metadata==4.8.3; python_version >= '3.6'
+importlib-metadata==4.8.3; python_version == '3.6'
+importlib-metadata==6.6.0; python_version >= '3.7'
 
 # Coverage reporting (no imports, invoked via coveralls script):
 coverage==5.0; python_version == '2.7' or python_version >= '3.6'
@@ -42,7 +43,8 @@ safety-schemas==0.0.1; python_version >= '3.7'
 dparse==0.6.4b0; python_version >= '3.7'
 ruamel.yaml==0.17.21; python_version >= '3.7'
 Authlib==1.2.0; python_version == '3.7'
-Authlib==1.3.1; python_version >= '3.8'
+Authlib==1.3.2; python_version == '3.8'
+Authlib==1.6.5; python_version >= '3.9'
 marshmallow==3.15.0; python_version >= '3.7'
 pydantic==1.10.13; python_version >= '3.7'
 pydantic_core==2.20.0; python_version >= '3.7'
@@ -60,8 +62,7 @@ more-itertools==5.0.0
 
 # Virtualenv
 virtualenv==16.1.0; python_version <= '3.6'
-virtualenv==20.21.0; python_version >= '3.7' and python_version <= '3.11'  # requires six<2,>=1.12.0
-virtualenv==20.26.6; python_version >= '3.12'
+virtualenv==20.26.6; python_version >= '3.7'
 
 # Sphinx (no imports, invoked via sphinx-build script):
 # Sphinx is used only on Python>=3.8
@@ -102,8 +103,7 @@ tomlkit==0.10.1; python_version >= '3.7'
 dill==0.3.4; python_version >= '3.6' and python_version <= '3.10'
 dill==0.3.7; python_version >= '3.11'
 platformdirs==2.2.0; python_version == '3.6'
-platformdirs==2.4.0; python_version >= '3.7' and python_version <= '3.11'
-platformdirs==3.9.1; python_version >= '3.12'
+platformdirs==3.9.1; python_version >= '3.7'
 
 # Flake8 and dependents (no imports, invoked via flake8 script):
 flake8==3.8.0; python_version <= '3.9'
@@ -158,7 +158,7 @@ dataclasses==0.8; python_version == '3.6'
 docopt==0.6.1
 enum34==1.1.6; python_version == "2.7"
 filelock==3.2.0; python_version <= '3.6'
-filelock==3.4.1; python_version == '3.7'
+filelock==3.12.2; python_version == '3.7'
 # safety 3.4.0 requires filelock~=3.16.1
 filelock==3.16.1; python_version >= '3.8'
 functools32==3.2.3.post2; python_version < "3.2"
