@@ -18,7 +18,7 @@ pluggy>=0.13.0
 # pylint>=2.15 requires colorama>=0.4.5
 colorama>=0.4.5
 # flake8 up to 6.0.0 has not yet adjusted to the removed interfaces in importlib-metadata 5.0 and fails with AttributeError
-importlib-metadata>=4.8.3,<5.0.0
+importlib-metadata>=6.6.0
 
 # Coverage reporting (no imports, invoked via coveralls script):
 # coverage is pinned to <7.0 to speed up pip; coveralls 3.3 also pins coverage<7.0
@@ -35,7 +35,8 @@ safety-schemas>=0.0.14
 dparse>=0.6.4
 ruamel.yaml>=0.17.21
 # click is handled in install
-Authlib>=1.3.1
+Authlib>=1.3.2; python_version == '3.8'
+Authlib>=1.6.5; python_version >= '3.9'
 marshmallow>=3.15.0
 pydantic>=2.8.0
 pydantic_core>=2.20.0
