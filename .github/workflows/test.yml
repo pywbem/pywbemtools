@@ -43,13 +43,13 @@ jobs:
         if [[ "${{ github.event_name }}" == "schedule" || "${{ github.head_ref }}" =~ ^release_ ]]; then \
           echo "matrix={ \
             \"os\": [ \"ubuntu-latest\", \"macos-latest\", \"windows-latest\" ], \
-            \"python-version\": [ \"3.8\", \"3.9\", \"3.10\", \"3.11\", \"3.12\", \"3.13.0\" ], \
+            \"python-version\": [ \"3.8\", \"3.9\", \"3.10\", \"3.11\", \"3.12\", \"3.13\", \"3.14\" ], \
             \"package_level\": [ \"minimum\", \"latest\" ] \
           }" >> $GITHUB_OUTPUT; \
         else \
           echo "matrix={ \
             \"os\": [ \"ubuntu-latest\" ], \
-            \"python-version\": [ \"3.13.0\" ], \
+            \"python-version\": [ \"3.14\" ], \
             \"package_level\": [ \"minimum\", \"latest\" ], \
             \"include\": [ \
               { \
@@ -79,7 +79,7 @@ jobs:
               }, \
               { \
                 \"os\": \"macos-latest\", \
-                \"python-version\": \"3.13.0\", \
+                \"python-version\": \"3.14\", \
                 \"package_level\": \"minimum\" \
               }, \
               { \
@@ -94,7 +94,7 @@ jobs:
               }, \
               { \
                 \"os\": \"windows-latest\", \
-                \"python-version\": \"3.13.0\", \
+                \"python-version\": \"3.14\", \
                 \"package_level\": \"latest\" \
               } \
             ] \
