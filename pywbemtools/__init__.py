@@ -21,5 +21,5 @@ Initialization of the pywbemtools package.
 import sys
 
 # Keep these Python versions in sync with setup.py
-if sys.version_info[0:2] < (3, 8):
-    raise RuntimeError('pywbemtools requires Python 3.8 or higher')
+if sys.version_info[0:2] < (3, 9):
+    raise RuntimeError('pywbemtools requires Python 3.9 or higher')
