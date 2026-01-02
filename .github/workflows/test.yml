@@ -246,7 +246,8 @@ jobs:
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
         RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
-        # TESTCASES: test_class_cmds.py
+        # TESTCASES: pywbemlistener
+        # TESTOPTS: -vv
       run: |
         make test
     - name: Run end2end test with WBEM server Docker image

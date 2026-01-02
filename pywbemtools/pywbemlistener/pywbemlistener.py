@@ -17,6 +17,8 @@
 The main function of the pywbemlistener command.
 """
 
+import sys
+import os
 import warnings
 import click
 
@@ -135,3 +137,49 @@ def cli(ctx, output_format, logdir, verbose, pdb, warn):
     # Since there is no interactive mode, there is never a context object.
     assert ctx.obj is None
     ctx.obj = ContextObj(output_format, logdir, verbose, pdb, warn)
+
+
+def main():
+    """
+    Main function - the registered entry point.
+
+    We perform the invocation of the command and handle exceptions here
+    instead of using the default Click way of doing it to get
+    control at the very end to cleanup the redirected stdout/stderr that is
+    used by the 'start' command).
+
+    Returns:
+      int: Exit code.
+    """
+    ctx = None
+    try:
+
+        my_name = os.path.basename(sys.argv[0])
+        ctx = cli.make_context(my_name, sys.argv[1:])
+        with ctx:
+            ctx.command.invoke(ctx)  # Calls cli()
+
+    except click.ClickException as exc:
+        # Used for command line parsing errors detected by Click and also
+        # of course when raised explicitly in our code.
+        print(f"Error: {exc}", flush=True, file=sys.stderr)
+        return exc.exit_code
+
+    except click.exceptions.Exit as exc:
+        # Used e.g. for --help
+        return exc.exit_code
+
+    finally:
+        # Cleanup for redirected stdout/stderr (used by start command).
+        if ctx is not None and ctx.obj is not None:
+            context = ctx.obj
+            if getattr(context, "saved_stdout", None) is not None:
+                sys.stdout = context.saved_stdout
+            if getattr(context, "saved_stderr", None) is not None:
+                sys.stderr = context.saved_stderr
+            if getattr(context, "stdout_fp", None) is not None:
+                context.stdout_fp.close()
+            if getattr(context, "stderr_fp", None) is not None:
+                context.stderr_fp.close()
+
+    return 0

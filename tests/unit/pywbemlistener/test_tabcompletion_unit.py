@@ -72,7 +72,6 @@ TESTCASES_LISTENER_NAME_COMPLETE = [
 ]
 
 
-@pytest.mark.skip()  # TODO: Disabled to circumvent failure on GitHub Actions
 @pytest.mark.parametrize(
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
     TESTCASES_LISTENER_NAME_COMPLETE)

@@ -64,6 +64,12 @@ class ContextObj:
         self._spinner_enabled = None  # Deferred init in getter
         self._spinner_obj = click_spinner.Spinner()
 
+        # Data for stdout/stderr redirection, used by start command
+        self.saved_stdout = None
+        self.saved_stderr = None
+        self.stdout_fp = None
+        self.stderr_fp = None
+
     def __repr__(self):
         return f'ContextObj(at {id(self):08x}, ' \
                'output_format={s.output_format}, ' \
