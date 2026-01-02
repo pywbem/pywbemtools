@@ -93,7 +93,7 @@ LIST_TESTCASES = [
         dict(
             stdout=[
                 r"^Name +Port +Scheme +Bind addr +PID +Created$",
-                r"^lis1 +50001 +http +none +[0-9]+ +[0-9\- :\.]+$",
+                r"^lis1 +50001 +http +\(any\) +[0-9]+ +[0-9\- :\.]+$",
             ],
             test='all',
         ),
@@ -113,8 +113,8 @@ LIST_TESTCASES = [
         dict(
             stdout=[
                 r"^Name +Port +Scheme +Bind addr +PID +Created$",
-                r"^lis1 +50001 +http +none +[0-9]+ +[0-9\- :\.]+$",
-                r"^lis2 +50002 +http +none +[0-9]+ +[0-9\- :\.]+$",
+                r"^lis1 +50001 +http +\(any\) +[0-9]+ +[0-9\- :\.]+$",
+                r"^lis2 +50002 +http +\(any\) +[0-9]+ +[0-9\- :\.]+$",
                 r"^lis3 +50003 +http +localhost +[0-9]+ +[0-9\- :\.]+$",
             ],
             test='all',
