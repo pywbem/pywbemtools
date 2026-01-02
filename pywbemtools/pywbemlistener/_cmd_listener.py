@@ -982,19 +982,14 @@ def cmd_listener_run(context, name, options):
     if start_pid is not None:
         start_pid = int(start_pid)
 
-    # If the stdout of the run process is a pipe (e.g. when capturing
-    # the output of the run command or its parent start command during
-    # tests, or when a user pipes the output of the run or start command),
-    # the parent process will not terminate because its child run process
-    # has the same pipe open. This is addressed by setting the file descriptor
-    # of stdout to the file descriptor of the opened log file (when logging)
-    # or the file descriptor of the opened null device (when not logging),
-    # using os.dup2().
-    # Note that this needs to be done at the OS file descriptor level. Setting
-    # sys.stdout is not sufficient, because its prior file descriptor would
-    # still be the open pipe.
-
     pid = os.getpid()
+
+    # The goal is that the run program:
+    # - writes to a log file when --logdir is specified.
+    # - writes stdout/stderr when --logdir is not specified and when not
+    #   started by the start program.
+    # - suppresses stdout/stderr when --logdir is not specified and when
+    #   started by the start program.
 
     logfile = get_logfile(context.logdir, name)
     if logfile:
@@ -1005,37 +1000,22 @@ def cmd_listener_run(context, name, options):
 
         # pylint: disable=consider-using-with
         log_fp = open(logfile, 'a', encoding='utf-8')
-
-        if sys.platform == 'win32':
-            # On Windows, the standard file descriptors are not inherited
-            # to the run process (probably due to the additional process
-            # in between), so the recommended way of redirecting stdout
-            # does not prevent the start process from terminating.
-            sys.stdout = log_fp
-        else:
-            # On UNIX, see the comment at the begin of this function.
-            # The null device will be closed in run_exit_handler()
-            os.dup2(log_fp.fileno(), sys.stdout.fileno())
+        sys.stdout = log_fp
+        sys.stderr = log_fp
 
         # This message is the first one of this run in the log file (appended)
         print_out(f"Opening 'run' output log file at {datetime.now()}")
+
     else:
 
-        # pylint: disable=consider-using-with
-        log_fp = open(os.devnull, 'w', encoding='utf-8')
+        # This message goes to the original stdout of the run process (wherever
+        # that is directed to)
+        print_out(f"Run process {pid}: Output is not logged")
 
-        if sys.platform == 'win32':
-            # On Windows, the standard file descriptors are not inherited
-            # to the run process (probably due to the additional process
-            # in between), so the recommended way of redirecting stdout
-            # does not prevent the start process from terminating.
-            sys.stdout = log_fp
-        else:
-            # On UNIX, see the comment at the begin of this function.
-            # The null device will be closed in run_exit_handler()
-            os.dup2(log_fp.fileno(), sys.stdout.fileno())
-
-        print_out("Run process {}: Assertion: This message should not appear")
+        # devnull = open(os.devnull, "w")
+        # sys.stdout = devnull
+        # sys.stderr = devnull
+        log_fp = None
 
     # Register a termination signal handler that causes the loop further down
     # to get control via SystemExit.
@@ -1074,6 +1054,9 @@ def cmd_listener_run(context, name, options):
 
     context.spinner_stop()
 
+    print_out(f"Creating listener with host={bind_addr}, "
+              f"http_port={http_port}, https_port={https_port}, "
+              f"certfile={certfile}, keyfile={keyfile}")
     try:
         listener = WBEMListener(
             host=bind_addr, http_port=http_port, https_port=https_port,
@@ -1081,6 +1064,8 @@ def cmd_listener_run(context, name, options):
     except ValueError as exc:
         raise click.ClickException(
             f"Cannot create listener {name}: {exc}")
+
+    print_out(f"Starting listener")
     try:
         listener.start()
     except (OSError, ListenerError) as exc:
@@ -1230,14 +1215,53 @@ def cmd_listener_start(context, name, options):
 
     prepare_startup_completion()
 
-    popen_kwargs = {"shell": False}
-    popen_kwargs['start_new_session'] = True
-
     if _config.VERBOSE_PROCESSES_ENABLED:
         print_out(f"Start process {pid}: Starting run process as: {run_args}")
 
-    # pylint: disable=consider-using-with
-    p = subprocess.Popen(run_args, **popen_kwargs)
+    # It is important to set stdout etc. to the null device in order not to
+    # inherit the corresponding file handles into the run program. If the file
+    # handles were inherited into the run program, the start program would not
+    # terminate when executed inside another Python program, such as in our
+    # tests.
+    # This needs ot happen at two levels:
+    # - passing subprocess.DEVNULL to subprocess.Popen(). This will set the
+    #   low level file handles in the run program to null.
+    # - setting the standard streams to an opened null device in the start
+    #   program. This will cause Python to close the original file handles.
+
+    devnull_w = None
+    devnull_r = None
+    try:
+        devnull_w = open(os.devnull, "w")
+        devnull_r = open(os.devnull, "r")
+        saved_stdout = sys.stdout
+        saved_stderr = sys.stderr
+        saved_stdin = sys.stdin
+        sys.stdout = devnull_w
+        sys.stderr = devnull_w
+        sys.stdin = devnull_r
+
+        popen_kwargs = dict(
+            shell=False,
+            start_new_session=True,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            close_fds=True,
+        )
+
+        # pylint: disable=consider-using-with
+        p = subprocess.Popen(run_args, **popen_kwargs)
+
+        sys.stdout = saved_stdout
+        sys.stderr = saved_stderr
+        sys.stdin = saved_stdin
+
+    finally:
+        if devnull_w:
+            devnull_w.close()
+        if devnull_r:
+            devnull_r.close()
 
     # Wait for startup completion or for error exit
     try:
