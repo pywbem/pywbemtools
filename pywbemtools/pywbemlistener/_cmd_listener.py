@@ -30,9 +30,9 @@ import argparse
 import importlib
 from time import sleep
 from datetime import datetime
+
 import click
 import psutil
-import packaging.version
 
 from pywbem import WBEMListener, ListenerError, CIMInstance, CIMProperty, \
     Uint16, WBEMConnection, Error
@@ -44,9 +44,6 @@ from .._output_formatting import format_table
 
 from . import _config
 from .pywbemlistener import cli
-
-# Click version as a tuple. Used to control tab-completion features
-CLICK_VERSION = packaging.version.parse(click.__version__).release
 
 # Signals used for having the 'run' command signal startup completion
 # back to its parent 'start' process.
