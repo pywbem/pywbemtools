@@ -684,7 +684,7 @@ TESTCASES_COMPARE_INSTANCES = [
           inst2=CIMInstance('CIM_Foo',
                             properties={'Name': 'Foo1', 'Chicken': 'Ham'},
                             qualifiers={'Key': CIMQualifier('Key', True)},
-                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo1'})),
           result=False),
      None, None, True),
 
