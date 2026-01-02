@@ -30,6 +30,7 @@ import argparse
 import importlib
 from time import sleep
 from datetime import datetime
+import logging
 
 import click
 import psutil
@@ -154,6 +155,19 @@ LISTEN_OPTIONS = [
                  help='Show help message for calling a Python function for '
                  'each received indication when using the --indi-call option '
                  'and exit.'),
+]
+
+# Options for specifying files to capture stdout/stderr
+# They are used only when testing, and are therefore hidden.
+TESTFILE_OPTIONS = [
+    click.option('--stdout-file', type=str, metavar='FILE',
+                 required=False, default=None, hidden=True,
+                 help='Used only by tests: Path name of stdout log file. '
+                 f'Default: No stdout log file.'),
+    click.option('--stderr-file', type=str, metavar='FILE',
+                 required=False, default=None, hidden=True,
+                 help='Used only by tests: Path name of stderr log file. '
+                 f'Default: No stderr log file.'),
 ]
 
 #############################################################################
@@ -377,6 +391,7 @@ def listener_run(context, name, **options):
 @cli.command('start', cls=PywbemtoolsCommand, options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='NAME', required=False)
 @add_options(LISTEN_OPTIONS)
+@add_options(TESTFILE_OPTIONS)
 @add_options(help_option)
 @click.pass_obj
 def listener_start(context, name, **options):
@@ -960,6 +975,15 @@ def display_list_listeners(listeners, table_format):
     click.echo(table)
 
 
+def stop_listener_thread(listener, name):
+    """
+    Stop the listener thread in the run command in case of errors.
+    """
+    if _config.VERBOSE_PROCESSES_ENABLED:
+        click.echo(f"Run process: Stopping listener thread for listener {name}")
+    listener.stop()
+
+
 ################################################################
 #
 #   Common methods for The action functions for the listener click group
@@ -979,60 +1003,33 @@ def cmd_listener_run(context, name, options):
     if start_pid is not None:
         start_pid = int(start_pid)
 
-    # If the stdout of the run process is a pipe (e.g. when capturing
-    # the output of the run command or its parent start command during
-    # tests, or when a user pipes the output of the run or start command),
-    # the parent process will not terminate because its child run process
-    # has the same pipe open. This is addressed by setting the file descriptor
-    # of stdout to the file descriptor of the opened log file (when logging)
-    # or the file descriptor of the opened null device (when not logging),
-    # using os.dup2().
-    # Note that this needs to be done at the OS file descriptor level. Setting
-    # sys.stdout is not sufficient, because its prior file descriptor would
-    # still be the open pipe.
-
     pid = os.getpid()
 
-    logfile = get_logfile(context.logdir, name)
-    if logfile:
+    # The 'run' command writes its stdout/stderr to a log file when --logdir
+    # is specified. Otherwise, it writes it to wherever the coresponding file
+    # handles are directed to.
 
-        # This message goes to the original stdout of the run process (wherever
-        # that is directed to)
-        print_out(f"Run process {pid}: Output is logged to: {logfile}")
+    if context.logdir:
+        logfile = get_logfile(context.logdir, name)
+
+        # This message goes to the stdout of the run process (wherever that is
+        # directed to)
+        if context.verbose:
+            print_out(f"Run process {pid}: Output is appended to log file: "
+                      f"{logfile}")
 
         # pylint: disable=consider-using-with
         log_fp = open(logfile, 'a', encoding='utf-8')
-
-        if sys.platform == 'win32':
-            # On Windows, the standard file descriptors are not inherited
-            # to the run process (probably due to the additional process
-            # in between), so the recommended way of redirecting stdout
-            # does not prevent the start process from terminating.
-            sys.stdout = log_fp
-        else:
-            # On UNIX, see the comment at the begin of this function.
-            # The null device will be closed in run_exit_handler()
-            os.dup2(log_fp.fileno(), sys.stdout.fileno())
+        sys.stdout = log_fp
+        sys.stderr = log_fp
 
         # This message is the first one of this run in the log file (appended)
         print_out(f"Opening 'run' output log file at {datetime.now()}")
+
     else:
 
-        # pylint: disable=consider-using-with
-        log_fp = open(os.devnull, 'w', encoding='utf-8')
+        log_fp = None
 
-        if sys.platform == 'win32':
-            # On Windows, the standard file descriptors are not inherited
-            # to the run process (probably due to the additional process
-            # in between), so the recommended way of redirecting stdout
-            # does not prevent the start process from terminating.
-            sys.stdout = log_fp
-        else:
-            # On UNIX, see the comment at the begin of this function.
-            # The null device will be closed in run_exit_handler()
-            os.dup2(log_fp.fileno(), sys.stdout.fileno())
-
-        print_out("Run process {}: Assertion: This message should not appear")
 
     # Register a termination signal handler that causes the loop further down
     # to get control via SystemExit.
@@ -1048,7 +1045,7 @@ def cmd_listener_run(context, name, options):
     listeners = get_listeners(name)
     if len(listeners) > 1:  # This upcoming listener and a previous one
         lis = listeners[0]
-        url = f'{lis.scheme}://{bind_addr or BIND_ADDR_ANY_STR}:{lis.port}'
+        url = f"{lis.scheme}://{lis.bind_addr or BIND_ADDR_ANY_STR}:{lis.port}"
         raise click.ClickException(
             f"Listener {name} already running at {url}")
 
@@ -1077,12 +1074,22 @@ def cmd_listener_run(context, name, options):
             certfile=certfile, keyfile=keyfile)
     except ValueError as exc:
         raise click.ClickException(
-            f"Cannot create listener {name}: {exc}")
+            f"Cannot create WBEMListener for listener {name}: {exc}")
+
+    if not context.logdir:
+        # Suppress the listener logger
+        listener.logger.addHandler(logging.NullHandler())
+    # otherwise, the lastResort handler writes to stderr, from where it is
+    # directed into the log file.
+
     try:
         listener.start()
     except (OSError, ListenerError) as exc:
         raise click.ClickException(
-            f"Cannot start listener {name}: {exc}")
+            f"Cannot start listener thread for listener {name}: {exc}")
+
+    if _config.VERBOSE_PROCESSES_ENABLED:
+        click.echo(f"Run process: Started listener thread for listener {name}")
 
     indi_call = options['indi_call']
     indi_file = options['indi_file']
@@ -1107,6 +1114,7 @@ def cmd_listener_run(context, name, options):
     if indi_call:
         mod_func = indi_call.rsplit('.', 1)
         if len(mod_func) < 2:
+            stop_listener_thread(listener, name)
             raise click.ClickException(
                 "The --indi-call option does not specify MODULE.FUNCTION: "
                 f"{indi_call}")
@@ -1116,35 +1124,39 @@ def cmd_listener_run(context, name, options):
         curdir = os.getcwd()
         if sys.path[0] != curdir:
             if context.verbose >= _config.VERBOSE_SETTINGS:
-                click.echo("Inserting current directory into front of Python "
-                           f"module search path: {curdir}")
+                click.echo("Run process: Inserting current directory into "
+                           f"front of Python module search path: {curdir}")
             sys.path.insert(0, curdir)
 
         try:
             module = importlib.import_module(mod_name)
         except ImportError as exc:
+            stop_listener_thread(listener, name)
             raise click.ClickException(
                 f"Cannot import module {mod_name}: {exc}")
         except SyntaxError as exc:
+            stop_listener_thread(listener, name)
             raise click.ClickException(
                 f"Cannot import module {mod_name}: SyntaxError: {exc}")
         try:
             func = getattr(module, func_name)
         except AttributeError:
+            stop_listener_thread(listener, name)
             raise click.ClickException(
                 f"Function {func_name}() not found in module {mod_name}")
         listener.add_callback(func)
         if context.verbose >= _config.VERBOSE_SETTINGS:
-            click.echo("Added indication handler for calling function "
-                       f"{func_name}() in module {mod_name}")
+            click.echo("Run process: Added indication handler for calling "
+                       f"function {func_name}() in module {mod_name}")
 
     if indi_file:
         listener.add_callback(file_func)
         if context.verbose >= _config.VERBOSE_SETTINGS:
-            click.echo('Added indication handler for appending to file '
-                       f'{indi_file} with format "{indi_format}"')
+            click.echo('Run process: Added indication handler for appending '
+                       f'to file {indi_file} with format "{indi_format}"')
 
-    click.echo(f"Running listener {name} at {url}")
+    if _config.VERBOSE_PROCESSES_ENABLED:
+        click.echo(f"Run process: Running listener {name} at {url}")
 
     # Signal successful startup completion to the parent 'start' process.
     if start_pid:
@@ -1159,12 +1171,13 @@ def cmd_listener_run(context, name, options):
             sleep(60)
     except (KeyboardInterrupt, SystemExit) as exc:
         if _config.VERBOSE_PROCESSES_ENABLED:
-            print_out(f"Run process: Caught exception {type(exc)}: {exc}")
+            print_out("Run process: Caught exception "
+                      f"{exc.__class__.__name__}: {exc}")
         # Note: SystemExit occurs only due to being raised in the signal handler
         # that was registered.
 
+        stop_listener_thread(listener, name)
         listener.stop()
-        click.echo(f"Shut down listener {name} running at {url}")
 
 
 def cmd_listener_start(context, name, options):
@@ -1179,11 +1192,13 @@ def cmd_listener_start(context, name, options):
     indi_file = options['indi_file']
     indi_format = options['indi_format']
     bind_addr = options['bind_addr']
+    stdout_file = options['stdout_file']
+    stderr_file = options['stderr_file']
 
     listeners = get_listeners(name)
     if listeners:
         lis = listeners[0]
-        url = f'{lis.scheme}://{bind_addr or BIND_ADDR_ANY_STR}:{lis.port}'
+        url = f"{scheme}://{bind_addr or BIND_ADDR_ANY_STR}:{port}"
         raise click.ClickException(
             f"Listener {name} already running at {url}")
 
@@ -1227,27 +1242,77 @@ def cmd_listener_start(context, name, options):
 
     prepare_startup_completion()
 
-    popen_kwargs = {"shell": False}
-    popen_kwargs['start_new_session'] = True
+    # If the 'start' command is run by the unit tests, the hidden
+    # --stdout-file and --stderr-file options are specified. In that case,
+    # stdout/stderr of the 'run' command are captured by writing them to
+    # corresponding files in order to avoid the use of pipes. If pipes were
+    # used, this would pass the corresponding file handles from the
+    # (short-lived) 'start' command to the (long-lived) 'run' command and
+    # would cause the process of the 'start' command to hang upon exit cleanup.
+    # If the 'start' command is run from a terminal, the stdout/stderr file
+    # handles are passed to the 'run' command wherever they are directed to,
+    # causing the 'run' command to write its stdout/stderr to the same place.
+    # In that case, the 'start' command does not hang upon exit cleanup.
 
-    if _config.VERBOSE_PROCESSES_ENABLED:
-        print_out(f"Start process {pid}: Starting run process as: {run_args}")
-
-    # pylint: disable=consider-using-with
-    p = subprocess.Popen(run_args, **popen_kwargs)
-
-    # Wait for startup completion or for error exit
+    stdout_fp = None
+    stderr_fp = None
     try:
-        rc = wait_startup_completion(p.pid)
-    except KeyboardInterrupt:
-        raise click.ClickException(
-            "Keyboard interrupt while waiting for listener to start up")
-    if rc != 0:
-        # Error has already been displayed
-        raise SystemExit(rc)
+        if stdout_file:
+            try:
+                stdout_fp = open(stdout_file, "w", encoding="utf-8")
+            except IOError as exc:
+                raise click.ClickException(
+                    f"Cannot open stdout file: {exc}") from exc
+            saved_stdout = sys.stdout
+            sys.stdout = stdout_fp
+        if stderr_file:
+            try:
+                stderr_fp = open(stderr_file, "w", encoding="utf-8")
+            except IOError as exc:
+                raise click.ClickException(
+                    f"Cannot open stdout file: {exc}") from exc
+            saved_stderr = sys.stderr
+            sys.stderr = stderr_fp
 
-    # A message about the successful startup has already been displayed by
-    # the child process.
+        popen_kwargs = dict(
+            shell=False,
+            start_new_session=True,
+            close_fds=True,
+            stdin=subprocess.DEVNULL,
+        )
+        if stdout_fp:
+            popen_kwargs["stdout"] = stdout_fp
+        if stderr_fp:
+            popen_kwargs["stderr"] = stderr_fp
+        # otherwise, our current file handles for stdout/stderr are passed on
+
+        if _config.VERBOSE_PROCESSES_ENABLED:
+            cmd = " ".join(run_args)
+            print_out(f"Start process {pid}: Starting run process: {cmd}")
+
+        # pylint: disable=consider-using-with
+        p = subprocess.Popen(run_args, **popen_kwargs)
+
+        # Wait for startup completion or for error exit
+        try:
+            rc = wait_startup_completion(p.pid)
+        except KeyboardInterrupt:
+            raise click.ClickException(
+                "Keyboard interrupt while waiting for listener to start up")
+        if rc != 0:
+            # Error has already been displayed
+            raise SystemExit(rc)
+
+        url = f"{scheme}://{bind_addr or BIND_ADDR_ANY_STR}:{port}"
+        print_out(f"Started listener {name} at {url}")
+
+    finally:
+        if stdout_fp:
+            sys.stdout = saved_stdout
+            stdout_fp.close()
+        if stderr_fp:
+            sys.stderr = saved_stderr
+            stderr_fp.close()
 
 
 def cmd_listener_stop(context, name):
@@ -1270,8 +1335,7 @@ def cmd_listener_stop(context, name):
         print_out(f"Waiting for run process {listener.pid} to complete")
     p.wait()
 
-    # A message about the successful shutdown has already been displayed by
-    # the child process.
+    print_out(f"Stopped listener {name}")
 
 
 def cmd_listener_show(context, name):

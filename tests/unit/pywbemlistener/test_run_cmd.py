@@ -49,12 +49,7 @@ RUN_HELP_FORMAT_PATTERNS = START_HELP_FORMAT_PATTERNS
 
 # Output patterns for 'run' command when the listener already exists
 RUN_EXISTS_PATTERNS = [
-    r"Listener .+ already running at ",
-]
-
-# Output patterns for 'run' command when the listener was successfully started
-RUN_SUCCESS_PATTERNS = [
-    r"Running listener .+ at ",
+    r"Listener .+ already running at",
 ]
 
 RUN_TESTCASES = [
@@ -132,7 +127,6 @@ RUN_TESTCASES = [
 ]
 
 
-@pytest.mark.skip()  # TODO: Disabled to circumvent failure on GitHub Actions
 @pytest.mark.parametrize(
     "desc, inputs, exp_results, condition",
     RUN_TESTCASES
