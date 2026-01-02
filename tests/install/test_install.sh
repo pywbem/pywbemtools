@@ -34,7 +34,8 @@ VERBOSE="true"
 # Indicates that pywbem is installed from a repository. This will disable
 # some install tests because they don't support this. Keep in sync with
 # the installation of pywbem from repo vs package in requirements.txt.
-PYWBEM_FROM_REPO="false"
+# TODO(RELEASE): Set to false again once pywbem 1.9.0 is released.
+PYWBEM_FROM_REPO="true"
 
 MYNAME=$(basename "$0")
 MYDIR=$(abspath $(dirname "$0")) # Absolute path of directory of this script
