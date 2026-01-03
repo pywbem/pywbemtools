@@ -253,6 +253,9 @@ TEST_CASES = [
     #     'general', and 'stdin'. See the 'inputs' parameter of
     #     CLITestsBase.command_test() in cli_test_extensions.py for detailed
     #     documentation.
+    #     In addition:
+    #     - skip_platforms: List of platforms (using sys.platform) for which
+    #       the testcase should be skipped.
     # * exp_response: Dictionary of expected responses (stdout, stderr, rc) and
     #     test definition (test: <testname>). See the 'exp_response' parameter
     #     of CLITestsBase.command_test() in cli_test_extensions.py for
@@ -1458,7 +1461,7 @@ TEST_CASES = [
                 'connection select fred',
                 'connection show',
                 'connection delete fred'],
-      'platform': 'win32'},  # ignore this platform.  See comments above
+      'skip_platforms': ['win32']},  # See comments above
      {'stdout': ['Deleted connection "fred"'],
       'rc': 0,
       'test': 'not-innows'},
@@ -1470,7 +1473,7 @@ TEST_CASES = [
      {'general': [],
       'args': ['delete', 'fred'],
       'cmdgrp': 'connection',
-      'platform': 'win32'},  # ignore this platform.  See comments above
+      'skip_platforms': ['win32']},  # See comments above
      {'stderr': 'Connection definition "fred" not found in connections file',
       'rc': 1,
       'test': 'innows'},
@@ -1765,9 +1768,9 @@ class TestGeneralOptions(CLITestsBase):
         Execute pybemcli with the defined input and test output.
         """
         # Temp bypass of windows platform because of issue with one test
-        if 'platform' in inputs:
-            if sys.platform == inputs['platform']:
-                return
+        if isinstance(inputs, dict) and \
+                sys.platform in inputs.get('skip_platforms', []):
+            pytest.skip(f"Issues (to be fixed) on platform {sys.platform}")
 
         cmd_grp = inputs['cmdgrp'] if 'cmdgrp' in inputs else ''
 
