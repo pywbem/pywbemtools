@@ -10,9 +10,8 @@
 
 # Base dependencies (must be consistent with base-requirements.txt)
 
-pip==25.0; python_version == '3.8'
-pip==25.2; python_version >= '3.9'
-setuptools==70.0.0
+pip==25.2
+setuptools==78.1.1
 setuptools-scm==9.2.0
 wheel==0.41.3
 
@@ -52,19 +51,16 @@ prompt-toolkit==3.0.36
 PyYAML==6.0.2
 
 yamlloader==0.5.5
-# Packaging 21.0 is required by safety 2.2.0
-packaging==24.1
+packaging==24.2
 
 mock==3.0.0
 
 
 # Indirect dependencies for install that are needed for some reason (must be consistent with requirements.txt)
 
-# packaging 21.3 requires pyparsing>=2.0.2,!=3.0.5
 pyparsing==2.3.1
 
-urllib3==2.2.3; python_version == '3.8'
-urllib3==2.5.0; python_version >= '3.9'
+urllib3==2.5.0
 
 
 # All other indirect dependencies for install that are not in requirements.txt
@@ -77,9 +73,7 @@ certifi==2024.7.4
 wcwidth==0.1.7
 
 # typing-extensions
-# typing-extensions 4.14.0 removed support for Python 3.8
-typing-extensions>=4.13.2; python_version == '3.8'
-typing-extensions>=4.14.1; python_version >= '3.9'
+typing-extensions>=4.14.1
 
 # requests 2.31 requires idna>=2.5,<4
 # idna>3 requires using requests >=2.26.0

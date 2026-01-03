@@ -405,7 +405,6 @@ ASSOCIATORS_CLASS_XML = """<CLASSPATH>
 
 """  # noqa: E501
 
-# This output only for python version ge 3.8. Contains qualifier output
 CIMFOO_SUB_SUB_WITH_QUALS_XML = """<CLASS NAME="CIM_Foo_sub_sub" SUPERCLASS="CIM_Foo_sub">
     <QUALIFIER NAME="Description" TYPE="string" PROPAGATED="false" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
         <VALUE>Subclass of CIM_Foo_sub</VALUE>
@@ -1356,7 +1355,6 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    # Test output compare of all components but only python v 3.8*
     ['Verify class command enumerate CIM_Foo with qualifiers, xml',
      {'args': ['enumerate', 'CIM_Foo_sub'],
       'general': ['--output-format', 'xml']},
@@ -3640,10 +3638,8 @@ class CIM_FooRef2 : CIM_BaseRef {
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
-    # Test limited to python ge python v 3.8 because qualifier ordering
-    # not determinate with python version lt 3.8.  See issue #1173
     # pylint: disable=line-too-long
-    ['Verify associators from two namespaces xml output, version ge 38',
+    ['Verify associators from two namespaces xml output',
      {'args': ['associators', 'CIM_FooRef1',
                '--namespace', 'root/cimv2,root/cimv3'],
       'general': ['--output-format', 'xml']},
