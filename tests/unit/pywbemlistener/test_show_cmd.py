@@ -98,7 +98,7 @@ SHOW_TESTCASES = [
                 r"^Name +lis1$",
                 r"^Port +50001$",
                 r"^Scheme +http$",
-                r"^Bind addr +none",
+                r"^Bind addr +\(any\)",
                 r"^Certificate file *$",
                 r"^Key file *$",
                 r"^Indication call *$",

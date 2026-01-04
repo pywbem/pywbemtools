@@ -78,6 +78,10 @@ DEFAULT_LISTENER_PORT = 25989
 DEFAULT_LISTENER_SCHEME = 'https'
 DEFAULT_INDI_FORMAT = '{dt} {h} {i_mof}'
 
+# Accept connections to any IP address
+BIND_ADDR_ANY = None  # Binary value
+BIND_ADDR_ANY_STR = "(any)"  # For display in URLs, messages
+
 LISTEN_OPTIONS = [
     click.option('-p', '--port', type=int, metavar='PORT',
                  required=False, default=DEFAULT_LISTENER_PORT,
@@ -94,7 +98,7 @@ LISTEN_OPTIONS = [
                  type=str,
                  metavar='HOST',
                  required=False,
-                 default=None,
+                 default=BIND_ADDR_ANY,
                  help='A host name or IP address to which this listener '
                       'will be bound. Binding the listener defines the '
                       'indication destination host name or IP address for '
@@ -216,7 +220,7 @@ class ListenerProperties:
             self.name,
             str(self.port),
             self.scheme,
-            self.bind_addr or 'none',
+            self.bind_addr or BIND_ADDR_ANY_STR,
             self.certfile,
             self.keyfile,
             self.indi_call,
@@ -251,7 +255,7 @@ class ListenerProperties:
             self.name,
             str(self.port),
             self.scheme,
-            self.bind_addr or 'none',
+            self.bind_addr or BIND_ADDR_ANY_STR,
             str(self.pid),
             self.created.strftime("%Y-%m-%d %H:%M:%S"),
         )
@@ -1047,7 +1051,7 @@ def cmd_listener_run(context, name, options):
     listeners = get_listeners(name)
     if len(listeners) > 1:  # This upcoming listener and a previous one
         lis = listeners[0]
-        url = f'{lis.scheme}://{bind_addr}:{lis.port}'
+        url = f'{lis.scheme}://{bind_addr or BIND_ADDR_ANY_STR}:{lis.port}'
         raise click.ClickException(
             f"Listener {name} already running at {url}")
 
@@ -1063,13 +1067,10 @@ def cmd_listener_run(context, name, options):
         certfile = options['certfile']
         keyfile = options['keyfile'] or certfile
 
-    # If there is no defined bind address, set it to the default value
-    # for a listener that receives indications on any network address.
-    # This allows using None as the default bind_addr elsewhere in the code
-    if not bind_addr:
-        bind_addr = ''
+    # The default for the --bind-addr option is None and specifies that
+    # the listener can receive indications on any network address.
 
-    url = f'{scheme}://{bind_addr}:{port}'
+    url = f'{scheme}://{bind_addr or BIND_ADDR_ANY_STR}:{port}'
 
     context.spinner_stop()
 
@@ -1185,7 +1186,7 @@ def cmd_listener_start(context, name, options):
     listeners = get_listeners(name)
     if listeners:
         lis = listeners[0]
-        url = f'{lis.scheme}://{bind_addr}:{lis.port}'
+        url = f'{lis.scheme}://{bind_addr or BIND_ADDR_ANY_STR}:{lis.port}'
         raise click.ClickException(
             f"Listener {name} already running at {url}")
 
