@@ -25,9 +25,8 @@ not in a command line environment.
 
 
 import os
-import packaging.version
+
 import pytest
-import click
 
 from pywbemtools.pywbemcli._cmd_help import help_arg_subject_shell_completer
 from pywbemtools.pywbemcli.pywbemcli import connection_name_completer
@@ -37,11 +36,6 @@ from ..pytest_extensions import simplified_test_function
 # pylint: enable=relative-beyond-top-level
 
 # pylint: disable=use-dict-literal
-
-# Click version as a tuple. Used to control tab-completion features
-CLICK_VERSION = packaging.version.parse(click.__version__).release
-# boolean True if click version 8 or greater.
-CLICK_V_8 = CLICK_VERSION[0] >= 8
 
 
 TEST_CONNECTION_YAML = """connection_definitions:
@@ -175,7 +169,7 @@ TESTCASES_CONNECTION_NAME_COMPLETE = [
           file_exists=False,
           incomplete="",
           exp_rtn=[]),
-     None, TabCompletionError, CLICK_V_8),
+     None, TabCompletionError, True),
 
     # Needs click version as condition to avoid unwanted exception because
     # of the exception expected.
@@ -186,7 +180,7 @@ TESTCASES_CONNECTION_NAME_COMPLETE = [
           file_exists=False,
           incomplete="",
           exp_rtn=[]),
-     None, TabCompletionError, CLICK_V_8),
+     None, TabCompletionError, True),
 ]
 
 
@@ -199,10 +193,6 @@ def test_connection_name_complete(testcase, ctx, yaml, file, file_exists,
     """
     Test function for connection_name_complete() function
     """
-    # Ignore the test for Click  version 7
-    if not CLICK_V_8:
-        return
-
     # Create a fake click context object that contains param "connections_file"
     class ClickContextMock:  # pylint: disable=too-few-public-methods
         """ Create a mock click context object containing param attribute """
@@ -273,9 +263,6 @@ def test_help_arg_subject_shell_complete(testcase, incomplete, exp_rtn):
     Test function for help_arg_subject_shell_complete() function. Note that
     the parameters ctx and param are not used by the function being tested
     """
-    # Ignore the test for Click  version lt 8
-    if CLICK_VERSION[0] < 8:
-        return
 
     # The code to be tested
     # ctx and param not used by the complete function.

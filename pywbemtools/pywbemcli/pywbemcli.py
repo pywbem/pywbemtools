@@ -23,7 +23,6 @@ import os
 import sys
 import warnings
 import traceback
-import packaging.version
 
 import click
 import click_repl
@@ -65,9 +64,6 @@ from ._warnings import InvalidConnectionFile, TabCompletionError
 
 
 __all__ = ['cli']
-
-# Click version as a tuple. Used to control tab-completion features
-CLICK_VERSION = packaging.version.parse(click.__version__).release
 
 PYWBEMCLI_STARTUP_ENVVAR = "PYWBEMCLI_STARTUP_SCRIPT"
 

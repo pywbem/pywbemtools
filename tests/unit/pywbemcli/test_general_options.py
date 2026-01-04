@@ -29,7 +29,6 @@ from pywbemtools.pywbemcli._connection_file_names import CONNECTIONS_FILENAME
 
 from .cli_test_extensions import CLITestsBase
 from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE
-from ..utils import CLICK_VERSION
 
 # pylint: disable=use-dict-literal
 
@@ -410,11 +409,7 @@ TEST_CASES = [
      {'general': ['-s', 'http://blah', '--use-pull', 'blah'],
       'cmdgrp': 'connection',
       'args': ['show']},
-     {'stderr': ['Invalid value', '-U', '--use-pull',
-                 'invalid choice: blah. (choose from yes, no, either)'
-                 if CLICK_VERSION < (8, 0) else
-                 "'blah' is not one of 'yes', 'no', 'either'"
-                 ],
+     {'stderr': ["'blah' is not one of 'yes', 'no', 'either'"],
       'rc': 2,
       'test': 'innows'},
      None, OK],
@@ -432,10 +427,7 @@ TEST_CASES = [
      {'general': ['-s', 'http://blah', '--pull-max-cnt', 'blah'],
       'cmdgrp': 'connection',
       'args': ['show']},
-     {'stderr': ['Invalid value for', '--pull-max-cnt',
-                 "blah is not a valid integer"
-                 if CLICK_VERSION < (8, 0) else
-                 "'blah' is not a valid integer"],
+     {'stderr': ["'blah' is not a valid integer"],
       'rc': 2,
       'test': 'innows'},
      None, OK],  # Only tests that the option is accepted
