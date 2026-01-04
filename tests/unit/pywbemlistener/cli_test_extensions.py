@@ -181,7 +181,7 @@ def ensure_no_listeners(verbose, situation):
         print(f"{situation}: Listing listeners: {cmd_args}")
         sys.stdout.flush()
     out = check_output(cmd_args, situation, "Listing listeners failed", verbose)
-    lis_lines = out.decode('utf-8').rstrip('\n').split('\n')
+    lis_lines = out.rstrip('\n').split('\n')
     for lis_line in lis_lines[1:]:
         lis_name = lis_line.split(' ')[0]
         cmd_args = f'pywbemlistener stop {lis_name}'
@@ -218,56 +218,76 @@ def check_output(cmd_args, situation, msg, verbose):
     Improved replacement for subprocess.check_output() with a reduced interface.
 
     The improvements are:
-    - Prints command output (stdout+stderr) in case the command fails.
+    - Prints command output (stdout+stderr+log files) in case the command fails.
+
+    Parameters:
+      cmd_args (str): Command line
+      situation (str): Short text describing the situation (eg. test setup)
+      msg (str): Error message
+      verbose (bool): Print the listener log file
+
+    Returns:
+      str: Standard output of the command, as a Unicode string.
     """
+    timeout = 30
+
     try:
-        # pylint: disable=consider-using-with
-        p = subprocess.Popen(cmd_args, shell=True, stdout=subprocess.PIPE)
-        try:
-            out, err = p.communicate(timeout=30)
-        except subprocess.TimeoutExpired:
-            p.kill()
-            p.wait()
-            raise
-        rc = p.poll()
-        if rc:
-            raise subprocess.CalledProcessError(
-                rc, cmd_args, output=out, stderr=err)
-    except Exception as exc:
-        # Note: The exception message contains the command line
-        print(f"{situation}: Error: {msg}: {exc}")
-        sys.stdout.flush()
-        if hasattr(exc, 'output'):
-            out = exc.output
-            if isinstance(out, bytes):
-                out = out.decode('utf-8')
-            print("Begin of command output (stdout):")
-            print(out)
-            print("End of command output")
-            sys.stdout.flush()
-        if hasattr(exc, 'stderr'):
-            err = exc.stderr
-            if isinstance(err, bytes):
-                err = err.decode('utf-8')
-            print("Begin of command output (stderr):")
-            print(err)
-            print("End of command output")
-            sys.stdout.flush()
+        cp = subprocess.run(
+            cmd_args, shell=True, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE, timeout=timeout, text=True, check=False)
+    except subprocess.TimeoutExpired as exc:
         if verbose:
-            # We do not have the listener name at this point, but there
-            # should be only one log file, if any.
-            log_files = 'pywbemlistener_*.log'
-            for log_file in glob.glob(log_files):
-                with open(log_file, encoding='utf-8') as log_fp:
-                    log_data = log_fp.read()
-                if isinstance(log_data, bytes):
-                    log_data = log_data.decode('utf-8')
-                print(f"Begin of log file {log_file}:")
-                print(log_data)
-                print("End of log file")
-                sys.stdout.flush()
-        raise
+            log_data = get_listener_logdata()
+        else:
+            log_data = None
+        out = exc.output
+        if isinstance(out, bytes):
+            out = out.decode('utf-8')
+        err = exc.stderr
+        if isinstance(err, bytes):
+            err = err.decode('utf-8')
+        raise AssertionError(
+            f"{msg}: The command {cmd_args!r} timed out after {timeout} s.\n"
+            f"Situation: {situation}\n"
+            f"Standard output:\n{out}\n"
+            f"Standard error:\n{err}\n"
+            f"{log_data}")
+
+    out = cp.stdout
+    err = cp.stderr
+    rc = cp.returncode
+    if rc != 0:
+        if verbose:
+            log_data = get_listener_logdata()
+        else:
+            log_data = None
+        raise AssertionError(
+            f"{msg}: The command {cmd_args!r} failed with rc={rc}.\n"
+            f"Situation: {situation}\n"
+            f"Standard output:\n{out}\n"
+            f"Standard error:\n{err}\n"
+            f"{log_data}")
+
     return out
+
+
+def get_listener_logdata():
+    """
+    Return the data in the listener log files.
+
+    We do not have the listener name at this point, but there
+    should be only one log file, if any.
+    """
+    log_files = 'pywbemlistener_*.log'
+    result = []
+    for log_file in glob.glob(log_files):
+        with open(log_file, encoding='utf-8') as log_fp:
+            log_data = log_fp.read()
+        if isinstance(log_data, bytes):
+            log_data = log_data.decode('utf-8')
+        result.append(f"Log file {log_file}:")
+        result.append(log_data)
+    return "\n".join(result)
 
 
 def assert_output(test, exp_patterns, act_lines, source, desc):
