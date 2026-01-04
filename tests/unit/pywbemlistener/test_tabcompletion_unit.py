@@ -24,23 +24,15 @@ not in a command line environment.
 """
 
 
-import packaging.version
 import pytest
-import click
 
 from pywbemtools.pywbemlistener._cmd_listener import listener_name_completer
 
 from ..pytest_extensions import simplified_test_function
-
 from .cli_test_extensions import ensure_no_listeners, start_listeners, \
     RUN, RUN_NO_WIN
 
 # pylint: disable=use-dict-literal
-
-# Click version as a tuple. Used to control tab-completion features
-CLICK_VERSION = packaging.version.parse(click.__version__).release
-# boolean True if click version 8 or greater.
-CLICK_V8 = CLICK_VERSION[0] >= 8
 
 
 TESTCASES_LISTENER_NAME_COMPLETE = [
@@ -92,10 +84,6 @@ def test_listener_name_complete(testcase, listeners, incomplete, exp_rtn):
     execute the function when <TAB> entered fro command line.
     """
     verbose = False
-
-    # Ignore the test for Click  version 7
-    if not CLICK_V8:
-        return
 
     # Do not run on windows. Setup consistently timing out trying to
     # create listeners and the target shells (bash, etc. are not on windows)

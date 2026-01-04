@@ -2,17 +2,12 @@
 This file contains extensions to Click for pywbemtools.
 """
 
-import packaging.version
-
 import click
 
 # Definitions of the components of the help usage line
 GENERAL_OPTS_TXT = '[GENERAL-OPTIONS]'
 CMD_OPTS_TXT = '[COMMAND-OPTIONS]'
 SUBCMD_HELP_TXT = "COMMAND [ARGS] " + CMD_OPTS_TXT
-
-# Click version as a tuple
-CLICK_VERSION = packaging.version.parse(click.__version__).release
 
 
 class PywbemtoolsGroup(click.Group):
@@ -120,12 +115,11 @@ class PywbemtoolsTopGroup(click.Group):
         script).
 
         This method extends the default behavior by disabling wildcard expansion
-        on Windows, when using Click 8.0.1 or higher (that is the version which
-        introduced this argument).
+        on Windows. That requires Click 8.0.1 or higher (that is the version
+        which introduced this argument).
         """
-        if CLICK_VERSION[0] >= 8:
-            kwargs = dict(kwargs)
-            kwargs['windows_expand_args'] = False
+        kwargs = dict(kwargs)
+        kwargs['windows_expand_args'] = False
         return self.main(*args, **kwargs)
 
 

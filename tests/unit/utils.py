@@ -26,12 +26,6 @@ from copy import copy
 from subprocess import Popen, PIPE, TimeoutExpired
 import shlex
 
-import packaging.version
-import click
-
-
-# Click version as a tuple
-CLICK_VERSION = packaging.version.parse(click.__version__).release
 
 EOL = '\n'  # Replace "\n" f-strings. "\" not fails in {} with python lt 3.12
 

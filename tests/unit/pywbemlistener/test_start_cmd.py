@@ -21,7 +21,6 @@ Test the 'pywbemlistener start' command.
 import pytest
 
 from .cli_test_extensions import pywbemlistener_test, RUN, RUN_NO_WIN
-from ..utils import CLICK_VERSION
 
 # pylint: disable=use-dict-literal
 
@@ -134,10 +133,7 @@ START_TESTCASES = [
         ),
         dict(
             rc=2,
-            stderr=[r"Invalid value for .*--scheme.: " +
-                    r"invalid choice: badscheme"
-                    if CLICK_VERSION < (8, 0) else
-                    r"'badscheme' is not one of 'http', 'https'"],
+            stderr=[r"'badscheme' is not one of 'http', 'https'"],
             test='contains',
         ),
         RUN_NO_WIN,
