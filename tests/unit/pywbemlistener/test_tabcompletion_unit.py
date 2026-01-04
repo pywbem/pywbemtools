@@ -100,7 +100,7 @@ def test_listener_name_complete(testcase, listeners, incomplete, exp_rtn):
     # Do not run on windows. Setup consistently timing out trying to
     # create listeners and the target shells (bash, etc. are not on windows)
     if not RUN_NO_WIN:
-        return
+        pytest.skip("Tab completion not supported on Windows")
 
     ensure_no_listeners(verbose, 'test setup')
 

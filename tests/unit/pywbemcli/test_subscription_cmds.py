@@ -263,6 +263,9 @@ TEST_CASES = [
     #     'general', and 'stdin'. See the 'inputs' parameter of
     #     CLITestsBase.command_test() in cli_test_extensions.py for detailed
     #     documentation.
+    #     In addition:
+    #     - skip_platforms: List of platforms (using sys.platform) for which
+    #       the testcase should be skipped.
     # * exp_response: Dictionary of expected responses (stdout, stderr, rc) and
     #     test definition (test: <testname>). See the 'exp_response' parameter
     #     of CLITestsBase.command_test() in cli_test_extensions.py for
@@ -1245,7 +1248,7 @@ TEST_CASES = [
                 '-o simple subscription list',
                 'subscription remove-filter duptestfilter --permanent --select',
                 '-o simple subscription list'],
-      'platform': 'win32'},  # ignore this platform
+      'skip_platforms': ['win32']},
      {'stdout': ['CIM_IndicationFilter   0  2 2',
                  '0: CIM_IndicationFilter.CreationClassName="CIM_IndicationFilter",Name="duptestfilter",SystemCreationClassName="CIM_ComputerSystem",SystemName="MockSystem_WBEMServerTest',  # noqa: E501
                  '1: CIM_IndicationFilterSub.CreationClassName="CIM_IndicationFilterSub",Name="duptestfilter",SystemCreationClassName="CIM_ComputerSystem",SystemName="blah',  # noqa: E501
@@ -1263,7 +1266,7 @@ TEST_CASES = [
       'env': {STARTUP_SCRIPT_ENVVAR: GET_TEST_PATH_STR(MOCK_PROMPT_0_FILE)},
       'stdin': ['server add-mof ' + str(SUBSCRIPTIONTEST_MOF_FILEPATH) + ' -n interop',  # noqa: E501
                 'subscription add-destination duptestdest -l http://blah:5000 --permanent'],  # noqa: E501
-      'platform': 'win32'},  # ignore this platform
+      'skip_platforms': ['win32']},
      {'stderr': ['permanent destination: Name=[duptestdest] add failed. Duplicates URL of existing destination'],  # noqa: E501
       'rc': 0,
       'test': 'innows'},
@@ -1277,7 +1280,7 @@ TEST_CASES = [
       'env': {STARTUP_SCRIPT_ENVVAR: GET_TEST_PATH_STR(MOCK_PROMPT_0_FILE)},
       'stdin': ['server add-mof ' + str(SUBSCRIPTIONTEST_MOF_FILEPATH) + ' -n interop',  # noqa: E501
                 'subscription add-filter duptestfilter -q "blah" --permanent'],  # noqa: E501
-      'platform': 'win32'},  # ignore this platform
+      'skip_platforms': ['win32']},
      {'stderr': ['permanent filter: Name=[duptestfilter] add failed. Duplicates URL of existing filter'],  # noqa: E501
       'rc': 0,
       'test': 'innows'},
@@ -1292,7 +1295,7 @@ TEST_CASES = [
                 # Test that that the remove-filter without --select OK
                 'subscription remove-filter duptestfilter --permanent',
                 '-o simple subscription list'],
-      'platform': 'win32'},  # ignore on windows
+      'skip_platforms': ['win32']},
      {'stderr': ['Remove failed. Multiple filters meet criteria identity=duptestfilter, owned=permanent.',  # noqa: E501
                  '* CIM_IndicationFilter.CreationClassName="CIM_IndicationFilter",Name="duptestfilter",SystemCreationClassName="CIM_ComputerSystem",SystemName="MockSystem_WBEMServerTest',  # noqa: E501
                  '* CIM_IndicationFilterSub.CreationClassName="CIM_IndicationFilterSub",Name="duptestfilter",SystemCreationClassName="CIM_ComputerSystem",SystemName="blah', ],  # noqa: E501
@@ -1309,7 +1312,7 @@ TEST_CASES = [
                 '-o simple subscription list',
                 'subscription remove-destination duptestdest --permanent --select',  # noqa: E501
                 '-o simple subscription list'],
-      'platform': 'win32'},  # ignore on windows
+      'skip_platforms': ['win32']},
      {'stdout': ['CIM_ListenerDestinationCIMXML   0  2 2',
                  '0: CIM_ListenerDestinationCIMXML.CreationClassName="CIM_ListenerDestinationCIMXML",Name="duptestdest",SystemCreationClassName="CIM_ComputerSystem",SystemName="MockSystem_WBEMServerTest',  # noqa: E501
                  '1: CIM_ListenerDestinationCIMXMLSub.CreationClassName="CIM_ListenerDestinationCIMXMLSub",Name="duptestdest",SystemCreationClassName="CIM_ComputerSystem",SystemName="blah',  # noqa: E501
@@ -1328,7 +1331,7 @@ TEST_CASES = [
                 # Test that that the remove-destination without --select OK
                 'subscription remove-destination duptestdest --permanent',
                 '-o simple subscription list'],
-      'platform': 'win32'},  # ignore on windows
+      'skip_platforms': ['win32']},
      {'stderr': ["Remove failed. Multiple destinations meet criteria identity='duptestdest', owned='permanent'",  # noqa: E501
                  '* CIM_ListenerDestinationCIMXML.CreationClassName="CIM_ListenerDestinationCIMXML",Name="duptestdest",SystemCreationClassName="CIM_ComputerSystem",SystemName="MockSystem_WBEMServerTest"',  # noqa: E501
                  '* CIM_ListenerDestinationCIMXMLSub.CreationClassName="CIM_ListenerDestinationCIMXMLSub",Name="duptestdest",SystemCreationClassName="CIM_ComputerSystem",SystemName="blah"'],  # noqa: E501
@@ -1672,9 +1675,9 @@ class TestSubcmdClass(CLITestsBase):  # pylint: disable=too-few-public-methods
         # TODO: Solve issue of concatenating model path into a string for
         # windows platform.  This causes loss of backslashes.
         # See test_generaloptions.py also
-        if 'platform' in inputs:
-            if sys.platform == inputs['platform']:
-                return
+        if isinstance(inputs, dict) and \
+                sys.platform in inputs.get('skip_platforms', []):
+            pytest.skip(f"Issues (to be fixed) on platform {sys.platform}")
 
         # Create the connection file from the 'yaml' input
         # The following removed because it was never used and is not docemented
