@@ -104,6 +104,10 @@ security:
             reason: Fixed virtualenv version 20.26.6 requires Python>=3.7 and is used there
         79756:
             reason: Fixed authlib version 1.6.4 requires Python>=3.9 and is used there
+        80401:
+            reason: Fixed authlib version 1.6.5 requires Python>=3.9 and is used there
+        81132:
+            reason: Fixed authlib version 1.6.5 requires Python>=3.9 and is used there
 
     # Continue with exit code 0 when vulnerabilities are found.
     continue-on-vulnerability-error: False

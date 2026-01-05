@@ -5,14 +5,10 @@ Change log
 ==========
 
 
-pywbemtools 1.3.1.dev1
-----------------------
+pywbemtools 1.3.1
+-----------------
 
-Released: not yet
-
-**Incompatible changes:**
-
-**Deprecations:**
+Released: 2026-01-04
 
 **Bug fixes:**
 
@@ -44,16 +40,6 @@ Released: not yet
   and qualifiers were always included.
 
 * Test: Fixed new issues raised by pylint 4.0.0.
-
-**Enhancements:**
-
-**Cleanup:**
-
-**Known issues:**
-
-* See `list of open issues`_.
-
-.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
 
 
 pywbemtools 1.3.0
