@@ -281,6 +281,7 @@ def check_output(cmd_args, situation, msg, verbose):
                 "--stderr-file", str(stderr_file)])
             cmd_args.extend(cmd_args_pt2)
 
+            cmd_stdin = subprocess.DEVNULL
             cmd_stdout = subprocess.DEVNULL
             cmd_stderr = subprocess.DEVNULL
 
@@ -288,13 +289,14 @@ def check_output(cmd_args, situation, msg, verbose):
             # This is any other command but the start command.
             # In that case, we can use pipes to capture its stdout/stderr,
             # because none of the other commands starts a long-lived process.
+            cmd_stdin = subprocess.PIPE
             cmd_stdout = subprocess.PIPE
             cmd_stderr = subprocess.PIPE
 
         try:
             cp = subprocess.run(
                 cmd_args, shell=False, text=True, check=False, close_fds=True,
-                stdin=subprocess.DEVNULL, stdout=cmd_stdout, stderr=cmd_stderr,
+                stdin=cmd_stdin, stdout=cmd_stdout, stderr=cmd_stderr,
                 timeout=timeout)
         except subprocess.TimeoutExpired as exc:
             if verbose:
