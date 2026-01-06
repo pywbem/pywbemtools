@@ -1195,6 +1195,47 @@ def cmd_listener_start(context, name, options):
     stdout_file = options['stdout_file']
     stderr_file = options['stderr_file']
 
+    # If the 'start' command is run by the unit tests, the hidden
+    # --stdout-file and --stderr-file options are specified. In that case,
+    # stdout/stderr of the 'run' command are captured by writing them to
+    # corresponding files in order to avoid the use of pipes. If pipes were
+    # used, this would pass the corresponding file handles from the
+    # (short-lived) 'start' command to the (long-lived) 'run' command and
+    # would cause the process of the 'start' command to hang upon exit cleanup.
+    # If the 'start' command is run from a terminal, the stdout/stderr file
+    # handles are passed to the 'run' command wherever they are directed to,
+    # causing the 'run' command to write its stdout/stderr to the same place.
+    # In that case, the 'start' command does not hang upon exit cleanup.
+
+    # We store the file pointers and saves sys.stdout/stderr in the click
+    # context object, so they can be cleaned up in the main() function.
+    # Because we raise all errors using ClickException, it is important that
+    # the error message resulting from catching that exception still goes
+    # wherever stderr has been changed to.
+
+    context.stdout_fp = None
+    context.stderr_fp = None
+    context.saved_stdout = None
+    context.saved_stderr = None
+    if stdout_file:
+        try:
+            context.stdout_fp = open(stdout_file, "w", encoding="utf-8")
+        except IOError as exc:
+            raise click.ClickException(
+                f"Cannot open stdout file: {exc}") from exc
+    if stderr_file:
+        try:
+            context.stderr_fp = open(stderr_file, "w", encoding="utf-8")
+        except IOError as exc:
+            raise click.ClickException(
+                f"Cannot open stderr file: {exc}") from exc
+    if context.stdout_fp:
+        context.saved_stdout = sys.stdout
+        sys.stdout = context.stdout_fp
+    if context.stderr_fp:
+        context.saved_stderr = sys.stderr
+        sys.stderr = context.stderr_fp
+
     listeners = get_listeners(name)
     if listeners:
         lis = listeners[0]
@@ -1242,77 +1283,37 @@ def cmd_listener_start(context, name, options):
 
     prepare_startup_completion()
 
-    # If the 'start' command is run by the unit tests, the hidden
-    # --stdout-file and --stderr-file options are specified. In that case,
-    # stdout/stderr of the 'run' command are captured by writing them to
-    # corresponding files in order to avoid the use of pipes. If pipes were
-    # used, this would pass the corresponding file handles from the
-    # (short-lived) 'start' command to the (long-lived) 'run' command and
-    # would cause the process of the 'start' command to hang upon exit cleanup.
-    # If the 'start' command is run from a terminal, the stdout/stderr file
-    # handles are passed to the 'run' command wherever they are directed to,
-    # causing the 'run' command to write its stdout/stderr to the same place.
-    # In that case, the 'start' command does not hang upon exit cleanup.
+    popen_kwargs = dict(
+        shell=False,
+        start_new_session=True,
+        close_fds=True,
+        stdin=subprocess.DEVNULL,
+    )
+    if context.stdout_fp:
+        popen_kwargs["stdout"] = context.stdout_fp
+    if context.stderr_fp:
+        popen_kwargs["stderr"] = context.stderr_fp
+    # otherwise, our current file handles for stdout/stderr are passed on
 
-    stdout_fp = None
-    stderr_fp = None
+    if _config.VERBOSE_PROCESSES_ENABLED:
+        cmd = " ".join(run_args)
+        print_out(f"Start process {pid}: Starting run process: {cmd}")
+
+    # pylint: disable=consider-using-with
+    p = subprocess.Popen(run_args, **popen_kwargs)
+
+    # Wait for startup completion or for error exit
     try:
-        if stdout_file:
-            try:
-                stdout_fp = open(stdout_file, "w", encoding="utf-8")
-            except IOError as exc:
-                raise click.ClickException(
-                    f"Cannot open stdout file: {exc}") from exc
-            saved_stdout = sys.stdout
-            sys.stdout = stdout_fp
-        if stderr_file:
-            try:
-                stderr_fp = open(stderr_file, "w", encoding="utf-8")
-            except IOError as exc:
-                raise click.ClickException(
-                    f"Cannot open stdout file: {exc}") from exc
-            saved_stderr = sys.stderr
-            sys.stderr = stderr_fp
+        rc = wait_startup_completion(p.pid)
+    except KeyboardInterrupt:
+        raise click.ClickException(
+            "Keyboard interrupt while waiting for listener to start up")
+    if rc != 0:
+        # Error has already been displayed
+        raise SystemExit(rc)
 
-        popen_kwargs = dict(
-            shell=False,
-            start_new_session=True,
-            close_fds=True,
-            stdin=subprocess.DEVNULL,
-        )
-        if stdout_fp:
-            popen_kwargs["stdout"] = stdout_fp
-        if stderr_fp:
-            popen_kwargs["stderr"] = stderr_fp
-        # otherwise, our current file handles for stdout/stderr are passed on
-
-        if _config.VERBOSE_PROCESSES_ENABLED:
-            cmd = " ".join(run_args)
-            print_out(f"Start process {pid}: Starting run process: {cmd}")
-
-        # pylint: disable=consider-using-with
-        p = subprocess.Popen(run_args, **popen_kwargs)
-
-        # Wait for startup completion or for error exit
-        try:
-            rc = wait_startup_completion(p.pid)
-        except KeyboardInterrupt:
-            raise click.ClickException(
-                "Keyboard interrupt while waiting for listener to start up")
-        if rc != 0:
-            # Error has already been displayed
-            raise SystemExit(rc)
-
-        url = f"{scheme}://{bind_addr or BIND_ADDR_ANY_STR}:{port}"
-        print_out(f"Started listener {name} at {url}")
-
-    finally:
-        if stdout_fp:
-            sys.stdout = saved_stdout
-            stdout_fp.close()
-        if stderr_fp:
-            sys.stderr = saved_stderr
-            stderr_fp.close()
+    url = f"{scheme}://{bind_addr or BIND_ADDR_ANY_STR}:{port}"
+    print_out(f"Started listener {name} at {url}")
 
 
 def cmd_listener_stop(context, name):

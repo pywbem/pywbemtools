@@ -17,6 +17,8 @@
 The main function of the pywbemlistener command.
 """
 
+import sys
+import os
 import warnings
 import click
 
@@ -135,3 +137,36 @@ def cli(ctx, output_format, logdir, verbose, pdb, warn):
     # Since there is no interactive mode, there is never a context object.
     assert ctx.obj is None
     ctx.obj = ContextObj(output_format, logdir, verbose, pdb, warn)
+
+
+def main():
+    """
+    Main function - the registered entry point.
+    """
+    ctx = None
+    try:
+        my_name = os.path.basename(sys.argv[0])
+        ctx = cli.make_context(my_name, sys.argv[1:])
+        with ctx:
+            ctx.command.invoke(ctx)
+    except click.ClickException as exc:
+        print(f"Error: {exc}", flush=True, file=sys.stderr)
+        return 1
+
+    except click.exceptions.Exit as exc:
+        return exc.exit_code
+
+    finally:
+        # Cleanup for redirected stdout/stderr (usee by start command).
+        if ctx is not None and ctx.obj is not None:
+            context = ctx.obj
+            if getattr(context, "saved_stdout", None) is not None:
+                sys.stdout = context.saved_stdout
+            if getattr(context, "saved_stderr", None) is not None:
+                sys.stderr = context.saved_stderr
+            if getattr(context, "stdout_fp", None) is not None:
+                context.stdout_fp.close()
+            if getattr(context, "stderr_fp", None) is not None:
+                context.stderr_fp.close()
+
+    return 0

@@ -60,7 +60,7 @@ dynamic = ["version", "dependencies"]
 
 [project.scripts]
 pywbemcli = "pywbemtools.pywbemcli.pywbemcli:cli"
-pywbemlistener = "pywbemtools.pywbemlistener.pywbemlistener:cli"
+pywbemlistener = "pywbemtools.pywbemlistener.pywbemlistener:main"
 
 [project.urls]
 Homepage = "https://github.com/pywbem/pywbemtools"
