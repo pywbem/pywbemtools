@@ -97,7 +97,7 @@ LIST_TESTCASES = [
             ],
             test='all',
         ),
-        RUN_NO_WIN,
+        "verbose",  # RUN_NO_WIN,
     ),
     (
         "Verify output of 'list' with two http listeners running",
@@ -119,7 +119,7 @@ LIST_TESTCASES = [
             ],
             test='all',
         ),
-        RUN_NO_WIN,
+        "verbose",  # RUN_NO_WIN,
     ),
 ]
 
