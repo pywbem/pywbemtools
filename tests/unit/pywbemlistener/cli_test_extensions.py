@@ -28,6 +28,7 @@ import tempfile
 import pathlib
 
 import pytest
+import psutil
 
 # pylint: disable=wrong-import-position
 from ..utils import execute_command, assert_rc, assert_patterns, \
@@ -314,6 +315,8 @@ def check_output(cmd_args, situation, msg, verbose):
             list_out = check_output(
                 list_args, situation, "Listing listeners failed", verbose)
 
+            open_files = psutil.Process().open_files()
+
             raise AssertionError(
                 f"{msg}: The command {cmd_args!r} timed out after "
                 f"{timeout} s.\n"
@@ -321,7 +324,8 @@ def check_output(cmd_args, situation, msg, verbose):
                 f"Standard output:\n{out}\n"
                 f"Standard error:\n{err}\n"
                 f"{log_data}\n"
-                f"Listeners:\n{list_out}") from exc
+                f"Listeners after command:\n{list_out}"
+                f"Open files after command:\n{open_files}") from exc
 
         if start_pos is not None:
             try:
