@@ -278,8 +278,8 @@ def check_output(cmd_args, situation, msg, verbose):
                 "--stderr-file", str(stderr_file)])
             cmd_args.extend(cmd_args_pt2)
 
-            cmd_stdout = None
-            cmd_stderr = None
+            cmd_stdout = subprocess.DEVNULL
+            cmd_stderr = subprocess.DEVNULL
 
         else:
             # This is any other command but the start command.
@@ -291,7 +291,7 @@ def check_output(cmd_args, situation, msg, verbose):
         try:
             cp = subprocess.run(
                 cmd_args, shell=False, text=True, check=False,
-                stdin=None, stdout=cmd_stdout, stderr=cmd_stderr,
+                stdin=subprocess.DEVNULL, stdout=cmd_stdout, stderr=cmd_stderr,
                 timeout=timeout)
         except subprocess.TimeoutExpired as exc:
             if verbose:
@@ -310,7 +310,7 @@ def check_output(cmd_args, situation, msg, verbose):
                 f"Situation: {situation}\n"
                 f"Standard output:\n{out}\n"
                 f"Standard error:\n{err}\n"
-                f"{log_data}")
+                f"{log_data}") from exc
 
         if start_pos is not None:
             try:
