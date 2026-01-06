@@ -200,6 +200,7 @@ jobs:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
         RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
         TESTCASES: test_list_cmd.py
+        PYTHONUNBUFFERED: 1
       run: |
         make test
     - name: Run end2end test with WBEM server Docker image
