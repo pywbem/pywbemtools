@@ -136,11 +136,21 @@ def test_lis_list(desc, inputs, exp_results, condition):
     pywbemlistener_test(desc, inputs, exp_results, condition)
 
 
-pytest.mark.skip("Debug function disabled")
+# @pytest.mark.skip("Debug function disabled")
 def test_lis_debug():
     """
     Test function for debugging the stdout/stderr redirection.
     """
+
+    cmd_args = ["pywbemlistener", "-vv", "stop", "lis1"]
+    print(f"test_lis_debug: Stopping listener: {cmd_args!r}", flush=True)
+    try:
+        out = check_output(
+            cmd_args, "test_lis_debug", "Stopping listeners failed",
+            verbose=True)
+        print(f"test_lis_debug: Success - stdout:\n{out}", flush=True)
+    except AssertionError as exc:
+        print(f"test_lis_debug: Failed - AssertionError: {exc}", flush=True)
 
     cmd_args = ["pywbemlistener", "-vv", "start", "lis1", "--scheme", "http",
                 "--port", "50001"]
@@ -153,11 +163,33 @@ def test_lis_debug():
     except AssertionError as exc:
         print(f"test_lis_debug: Failed - AssertionError: {exc}", flush=True)
 
+    cmd_args = ["pywbemlistener", "-vv", "start", "lis1", "--scheme", "http",
+                "--port", "50001"]
+    print(f"test_lis_debug: Starting listener: {cmd_args!r}", flush=True)
+    try:
+        out = check_output(
+            cmd_args, "test_lis_debug", "Starting listeners failed",
+            verbose=True)
+        print(f"test_lis_debug: Success - stdout:\n{out}", flush=True)
+    except AssertionError as exc:
+        print(f"test_lis_debug: Failed - AssertionError: {exc}", flush=True)
+
+
     cmd_args = ["pywbemlistener", "-o", "plain", "list"]
     print(f"test_lis_debug: Listing listeners: {cmd_args!r}", flush=True)
     try:
         out = check_output(
             cmd_args, "test_lis_debug", "Listing listeners failed",
+            verbose=True)
+        print(f"test_lis_debug: Success - stdout:\n{out}", flush=True)
+    except AssertionError as exc:
+        print(f"test_lis_debug: Failed - AssertionError: {exc}", flush=True)
+
+    cmd_args = ["pywbemlistener", "-vv", "stop", "lis1"]
+    print(f"test_lis_debug: Stopping listener: {cmd_args!r}", flush=True)
+    try:
+        out = check_output(
+            cmd_args, "test_lis_debug", "Stopping listeners failed",
             verbose=True)
         print(f"test_lis_debug: Success - stdout:\n{out}", flush=True)
     except AssertionError as exc:
