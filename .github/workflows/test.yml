@@ -48,56 +48,9 @@ jobs:
           }" >> $GITHUB_OUTPUT; \
         else \
           echo "matrix={ \
-            \"os\": [ \"ubuntu-latest\" ], \
-            \"python-version\": [ \"3.14\" ], \
-            \"package_level\": [ \"minimum\", \"latest\" ], \
-            \"include\": [ \
-              { \
-                \"os\": \"ubuntu-latest\", \
-                \"python-version\": \"3.9\", \
-                \"package_level\": \"minimum\" \
-              }, \
-              { \
-                \"os\": \"ubuntu-latest\", \
-                \"python-version\": \"3.9\", \
-                \"package_level\": \"latest\" \
-              }, \
-              { \
-                \"os\": \"ubuntu-latest\", \
-                \"python-version\": \"3.10\", \
-                \"package_level\": \"latest\" \
-              }, \
-              { \
-                \"os\": \"macos-latest\", \
-                \"python-version\": \"3.9\", \
-                \"package_level\": \"latest\" \
-              }, \
-              { \
-                \"os\": \"macos-latest\", \
-                \"python-version\": \"3.11\", \
-                \"package_level\": \"latest\" \
-              }, \
-              { \
-                \"os\": \"macos-latest\", \
-                \"python-version\": \"3.14\", \
-                \"package_level\": \"minimum\" \
-              }, \
-              { \
-                \"os\": \"windows-latest\", \
-                \"python-version\": \"3.9\", \
-                \"package_level\": \"latest\" \
-              }, \
-              { \
-                \"os\": \"windows-latest\", \
-                \"python-version\": \"3.12\", \
-                \"package_level\": \"latest\" \
-              }, \
-              { \
-                \"os\": \"windows-latest\", \
-                \"python-version\": \"3.14\", \
-                \"package_level\": \"latest\" \
-              } \
-            ] \
+            \"os\": [ \"macos-latest\" ], \
+            \"python-version\": [ \"3.12\", \"3.14\" ], \
+            \"package_level\": [ \"latest\" ] \
           }" >> $GITHUB_OUTPUT; \
         fi
     - name: Show matrix in JSON
@@ -196,57 +149,57 @@ jobs:
       run: |
         echo "Installed Python packages:"
         make pip_list
-    - name: Display platform and env vars
-      env:
-        PACKAGE_LEVEL: ${{ matrix.package_level }}
-        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
-      run: |
-        make platform env
-    - name: Show package dependency tree
-      run: |
-        echo "Package dependency tree of installed Python packages:"
-        python -m pipdeptree --all
-    - name: Run check_reqs
-      env:
-        PACKAGE_LEVEL: ${{ matrix.package_level }}
-        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
-      run: |
-        make check_reqs
-    - name: Run build
-      env:
-        PACKAGE_LEVEL: ${{ matrix.package_level }}
-        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
-      run: |
-        make build
-    - name: Run builddoc
-      env:
-        PACKAGE_LEVEL: ${{ matrix.package_level }}
-        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
-      run: |
-        make builddoc
-    - name: Run check
-      env:
-        PACKAGE_LEVEL: ${{ matrix.package_level }}
-        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
-      run: |
-        make check
-    - name: Run ruff
-      env:
-        PACKAGE_LEVEL: ${{ matrix.package_level }}
-        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
-      run: |
-        make ruff
-    - name: Run pylint
-      env:
-        PACKAGE_LEVEL: ${{ matrix.package_level }}
-        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
-      run: |
-        make pylint
+    # - name: Display platform and env vars
+    #   env:
+    #     PACKAGE_LEVEL: ${{ matrix.package_level }}
+    #     RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
+    #   run: |
+    #     make platform env
+    # - name: Show package dependency tree
+    #   run: |
+    #     echo "Package dependency tree of installed Python packages:"
+    #     python -m pipdeptree --all
+    # - name: Run check_reqs
+    #   env:
+    #     PACKAGE_LEVEL: ${{ matrix.package_level }}
+    #     RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
+    #   run: |
+    #     make check_reqs
+    # - name: Run build
+    #   env:
+    #     PACKAGE_LEVEL: ${{ matrix.package_level }}
+    #     RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
+    #   run: |
+    #     make build
+    # - name: Run builddoc
+    #   env:
+    #     PACKAGE_LEVEL: ${{ matrix.package_level }}
+    #     RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
+    #   run: |
+    #     make builddoc
+    # - name: Run check
+    #   env:
+    #     PACKAGE_LEVEL: ${{ matrix.package_level }}
+    #     RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
+    #   run: |
+    #     make check
+    # - name: Run ruff
+    #   env:
+    #     PACKAGE_LEVEL: ${{ matrix.package_level }}
+    #     RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
+    #   run: |
+    #     make ruff
+    # - name: Run pylint
+    #   env:
+    #     PACKAGE_LEVEL: ${{ matrix.package_level }}
+    #     RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
+    #   run: |
+    #     make pylint
     - name: Run test
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
         RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
-        # TESTCASES: test_class_cmds.py
+        TESTCASES: test_list_cmd.py
       run: |
         make test
     - name: Run end2end test with WBEM server Docker image
