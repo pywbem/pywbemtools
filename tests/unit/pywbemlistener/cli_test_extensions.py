@@ -187,6 +187,8 @@ def ensure_no_listeners(verbose, situation):
         lis_name = lis_line.split(' ')[0]
         cmd_args = ["pywbemlistener", "stop", lis_name]
         if verbose:
+            cmd_args.insert(1, "-vv")
+        if verbose:
             print(f"{situation}: Stopping listener: {cmd_args!r}", flush=True)
         check_output(cmd_args, situation, "Stopping listener failed", verbose)
 
