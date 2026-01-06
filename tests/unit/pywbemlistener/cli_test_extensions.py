@@ -306,13 +306,22 @@ def check_output(cmd_args, situation, msg, verbose):
             err = exc.stderr
             if isinstance(err, bytes):
                 err = err.decode('utf-8')
+
+            list_args = ["pywbemlistener", "-o", "plain", "list"]
+            if verbose:
+                print(f"{situation}: Listing listeners: {list_args!r}",
+                      flush=True)
+            list_out = check_output(
+                list_args, situation, "Listing listeners failed", verbose)
+
             raise AssertionError(
                 f"{msg}: The command {cmd_args!r} timed out after "
                 f"{timeout} s.\n"
                 f"Situation: {situation}\n"
                 f"Standard output:\n{out}\n"
                 f"Standard error:\n{err}\n"
-                f"{log_data}") from exc
+                f"{log_data}\n"
+                f"Listeners:\n{list_out}") from exc
 
         if start_pos is not None:
             try:
