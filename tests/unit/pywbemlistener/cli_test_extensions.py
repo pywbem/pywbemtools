@@ -290,7 +290,7 @@ def check_output(cmd_args, situation, msg, verbose):
 
         try:
             cp = subprocess.run(
-                cmd_args, shell=False, text=True, check=False,
+                cmd_args, shell=False, text=True, check=False, close_fds=True,
                 stdin=subprocess.DEVNULL, stdout=cmd_stdout, stderr=cmd_stderr,
                 timeout=timeout)
         except subprocess.TimeoutExpired as exc:
