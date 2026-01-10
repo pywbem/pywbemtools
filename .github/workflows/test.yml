@@ -199,7 +199,8 @@ jobs:
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
         RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
-        TESTCASES: test_list_cmd.py
+        TESTCASES: test_lis_debug
+        TESTOPTS: -vv
         PYTHONUNBUFFERED: 1
       run: |
         make test

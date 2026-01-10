@@ -142,22 +142,35 @@ def cli(ctx, output_format, logdir, verbose, pdb, warn):
 def main():
     """
     Main function - the registered entry point.
+
+    We perform the invocation of the command and handle exceptions here
+    instead of using the default Click way of doing that, in order to get
+    control at the very end to cleanup the redirected stdout/stderr that is
+    used by the 'start' command).
+
+    Returns:
+      int: Exit code.
     """
     ctx = None
     try:
+
         my_name = os.path.basename(sys.argv[0])
         ctx = cli.make_context(my_name, sys.argv[1:])
         with ctx:
-            ctx.command.invoke(ctx)
+            ctx.command.invoke(ctx)  # Calls cli()
+
     except click.ClickException as exc:
+        # Used for command line parsing errors detected by Click and also
+        # of course when raised explicitly in our code.
         print(f"Error: {exc}", flush=True, file=sys.stderr)
-        return 1
+        return exc.exit_code
 
     except click.exceptions.Exit as exc:
+        # Used e.g. for --help
         return exc.exit_code
 
     finally:
-        # Cleanup for redirected stdout/stderr (usee by start command).
+        # Cleanup for redirected stdout/stderr (used by start command).
         if ctx is not None and ctx.obj is not None:
             context = ctx.obj
             if getattr(context, "saved_stdout", None) is not None:

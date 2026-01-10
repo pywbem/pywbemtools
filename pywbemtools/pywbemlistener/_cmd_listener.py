@@ -1300,7 +1300,7 @@ def cmd_listener_start(context, name, options):
         print_out(f"Start process {pid}: Starting run process: {cmd}")
 
     # pylint: disable=consider-using-with
-    p = subprocess.Popen(run_args, **popen_kwargs)
+    # p = subprocess.Popen(run_args, **popen_kwargs)
 
     # Wait for startup completion or for error exit
     try:
