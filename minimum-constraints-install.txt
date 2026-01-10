@@ -60,7 +60,7 @@ mock==3.0.0
 
 pyparsing==2.3.1
 
-urllib3==2.5.0
+urllib3==2.6.0
 
 
 # All other indirect dependencies for install that are not in requirements.txt
