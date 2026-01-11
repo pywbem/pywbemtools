@@ -303,12 +303,25 @@ def check_output(cmd_args, situation, msg, verbose):
                 log_data = get_listener_logdata()
             else:
                 log_data = None
-            out = exc.output
-            if isinstance(out, bytes):
-                out = out.decode('utf-8')
-            err = exc.stderr
-            if isinstance(err, bytes):
-                err = err.decode('utf-8')
+            if start_pos is not None:
+                try:
+                    out = stdout_file.read_text()
+                except FileNotFoundError:
+                    out = ""
+                try:
+                    err = stderr_file.read_text()
+                except FileNotFoundError:
+                    err = ""
+            else:
+                out = ""
+                err = ""
+
+            exc_out = exc.output
+            if isinstance(exc_out, bytes):
+                exc_out = exc_out.decode('utf-8')
+            exc_err = exc.stderr
+            if isinstance(exc_err, bytes):
+                exc_err = exc_err.decode('utf-8')
 
             list_args = ["pywbemlistener", "-o", "plain", "list"]
             if verbose:
@@ -325,6 +338,8 @@ def check_output(cmd_args, situation, msg, verbose):
                 f"Situation: {situation}\n"
                 f"Standard output:\n{out}\n"
                 f"Standard error:\n{err}\n"
+                f"Exception standard output:\n{exc_out}\n"
+                f"Exception standard error:\n{exc_err}\n"
                 f"{log_data}\n"
                 f"Listeners after command:\n{list_out}"
                 f"Open files after command:\n{open_files}") from exc
