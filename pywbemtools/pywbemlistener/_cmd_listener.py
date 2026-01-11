@@ -634,6 +634,8 @@ def wait_startup_completion(child_pid):
     # pylint: disable=global-statement,global-variable-not-assigned
     global RUN_STARTUP_STATUS, RUN_STARTUP_COND
 
+    print_out(f"Debug start: Waiting for run process to complete startup")
+
     if _config.VERBOSE_PROCESSES_ENABLED:
         print_out(f"Start process: Waiting for run process {child_pid} to "
                   "complete startup")
@@ -1091,6 +1093,8 @@ def cmd_listener_run(context, name, options):
 
     context.spinner_stop()
 
+    print_out(f"Debug run: Creating listener")
+
     try:
         listener = WBEMListener(
             host=bind_addr, http_port=http_port, https_port=https_port,
@@ -1104,6 +1108,8 @@ def cmd_listener_run(context, name, options):
         listener.logger.addHandler(logging.NullHandler())
     # otherwise, the lastResort handler writes to stderr, from where it is
     # directed into the log file.
+
+    print_out(f"Debug run: Starting listener")
 
     try:
         listener.start()
@@ -1177,6 +1183,8 @@ def cmd_listener_run(context, name, options):
         if context.verbose >= _config.VERBOSE_SETTINGS:
             click.echo('Run process: Added indication handler for appending '
                        f'to file {indi_file} with format "{indi_format}"')
+
+    print_out(f"Debug run: Running listener")
 
     if _config.VERBOSE_PROCESSES_ENABLED:
         click.echo(f"Run process: Running listener {name} at {url}")
