@@ -22,6 +22,7 @@ NOTE: Commands are ordered in help display by their order in this file.
 
 import sys
 import os
+import stat
 import subprocess
 import signal
 import atexit
@@ -991,6 +992,23 @@ def stop_listener_thread(listener, name):
 ###############################################################
 
 
+def os_target(stream):
+    """
+    Returns the target of the stream at the OS level.
+    """
+    fd = stream.fileno()
+    mode = os.fstat(fd).st_mode
+
+    if stat.S_ISFIFO(mode):
+        return "pipe"
+    elif stat.S_ISREG(mode):
+        return "file"
+    elif stat.S_ISCHR(mode):
+        return "terminal"
+    else:
+        return "other"
+
+
 def cmd_listener_run(context, name, options):
     """
     Run as a listener.
@@ -1004,6 +1022,9 @@ def cmd_listener_run(context, name, options):
         start_pid = int(start_pid)
 
     pid = os.getpid()
+
+    print_out(f"Debug run: OS targets: sys.stdout={os_target(sys.stdout)}, "
+              f"sys.stderr={os_target(sys.stderr)}")
 
     # The 'run' command writes its stdout/stderr to a log file when --logdir
     # is specified. Otherwise, it writes it to wherever the coresponding file
@@ -1300,7 +1321,7 @@ def cmd_listener_start(context, name, options):
         print_out(f"Start process {pid}: Starting run process: {cmd}")
 
     # pylint: disable=consider-using-with
-    # p = subprocess.Popen(run_args, **popen_kwargs)
+    p = subprocess.Popen(run_args, **popen_kwargs)
 
     # Wait for startup completion or for error exit
     try:
