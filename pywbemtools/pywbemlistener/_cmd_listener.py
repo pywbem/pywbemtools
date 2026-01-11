@@ -1002,7 +1002,9 @@ def os_target(stream):
     if stat.S_ISFIFO(mode):
         return "pipe"
     elif stat.S_ISREG(mode):
-        return "file"
+        name = getattr(stream, "name", None)
+        result = f"file {name}" if name else "file"
+        return result
     elif stat.S_ISCHR(mode):
         return "terminal"
     else:
@@ -1216,6 +1218,10 @@ def cmd_listener_start(context, name, options):
     stdout_file = options['stdout_file']
     stderr_file = options['stderr_file']
 
+    print_out("Debug start begin: OS targets: "
+              f"sys.stdout={os_target(sys.stdout)}, "
+              f"sys.stderr={os_target(sys.stderr)}")
+
     # If the 'start' command is run by the unit tests, the hidden
     # --stdout-file and --stderr-file options are specified. In that case,
     # stdout/stderr of the 'run' command are captured by writing them to
@@ -1319,6 +1325,10 @@ def cmd_listener_start(context, name, options):
     if _config.VERBOSE_PROCESSES_ENABLED:
         cmd = " ".join(run_args)
         print_out(f"Start process {pid}: Starting run process: {cmd}")
+
+    print_out("Debug start launching run: OS targets: "
+              f"sys.stdout={os_target(sys.stdout)}, "
+              f"sys.stderr={os_target(sys.stderr)}")
 
     # pylint: disable=consider-using-with
     p = subprocess.Popen(run_args, **popen_kwargs)
