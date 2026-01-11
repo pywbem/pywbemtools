@@ -1107,11 +1107,12 @@ def cmd_listener_run(context, name, options):
         # Direct the listener logger into the same log file
         logfile_handler = logging.FileHandler(logfile, encoding="utf-8")
         listener.logger.addHandler(logfile_handler)
+        listener.logger.setLevel(logging.DEBUG)
     else:
         # Suppress the listener logger
         listener.logger.addHandler(logging.NullHandler())
-    # otherwise, the lastResort handler writes to stderr, from where it is
-    # directed into the log file.
+    # Note: If no handler is added, the lastResort handler writes to stderr,
+    # from where it is directed into the log file.
 
     if _config.VERBOSE_PROCESSES_ENABLED:
         click.echo(f"Run process: Starting listener thread for listener {name}")
