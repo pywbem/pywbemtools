@@ -17,7 +17,7 @@
 Test the 'pywbemlistener list' command.
 """
 
-
+import os
 import pytest
 
 from .cli_test_extensions import pywbemlistener_test, RUN, RUN_NO_WIN, \
@@ -136,16 +136,27 @@ def test_lis_list(desc, inputs, exp_results, condition):
     pywbemlistener_test(desc, inputs, exp_results, condition)
 
 
+def cleanup_logfile(logdir, name):
+    """
+    Remove the log file for the listener with that name if it exists.
+    """
+    logfile = os.path.join(logdir, f'pywbemlistener_{name}.log')
+    if os.path.exists(logfile):
+        os.remove(logfile)
+
+
 # @pytest.mark.skip("Debug function disabled")
 def test_lis_debug(capsys):
     """
     Test function for debugging the stdout/stderr redirection.
     """
+    name = "lis1"
+    logdir = "."
 
     with capsys.disabled():
 
         print("--------------------------", flush=True)
-        cmd_args = ["pywbemlistener", "-vv", "stop", "lis1"]
+        cmd_args = ["pywbemlistener", "-vv", "stop", name]
         print(f"test_lis_debug: Stopping listener: {cmd_args!r}", flush=True)
         try:
             out = check_output(
@@ -156,8 +167,9 @@ def test_lis_debug(capsys):
             print(f"test_lis_debug: Failed - AssertionError: {exc}", flush=True)
 
         print("--------------------------", flush=True)
-        cmd_args = ["pywbemlistener", "-vv", "start", "lis1", "--scheme",
-                    "http", "--port", "50001"]
+        cleanup_logfile(logdir, name)
+        cmd_args = ["pywbemlistener", "-vv", "-l", logdir, "start", name,
+                    "--scheme", "http", "--port", "50001"]
         print(f"test_lis_debug: Starting listener: {cmd_args!r}", flush=True)
         try:
             out = check_output(
@@ -168,7 +180,8 @@ def test_lis_debug(capsys):
             print(f"test_lis_debug: Failed - AssertionError: {exc}", flush=True)
 
         print("--------------------------", flush=True)
-        cmd_args = ["pywbemlistener", "-vv", "start", "lis1", "--scheme",
+        cleanup_logfile(logdir, name)
+        cmd_args = ["pywbemlistener", "-vv", "start", name, "--scheme",
                     "http", "--port", "50001"]
         print(f"test_lis_debug: Starting listener: {cmd_args!r}", flush=True)
         try:
@@ -191,7 +204,7 @@ def test_lis_debug(capsys):
             print(f"test_lis_debug: Failed - AssertionError: {exc}", flush=True)
 
         print("--------------------------", flush=True)
-        cmd_args = ["pywbemlistener", "-vv", "stop", "lis1"]
+        cmd_args = ["pywbemlistener", "-vv", "stop", name]
         print(f"test_lis_debug: Stopping listener: {cmd_args!r}", flush=True)
         try:
             out = check_output(
@@ -202,7 +215,7 @@ def test_lis_debug(capsys):
             print(f"test_lis_debug: Failed - AssertionError: {exc}", flush=True)
 
         print("--------------------------", flush=True)
-        cmd_args = ["pywbemlistener", "-vv", "stop", "lis1"]
+        cmd_args = ["pywbemlistener", "-vv", "stop", name]
         print(f"test_lis_debug: Stopping listener: {cmd_args!r}", flush=True)
         try:
             out = check_output(
@@ -211,3 +224,5 @@ def test_lis_debug(capsys):
             print(f"test_lis_debug: Success - stdout:\n{out}", flush=True)
         except AssertionError as exc:
             print(f"test_lis_debug: Failed - AssertionError: {exc}", flush=True)
+
+        cleanup_logfile(logdir, name)

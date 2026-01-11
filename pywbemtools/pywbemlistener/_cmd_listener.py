@@ -1109,7 +1109,8 @@ def cmd_listener_run(context, name, options):
     # otherwise, the lastResort handler writes to stderr, from where it is
     # directed into the log file.
 
-    print_out(f"Debug run: Starting listener")
+    if _config.VERBOSE_PROCESSES_ENABLED:
+        click.echo(f"Run process: Starting listener thread for listener {name}")
 
     try:
         listener.start()
