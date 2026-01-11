@@ -1103,7 +1103,11 @@ def cmd_listener_run(context, name, options):
         raise click.ClickException(
             f"Cannot create WBEMListener for listener {name}: {exc}")
 
-    if not context.logdir:
+    if context.logdir:
+        # Direct the listener logger into the same log file
+        logfile_handler = logging.FileHandler(logfile, encoding="utf-8")
+        listener.logger.addHandler(logfile_handler)
+    else:
         # Suppress the listener logger
         listener.logger.addHandler(logging.NullHandler())
     # otherwise, the lastResort handler writes to stderr, from where it is
