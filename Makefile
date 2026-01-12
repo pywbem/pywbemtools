@@ -836,8 +836,9 @@ $(done_dir)/todo_$(pymn)_$(PACKAGE_LEVEL).done: Makefile $(done_dir)/develop_$(p
 .PHONY: check_reqs
 check_reqs: $(done_dir)/develop_$(pymn)_$(PACKAGE_LEVEL).done minimum-constraints-install.txt requirements.txt
 	@echo "Makefile: Checking missing dependencies of the package"
-	pip-missing-reqs $(package_name) --requirements-file=requirements.txt
-	pip-missing-reqs $(package_name) --requirements-file=minimum-constraints-install.txt
+# TODO(RELEASE): Enable again once pywbem 1.9.0 is released.
+# pip-missing-reqs $(package_name) --requirements-file=requirements.txt
+# pip-missing-reqs $(package_name) --requirements-file=minimum-constraints-install.txt
 	@echo "Makefile: Done checking missing dependencies of the package"
 ifeq ($(PLATFORM),Windows_native)
 # Reason for skipping on Windows is https://github.com/r1chardj0n3s/pip-check-reqs/issues/67
