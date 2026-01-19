@@ -58,12 +58,20 @@ START_HELP_FORMAT_PATTERNS = [
 
 # Output patterns for 'start' command when the listener already exists
 START_EXISTS_PATTERNS = [
-    r"Listener .+ already running at ",
+    r"Listener .+ already running at",
 ]
 
 # Output patterns for 'start' command when the listener was successfully started
+# with log
 START_SUCCESS_LOG_PATTERNS = [
-    r"Run process( [0-9]+)?: Output is logged",
+    r"Run process( [0-9]+)?: Output is appended to log file:",
+    r"Started listener .+ at"
+]
+
+# Output patterns for 'start' command when the listener was successfully started
+# without log
+START_SUCCESS_NOLOG_PATTERNS = [
+    r"Started listener .+ at"
 ]
 
 START_TESTCASES = [
@@ -159,7 +167,7 @@ START_TESTCASES = [
             args=['start', 'lis1', '--scheme', 'http', '--port', '50001'],
         ),
         dict(
-            stdout=[''],
+            stdout=START_SUCCESS_NOLOG_PATTERNS,
             test='all',
         ),
         RUN_NO_WIN,
@@ -172,7 +180,7 @@ START_TESTCASES = [
                   '--port', '50001'],
         ),
         dict(
-            stdout=[''],
+            stdout=START_SUCCESS_NOLOG_PATTERNS,
             test='all',
         ),
         RUN_NO_WIN,
@@ -213,7 +221,7 @@ START_TESTCASES = [
         ),
         dict(
             rc=1,
-            stderr=[r"Cannot create listener .+: "
+            stderr=[r"Cannot create WBEMListener for listener .+: "
                     r"https_port requires certfile"],
             test='all',
         ),
@@ -258,7 +266,7 @@ START_TESTCASES = [
                   '--certfile', 'tests/certs/server_cert_key.pem'],
         ),
         dict(
-            stdout=[''],
+            stdout=START_SUCCESS_NOLOG_PATTERNS,
             test='all',
         ),
         RUN_NO_WIN,
@@ -272,7 +280,7 @@ START_TESTCASES = [
                   '--keyfile', 'tests/certs/server_key.pem'],
         ),
         dict(
-            stdout=[''],
+            stdout=START_SUCCESS_NOLOG_PATTERNS,
             test='all',
         ),
         RUN_NO_WIN,
@@ -288,14 +296,21 @@ START_TESTCASES = [
                   'tests.unit.pywbemlistener.indicall_display.display'],
         ),
         dict(
-            stdout=[''],
+            stdout=[
+                r"Inserting current directory into front of Python module "
+                r"search path",
+                r"Added indication handler for calling function "
+                r"display\(\) in module tests\.unit\.pywbemlistener\."
+                r"indicall_display",
+                r"Started listener lis1 at http://localhost:50001",
+            ],
             test='all',
         ),
         RUN_NO_WIN,
     ),
     (
         "Verify success of 'start' with --indi-call on valid module.function, "
-        "with log and localhost bint addr",
+        "with log and localhost bind addr",
         dict(
             args=['-v', '-l', '.', 'start', 'lis1', '--scheme', 'http',
                   '--bind-addr', 'localhost', '--port', '50001', '--indi-call',
@@ -307,16 +322,29 @@ START_TESTCASES = [
                 'pywbemlistener_lis1.log',
                 [
                     r"Opening 'run' output log file at .+",
-
-                    r"Inserting current directory into front of Python module "
-                    r"search path",
-                    r"Added indication handler for calling function "
-                    r"display\(\) in module tests\.unit\.pywbemlistener\."
-                    r"indicall_display",
-
-                    r"Running listener lis1 at http://localhost:50001",
-                    r"Shut down listener lis1 running at "
-                    r"http://localhost:50001",
+                    r"Creating indication queue with max size: ",
+                    r"Starting callback thread",
+                    r"Entering callback processing loop",
+                    r"Creating threaded HTTP server for host 'localhost' on ",
+                    r"Resolving address of host localhost using AF_INET",
+                    r"Successfully resolved address of host localhost to:",
+                    r"Creating HTTPServer for family 2 and sockaddr",
+                    r"Successfully created HTTPServer for family 2",
+                    r"Starting HTTP listener thread to run threaded HTTP "
+                    r"server",
+                    r"Run process: Inserting current directory into front of "
+                    r"Python module search path",
+                    r"Adding callback function 'display'",
+                    r"Run process: Added indication handler for calling "
+                    r"function display\(\) in module "
+                    r"tests\.unit\.pywbemlistener\.indicall_display",
+                    r"Stopping threaded HTTP server and its listener thread",
+                    r"Stopped threaded HTTP server and its listener thread",
+                    r"Waiting for indication queue to be empty",
+                    r"Indication queue is now empty",
+                    r"Stopping callback thread",
+                    r"Leaving callback processing loop",
+                    r"Stopped callback thread",
                     r"Closing 'run' output log file at .+",
                 ],
             ),
@@ -338,16 +366,29 @@ START_TESTCASES = [
                 'pywbemlistener_lis1.log',
                 [
                     r"Opening 'run' output log file at .+",
-
-                    r"Inserting current directory into front of Python module "
-                    r"search path",
-                    r"Added indication handler for calling function "
-                    r"display\(\) in module tests\.unit\.pywbemlistener\."
-                    r"indicall_display",
-
-                    r"Running listener lis1 at http://:50001",
-                    r"Shut down listener lis1 running at "
-                    r"http://:50001",
+                    r"Creating indication queue with max size: ",
+                    r"Starting callback thread",
+                    r"Entering callback processing loop",
+                    r"Creating threaded HTTP server for host None on ",
+                    r"Resolving address of host None using AF_INET",
+                    r"Successfully resolved address of host None to:",
+                    r"Creating HTTPServer for family 2 and sockaddr",
+                    r"Successfully created HTTPServer for family 2",
+                    r"Starting HTTP listener thread to run threaded HTTP "
+                    r"server",
+                    r"Run process: Inserting current directory into front of "
+                    r"Python module search path",
+                    r"Adding callback function 'display'",
+                    r"Run process: Added indication handler for calling "
+                    r"function display\(\) in module "
+                    r"tests\.unit\.pywbemlistener\.indicall_display",
+                    r"Stopping threaded HTTP server and its listener thread",
+                    r"Stopped threaded HTTP server and its listener thread",
+                    r"Waiting for indication queue to be empty",
+                    r"Indication queue is now empty",
+                    r"Stopping callback thread",
+                    r"Leaving callback processing loop",
+                    r"Stopped callback thread",
                     r"Closing 'run' output log file at .+",
                 ],
             ),
@@ -411,35 +452,29 @@ START_TESTCASES = [
                   '--port', '50001', '--indi-file', 'new.log'],
         ),
         dict(
-            stdout=[''],
+            stdout=[
+                r"Run process: Added indication handler for appending to file "
+                fr"new\.log with format .{DEFAULT_INDI_FORMAT}.",
+                r"Started listener lis1 at http://\(any\):50001",
+            ],
             test='all',
         ),
         RUN_NO_WIN,
     ),
     (
-        "Verify success of 'start' with --indi-file on non-existing file, with "
-        "log bind to localhost",
+        "Verify success of 'start' with --indi-file on non-existing file, no "
+        "log, bind to localhost",
         dict(
-            args=['-v', '-l', '.', 'start', 'lis1', '--scheme', 'http',
+            args=['-v', 'start', 'lis1', '--scheme', 'http',
                   '--bind-addr', 'localhost', '--port', '50001', '--indi-file',
                   'new.log'],
         ),
         dict(
-            stdout=START_SUCCESS_LOG_PATTERNS,
-            log=(
-                'pywbemlistener_lis1.log',
-                [
-                    r"Opening 'run' output log file at .+",
-
-                    r"Added indication handler for appending to file new\.log "
-                    fr"with format .{DEFAULT_INDI_FORMAT}.",
-
-                    r"Running listener lis1 at http://localhost:50001",
-                    r"Shut down listener lis1 running at "
-                    r"http://localhost:50001",
-                    r"Closing 'run' output log file at .+",
-                ],
-            ),
+            stdout=[
+                r"Run process: Added indication handler for appending to file "
+                fr"new\.log with format .{DEFAULT_INDI_FORMAT}.",
+                r"Started listener lis1 at http://localhost:50001",
+            ],
             test='all',
         ),
         RUN_NO_WIN,
@@ -454,18 +489,19 @@ START_TESTCASES = [
         ),
         dict(
             stdout=[
-                r"Start process( [0-9]+)?: Starting run process as: "
-                r"\['pywbemlistener', '-vv', 'run', u?'lis1', '--port', "
-                r"'50001', '--scheme', 'http', "
-                r"'--start-pid', '[0-9]+', "
-                r"'--bind-addr', u?'localhost', "
-                fr"'--indi-format', u?'{DEFAULT_INDI_FORMAT}'\]",
+                r"Start process( [0-9]+)?: Starting run process: .*",
                 r"Start process( [0-9]+)?: Waiting for run process [0-9]+ to "
                 r"complete startup",
+                r"Run process: Starting listener thread for listener lis1",
+                r"Run process: Started listener thread for listener lis1",
+                r"Run process: Running listener lis1 at http://localhost:50001",
+                r"Run process: Sending success signal \([0-9]+\) to start "
+                r"process",
                 r"Start process( [0-9]+)?: Handling success signal .+ from "
                 r"run process",
                 r"Start process( [0-9]+)?: Startup of run process [0-9]+ "
                 r"succeeded",
+                r"Started listener lis1 at http://localhost:50001",
             ],
             test='all',
         ),
@@ -492,7 +528,6 @@ START_TESTCASES = [
 ]
 
 
-@pytest.mark.skip()  # TODO: Disabled to circumvent failure on GitHub Actions
 @pytest.mark.parametrize(
     "desc, inputs, exp_results, condition",
     START_TESTCASES
