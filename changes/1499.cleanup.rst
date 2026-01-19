@@ -1,3 +1,0 @@
-Test: Changed testcase in test_common.py to no longer depend on propagation
-of key properties to key bindings in 'pywbem.CIMInstance', which had been
-deprecated in pywbem.
