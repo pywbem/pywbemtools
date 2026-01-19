@@ -18,8 +18,8 @@ wheel==0.41.3
 
 # Direct dependencies for install (must be consistent with requirements.txt)
 
-# TODO(RELEASE): Enable again once pywbem 1.9.0 is released.
-# pywbem==1.9.0
+# TODO(RELEASE): Enable when using a released pywbem version:
+pywbem==1.9.0
 # When using the GitHub master branch of pywbem, simply comment out the line
 # above, since links are not allowed in constraint files - the minimum will be
 # ensured by requirements.txt then.
