@@ -547,6 +547,18 @@ def get_listeners(name=None):
                 psutil.NoSuchProcess):
             # Ignore processes we cannot access or that ended meanwhile
             continue
+        except OSError as exc:
+            if exc.errno == 0 and "KERN_PROCARGS2" in str(exc):
+                # Ignore the following error:
+                #   [Errno 0] Undefined error: 0 (originated from
+                #   sysctl(KERN_PROCARGS2))
+                # See https://github.com/giampaolo/psutil/issues/2708
+                # Note: psutil plans to raise AccessDenied for this error in
+                # the future, see
+                # https://github.com/giampaolo/psutil/issues/2708 .
+                continue
+            raise
+
         for i, item in enumerate(cmdline):
             if item.endswith(cmdname):
                 listener_index = i
