@@ -1,0 +1,4 @@
+pywbemlistener: Circumvented the behavior that on macOS where "pywbemlistener list"
+could raise OSError "Errno 0 (originated from sysctl(KERN_PROCARGS2)" when
+retrieving the command line of a process when listing the processes, by
+ignoring that error.
