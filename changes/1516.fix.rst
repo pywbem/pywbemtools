@@ -1,0 +1,3 @@
+Changed the minimum version of "click-repl" to 0.3.0. That version does not
+contain the support for global options in repl mode, but it passes the
+tests and we cannot use it from our fork when releasing to Pypi.
