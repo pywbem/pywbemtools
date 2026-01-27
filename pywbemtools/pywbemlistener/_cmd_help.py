@@ -90,7 +90,7 @@ for each shell type:
 
 * Getting from pywbemlistener the body of a completion script for the shell to
   be activated. This is done by executing a script statement of form
-  ``_pywbemlistener_COMPLETE=bash_source pywbemlistener``.
+  ``_PYWBEMLISTENER_COMPLETE=bash_source pywbemlistener``.
 * Notifying the shell of this completion script with an eval statement or
   saving the script and notifying the shell later by sourcing the resulting
   completion script file.

@@ -31,14 +31,7 @@ Click==8.0.2
 click-spinner==0.1.8; python_version <= '3.11'
 click-spinner==0.1.10; python_version >= '3.12'
 
-# TODO: The version specified in requirements.txt is a fork of
-# click=repl. When that fork is integrated and a new version of click-repl
-# is released that should be the new minimum because that fork changes the
-# repl function interface by adding a new parameter that pywbemcli uses.
-# Version 0.3.0 does not work for us because of issue #1441 so in requirements
-# we are currently using a forked version of the click-repl master.
-# Probably: click-repl==0.3.1
-click-repl @ git+https://github.com/pywbem/click-repl.git@allow-general-options
+click-repl==0.2.0
 
 asciitree==0.3.3
 tabulate==0.8.2; python_version <= '3.9'
