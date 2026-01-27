@@ -211,14 +211,14 @@ Example:
 
 # pylint: disable=invalid-name
 tab_completion_help_msg = """
-Tab completion is always available in the interactive mode (see help repl).
-Tab completion in the command mode, when activated,
+Tab completion is not supported in the interactive mode.
+Tab completion is supported in the command mode, when activated.
 
 Tab completion for option values and arguments exists when the data is local.
 It is not provided for option values and arguments where access to a WBEM
 server is required.
 
-Tab completion  is available for:
+Tab completion is available for:
 
 * the command group names
 * the command names

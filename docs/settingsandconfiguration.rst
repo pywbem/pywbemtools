@@ -23,6 +23,7 @@ Both pywbemtools and pywbemcli execute after installation without any
 configuration except for the use of tab-completion (using <TAB> on the shell
 command line) to attempt to complete parameters.
 
+
 .. _`Activating shell tab-completion`:
 
 Activating shell tab-completion
@@ -32,38 +33,31 @@ Activating shell tab-completion
 .. index:: pair: zsh shell; tab-completion
 .. index:: pair: fish shell; tab-completion
 
-Shell tab-completion for pywbemlistener and pywbemcli must be manually activated
-after installation and tab-completion is available only for the following shells:
-(bash, zsh, and fish).  Tab-completion must be activated separately for
-pywbemcli and pywbemlistener.
+Tab-completion is supported for pywbemlistener and in the :ref:`command mode` of
+pywbemcli, for the following shells:
 
-.. index:: tab-completion
-.. index:: Activating tab-completion
+  * **bash shell** - (bash version 4.4 or greater). not all Linux implementations
+    include the bash_complete addon so that the user may be required to install
+    the add-on. A simple test with a utility like ``ls`` will indicate if
+    tab-completion is available  in bash(ex. enter ``ls <TAB>`` to test for the
+    existence of the bash_complete addon).
 
-To activate shell tab-completion for the shells where pywbemcli and pywbemlistener
-support shell completion, you inform the shell that completion is
-available for each tool. This is done through the following statement:
+  * **zsh shell** - Tab-completion is available for all versions of zsh but
+    may need to be activated in the zsh config file. Furthermore there are two
+    different completion systems for zsh.
 
-    ``_<PROG-NAME>_COMPLETE = _<SHELL-NAME>_source  <prog-name>``
+  * **fish shell** - Available for all versions of this shell.
 
-    where:
+Tab-completion is not supported in the :ref:`Interactive mode` of pywbemcli.
 
-      * ``<PROG-NAME>`` is the name of the pywbemtool in uppercase
-      * ``<SHELL-NAME>`` is the name of the shell (ex. bash, zsh, or fish)
-      * ``<prog-name`` the name of the pywbemtool in lower case
+Tab-completion allows to:
 
-This magic variable notifies the shell that this is a shell tab-completion
-variable and the shell then calls back to ``<prog-name>`` with arguments
-containing ``_<PROG-NAME>_COMPLETE`` and ``_<SHELL-NAME>_source`` and other
-tab-completion information in environment variables.  The pywbemtool returns
-the pywbemtool competion script specific for that shell.
+* Complete the static elements of the command line including:
 
-Tab-completion is supported in pywbemcli and pywbemlistener to:
-
-* Completd  the static elements of the command line including:
     * command group names (ex. ``subscription``),
     * command names (ex. ``enumerate``, ``list``, etc.),
     * option names (``--name``, ``-n``, etc.).
+
 * Complete the value of arguments and options that depend on
   local data to complete the commands (i.e where a WBEM server is not contacted).
   Thus, the pywbemcli option ``--name`` which defines the name of a connection
@@ -71,23 +65,30 @@ Tab-completion is supported in pywbemcli and pywbemlistener to:
   in the file). But the value of the class in ``class get`` does not support
   tab-completion because that involves a connection to the WBEM server.
 
-Tab-completion is:
+Tab-completion for pywbemlistener and the :ref:`command mode` of pywbemcli
+must be manually activated after installation, separately for pywbemcli and
+pywbemlistener.
 
-* Always enabled in the pywbemcli :ref:`Interactive mode`. **WARNING:** Currently the
-  tab-completion of option and argument values does not work in the interactive
-  mode because of issues with a pywbemcli dependencies.
-* Enabled in the :ref:`command mode` when shell tab-completion is activated
-  for pywbemcli/pywbemlistener and only with the following shells:
+.. index:: tab-completion
+.. index:: Activating tab-completion
 
-  * **bash shell** - (bash version 4.4 or greater). not all Linux implementations
-    include the bash_complete addon so that the user may be required to install
-    the add-on. A simple test with a utility like ``ls`` will indicate if
-    tab-completion is available  in bash(ex. enter ``ls <TAB>`` to test for the
-    existence of the bash_complete addon).
-  * **zsh shell** - Tab-completion is available for all versions of zsh but
-    may need to be activated in the zsh config file. Furthermore there are two
-    different completion systems for zsh.
-  * **fish shell** - Available for all versions of this shell.
+To activate shell tab-completion, you inform the shell that completion is
+available for each pywbemtools command. This is done through the following
+statement:
+
+    ``_<PROG-NAME>_COMPLETE = _<SHELL-NAME>_source  <prog-name>``
+
+    where:
+
+      * ``<PROG-NAME>`` is the name of the pywbemtools command in uppercase
+      * ``<SHELL-NAME>`` is the name of the shell (ex. bash, zsh, or fish)
+      * ``<prog-name`` the name of the pywbemtools command in lower case
+
+This magic variable notifies the shell that this is a shell tab-completion
+variable and the shell then calls back to ``<prog-name>`` with arguments
+containing ``_<PROG-NAME>_COMPLETE`` and ``_<SHELL-NAME>_source`` and other
+tab-completion information in environment variables.  The pywbemtools command
+then returns the completion script specific for that shell.
 
 Once tab-completion is activated for a shell type , hitting <TAB> or <TAB><TAB>
 initiates tab-completion for command names, option names, and some

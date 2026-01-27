@@ -45,7 +45,8 @@ INSTANCENAME_HELP_LINES = [
 ]
 
 TABCOMPLETION_HELP_LINES = [
-    "Tab completion is always available in the interactive mode (see help repl)"
+    "Tab completion is not supported in the interactive mode.",
+    "Tab completion is supported in the command mode, when activated."
 ]
 
 ACTIVATE_HELP_LINES = [
