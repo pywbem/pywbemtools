@@ -106,3 +106,10 @@ pip-check-reqs>=2.5.1; python_version >= '3.12'
 # Jinja2 is used by Sphinx, and pip needs explicit versions for this
 # otherwise indirect dependency.
 Jinja2>=3.1.5
+
+
+# Dependencies from install that are needed for consistency (e.g. because pinned)
+
+# Click 8.2 made some attributes read-only and click-repl 0.2.0/0.3.0 does not
+#   support that yet, see https://github.com/click-contrib/click-repl/issues/128
+Click>=8.0.2,<8.2
