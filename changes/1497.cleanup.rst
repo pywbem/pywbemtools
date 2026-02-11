@@ -1,2 +1,0 @@
-Removed conditional code that checks for Click version >= 8.0 because the
-minimum Click version is now 8.0 on all supported Python versions.
