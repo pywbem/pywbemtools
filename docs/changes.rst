@@ -15,6 +15,170 @@ Change log
    .. include:: tmp_changes.rst
 
 .. towncrier start
+pywbemtools 1.4.0
+^^^^^^^^^^^^^^^^^
+
+Released: 2026-02-12
+
+**Incompatible changes:**
+
+* The migration from setup.py to pyproject.toml removed the possibility to run
+  setup.py as a command, for example to install or test pywbemtools. Note that
+  running setup.py as a command has been deprecated by the Python setuptools
+  team.
+
+* Removed support for Python 3.8, because (1) Python 3.8 has been out of service since
+  2024-10-07, and (2) the license definition according to PEP 639 requires
+  setuptools >= 77.0.3 which requires Python >= 3.9, and pyproject.toml does
+  not support environment markers.
+
+* Removed support for Python 2.7, 3.6, and 3.7. (`#1390 <https://github.com/pywbem/pywbemtools/issues/1390>`_)
+
+**Bug fixes:**
+
+* Fixed safety issues up to 2026-02-11.
+
+* Development: Fixed new issues reported by Pylint 3.2 and 3.3.
+
+* Test: Fixed the issue that coveralls was not found in the test workflow on MacOS
+  with Python 3.9-3.11, by running it without login shell. Added Python 3.11 on
+  MacOS to the normal tests.
+
+* Development: Fixed pydantic install issue on Python 3.13 by excluding
+  safety-schemas version 0.0.7.
+
+* Test: Python 3.13 was pinned to 3.13.0 to work around a pylint issue on
+  Python 3.13.1.
+
+* Development: Removed 'upload' target from Makefile, and dependency to 'twine'
+  package and some of its dependent packages. It is no longer needed since the
+  introduction of the publish.yml GitHub Actions workflow.
+
+* Development: Fix issue with minimum-constraints-develop.txt that causing
+  failure of make check_reqs. Added two pkgs to minimum-constraints-develop.txt:
+  package Levenshtein used by safety and Sphinx and roman-numerals-py used by
+  Sphinx. See PR 1453 for details.
+
+* Dev: Fixed issue where the package version used for distribution archive file
+  names were generated inconsistently between setuptools_scm (used in Makefile)
+  and the 'build' module, by using no build isolation ('--no-isolation' option
+  of the 'build' module) and increasing the minimum version of 'setuptools-scm'
+  to 9.2.0, which fixes a number of version related issues.
+
+* Dev: Circumvented safety issue with import of typer module by pinning typer
+  to <0.17.0.
+
+* Dev: Added support for generating AUTHORS.md file.
+
+* Development: Tolerate premature deletion of local release/start branches.
+
+* Dev: Added dependencies for Sphinx.
+
+* Dev: Increased version of safety to 3.6.2 to simplify its dependencies.
+
+* Fixed 'socket.gaierror' exception when --bind-addr option was not specified.
+
+* Test: Fixed new issues raised by pylint 4.0.0.
+
+* Development: Increased minimum versions of PyYAML to 6.0.2 and psutil to 6.0.0,
+  to fix install errors with Python 3.13 on Windows. (`#1432 <https://github.com/pywbem/pywbemtools/issues/1432>`_)
+
+* Fixed that the --nq, --no-qualifiers option was ignored for class operations,
+  and qualifiers were always included. (`#1476 <https://github.com/pywbem/pywbemtools/issues/1476>`_)
+
+* Fixed the timeout errors when test programs run the pywbemlistener 'start'
+  command. (`#1492 <https://github.com/pywbem/pywbemtools/issues/1492>`_)
+
+* pywbemlistener: Circumvented the behavior that on macOS where "pywbemlistener list"
+  could raise OSError "Errno 0 (originated from sysctl(KERN_PROCARGS2)" when
+  retrieving the command line of a process when listing the processes, by
+  ignoring that error. (`#1511 <https://github.com/pywbem/pywbemtools/issues/1511>`_)
+
+* Changed the minimum version of "click-repl" to 0.2.0 again and pinned to <0.3.0
+  and removed the use of global options with click-repl, because the support for
+  global options has not yet been released by click-repl. Since this removed the
+  support for tab-completion in the interactive mode of pywbemcli, clarified
+  that in the command help and in the documentation. (`#1516 <https://github.com/pywbem/pywbemtools/issues/1516>`_)
+
+**Enhancements:**
+
+* Development: Migrated from setup.py to pyproject.toml since that is the
+  recommended direction for Python packages. The make targets have not changed.
+  The content of the wheel and source distribution archives has not changed.
+
+  Some files have been renamed:
+  - minimum-constraints.txt to minimum-constraints-develop.txt
+  - .safety-policy-all.yml to .safety-policy-develop.yml
+
+  Removed pywbem/_version_scm.py from git tracking, because it is now
+  dynamically created when building the distribution.
+
+* Development: The pywbem version during development now uses an automatically
+  calculated dev number and the git commit hash, e.g. '1.4.0a1.dev9+gad875911'.
+  The pywbem version numbers for packages released to Pypi are unchanged: 'M.N.U'.
+  Updated the release description in DEVELOP.md to no longer edit the version
+  file.
+
+* Added support for Python 3.14.
+
+* Development: Changed release process to use a GitHub Actions workflow and
+  documented that in DEVELOP.md. (`#1395 <https://github.com/pywbem/pywbemtools/issues/1395>`_)
+
+* Added support for and testing on Python 3.13. (`#1429 <https://github.com/pywbem/pywbemtools/issues/1429>`_)
+
+* Development: Simplified the release of a version and the start of a new
+  version by new make targets:
+  release_branch
+  release_publish
+  start_branch
+  start_tag (`#1435 <https://github.com/pywbem/pywbemtools/issues/1435>`_)
+
+* Development: Migrated to use towncrier for change logs.
+  See docs/development.rst for details and usage. (`#1436 <https://github.com/pywbem/pywbemtools/issues/1436>`_)
+
+* Docs: Added description for installation using "uv". (`#1456 <https://github.com/pywbem/pywbemtools/issues/1456>`_)
+
+* Changed installation instructions to recommend the use of pipx. (`#1457 <https://github.com/pywbem/pywbemtools/issues/1457>`_)
+
+* Increased version of pywbem package to 1.9.0 to pick up fixes and new functions. (`#1503 <https://github.com/pywbem/pywbemtools/issues/1503>`_)
+
+**Cleanup:**
+
+* Test: Added retries for sending coverage data to the coveralls.io site to
+  address issues with the site.
+
+* Test: Changed simple returns from some test functions in case the test is not
+  supported, to use pytest.skip() in order to show the reason for skipping.
+
+* Removed code and tests that depend on the differences between Python 3.8+ and
+  on differences between pywbem 1.0.0 and earlier versions of Python. (`#1405 <https://github.com/pywbem/pywbemtools/issues/1405>`_)
+
+* Refactored pywbemcli tests to avoid hiding the default connection file and
+  the names for the connection file and mock cache by moving as part of tests.
+  EnvVar PYWBEMCLI_ALT_HOME_DIR defines alternate directory for connection file
+  and mockcache and is set for all pywbemcli tests. The definition of file
+  names for default connection file and mock cache managed by pywbemcli moved
+  from  pywbemtools/pywbemcli/_utils.py to pywbemcli/_connection_file_names.py. (`#1423 <https://github.com/pywbem/pywbemtools/issues/1423>`_)
+
+* Used click-repl version 3 forked. Currently this is using a forked version
+  since the proposed changes to fix issues have not been incorporated into a
+  released version of click-repl. (`#1441 <https://github.com/pywbem/pywbemtools/issues/1441>`_)
+
+* Docs: Integrated the descriptions on how to release and start a new version
+  into the online documentation and reduced DEVELOP.md to contain a link to the
+  corresponding chapter of the online documentation. (`#1448 <https://github.com/pywbem/pywbemtools/issues/1448>`_)
+
+* Used new license format defined in PEP 639 to accommodate upcoming removal
+  of support for old format. (`#1489 <https://github.com/pywbem/pywbemtools/issues/1489>`_)
+
+* Removed conditional code that checks for Click version >= 8.0 because the
+  minimum Click version is now 8.0 on all supported Python versions. (`#1497 <https://github.com/pywbem/pywbemtools/issues/1497>`_)
+
+* Test: Changed testcase in test_common.py to no longer depend on propagation
+  of key properties to key bindings in 'pywbem.CIMInstance', which had been
+  deprecated in pywbem. (`#1499 <https://github.com/pywbem/pywbemtools/issues/1499>`_)
+
+
 pywbemtools 1.3.0
 -----------------
 
