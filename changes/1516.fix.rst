@@ -1,5 +1,0 @@
-Changed the minimum version of "click-repl" to 0.2.0 again and pinned to <0.3.0
-and removed the use of global options with click-repl, because the support for
-global options has not yet been released by click-repl. Since this removed the
-support for tab-completion in the interactive mode of pywbemcli, clarified
-that in the command help and in the documentation.
