@@ -398,6 +398,9 @@ def listener_start(context, name, **options):
     """
     Start a named WBEM indication listener in the background.
 
+    The NAME argument wil be used as the name of the new WBEM indication
+    listener.
+
     A listener with that name must not be running, otherwise the command fails.
 
     A listener is identified by its hostname or IP address and a port number.
@@ -427,7 +430,9 @@ def listener_stop(context, name):
 
     The listener will shut down gracefully.
 
-    A listener with that name must be running, otherwise the command fails.
+    The NAME argument is the name of a WBEM indication listener previously
+    started with the pywbemlistener command. Tab completion is supported for
+    the NAME argument.
 
     Examples:
 
@@ -448,7 +453,9 @@ def listener_show(context, name):
     """
     Show a named WBEM indication listener.
 
-    A listener with that name must be running, otherwise the command fails.
+    The NAME argument is the name of a WBEM indication listener previously
+    started with the pywbemlistener command. Tab completion is supported for
+    the NAME argument.
 
     Examples:
 
@@ -493,6 +500,10 @@ def listener_test(context, name, **options):
 
     The indication is an alert indication with fixed properties. This allows
     testing the listener and what it does with the indication.
+
+    The NAME argument is the name of a WBEM indication listener previously
+    started with the pywbemlistener command. Tab completion is supported for
+    the NAME argument.
 
     Examples:
 
