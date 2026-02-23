@@ -60,7 +60,7 @@ from .._utils import pywbemtools_warn, get_terminal_width, debug_log
 from .._options import add_options, help_option
 from .._output_formatting import OUTPUT_FORMAT_GROUPS, OUTPUT_FORMATS
 
-from ._warnings import InvalidConnectionFile, TabCompletionError
+from ._warnings import InvalidConnectionFile
 
 
 __all__ = ['cli']
@@ -142,39 +142,36 @@ def get_ctx_attrs(ctx):
 def connection_name_completer(ctx, param, incomplete):
     # pylint: disable=unused-argument
     """
-    Shell complete function for the general option --name.  This function is
-    called if <TAB> is entered from terminal as part of the value of the
-    --name general option.  It returns all entries in connection table that
-    start with the string in incomplete.
+    Shell completion function for the NAME argument of connection commands.
 
-    If there is an issue with the connections file, a warning is issued and
-    an empty string returned.  This method must not generate an exception
-    because it could pass that back to the shell.
+    This function is called when tab completion has been activated for
+    pywbemcli and <TAB> is entered before or during typing the NAME argument.
+
+    This function returns the names of all connections found in the connection
+    file that start with the string in "incomplete".
+
+    If there is no connection file, this is tolerated and the empty string
+    (i.e. no completion suggestion) is returned.
+
+    Note: This method must not generate an exception because that would cause
+    a traceback to be shown.
     """
     if 'connections_file' in ctx.params:
         connections_file = \
             ctx.params['connections_file'] or DEFAULT_CONNECTIONS_FILE
     else:
         connections_file = DEFAULT_CONNECTIONS_FILE
-    try:
-        connections_repo = ConnectionRepository(connections_file)
-        # Test for file exists because defining repo or iteration ignore
-        # not-existent file.
-        if not connections_repo.file_exists():
-            raise ConnectionsFileError(
-                f"Connections file: '{connections_file}' does not exist.")
 
-        # Returns list of click CompletionItems from list of keys in
-        # the repository.
-        return [click_completion_item(name) for name in connections_repo
-                if name.startswith(incomplete)]
+    connections_repo = ConnectionRepository(connections_file)
 
-    except ConnectionsFileError as cfe:
-        pywbemtools_warn(
-            f"Connection file: {connections_file},  "   # FIXIT: drop one space
-            f"Fatal Error: {cfe.__class__.__name__}: {cfe}.",
-            TabCompletionError)
+    # If the connection file does not exist, return no suggestions.
+    if not connections_repo.file_exists():
         return ""
+
+    # Returns list of click CompletionItems from list of keys in
+    # the repository.
+    return [click_completion_item(name) for name in connections_repo
+            if name.startswith(incomplete)]
 
 
 ###########################################################################

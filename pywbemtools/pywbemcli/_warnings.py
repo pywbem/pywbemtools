@@ -29,13 +29,3 @@ class InvalidConnectionFile(pywbemwarning):
     lack of connection file.
     """
     pass
-
-
-class TabCompletionError(pywbemwarning):
-    """
-    Indicates that invalid connection file in a tab completion.
-    This warning is used in place of an exception for cmd line tab completion
-    errors because exceptions should never be issued in tab-completion
-    handling
-    """
-    pass
