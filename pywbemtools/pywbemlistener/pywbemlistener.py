@@ -154,10 +154,7 @@ def main():
     ctx = None
     try:
 
-        my_name = os.path.basename(sys.argv[0])
-        ctx = cli.make_context(my_name, sys.argv[1:])
-        with ctx:
-            ctx.command.invoke(ctx)  # Calls cli()
+        cli(standalone_mode=False)
 
     except click.ClickException as exc:
         # Used for command line parsing errors detected by Click and also
