@@ -655,13 +655,13 @@ Help text for ``pywbemcli connection`` (see :ref:`connection command group`):
 
     Commands:
       export       Export the current connection.
-      show         Show a WBEM connection definition or the current connection.
-      delete       Delete a WBEM connection definition.
-      select       Select a WBEM connection definition as current or default.
+      show         Show a connection definition.
+      delete       Delete a connection definition.
+      select       Select a connection definition as current or default.
       test         Test the current connection with a predefined WBEM request.
-      save         Save the current connection parameters to a named connection.
-      list         List the WBEM connection definitions.
-      set-default  Set a connection as the default connection.
+      save         Save the current connection parameters to a named connection definition.
+      list         List the connection definitions.
+      set-default  Set a connection definition as the default connection.
 
 
 .. _`pywbemcli connection delete --help`:
@@ -678,10 +678,13 @@ Help text for ``pywbemcli connection delete`` (see :ref:`connection delete comma
 
     Usage: pywbemcli [GENERAL-OPTIONS] connection delete NAME [COMMAND-OPTIONS]
 
-      Delete a WBEM connection definition.
+      Delete a connection definition.
 
-      Delete a named connection definition from the connections file. If the NAME argument is omitted, a list of all
-      connection definitions is displayed on the terminal  and a prompt for selecting one of these connections.
+      The NAME argument is the name of the connection definition in the connections file. The connection definition in the
+      connections file must exist. Tab completion is supported for the NAME argument.
+
+      If the NAME argument is omitted, a list of all connection definitions from the connections file is displayed and the
+      user is prompted for selecting one of them.
 
       Example:
 
@@ -733,7 +736,7 @@ Help text for ``pywbemcli connection list`` (see :ref:`connection list command`)
 
     Usage: pywbemcli [GENERAL-OPTIONS] connection list [COMMAND-OPTIONS]
 
-      List the WBEM connection definitions.
+      List the connection definitions.
 
       This command displays all entries in the connections file and the current connection if it exists and is not in the
       connections file as a table.
@@ -762,7 +765,7 @@ Help text for ``pywbemcli connection save`` (see :ref:`connection save command`)
 
     Usage: pywbemcli [GENERAL-OPTIONS] connection save NAME [COMMAND-OPTIONS]
 
-      Save the current connection parameters to a named connection.
+      Save the current connection parameters to a named connection definition.
 
       Save the current connection to the connections file as a connection definition named NAME. The NAME argument is
       required. If a connection definition with that name already exists, it is overwritten without warning.
@@ -794,11 +797,13 @@ Help text for ``pywbemcli connection select`` (see :ref:`connection select comma
 
     Usage: pywbemcli [GENERAL-OPTIONS] connection select NAME [COMMAND-OPTIONS]
 
-      Select a WBEM connection definition as current or default.
+      Select a connection definition as current or default.
 
-      Select the connection definition named NAME from the connections file to be the current connection. The connection
-      definition in the connections file must exist. If the NAME argument is omitted, a list of connection definitions from
-      the connections file is presented with a prompt for the user to select a connection definition.
+      The NAME argument is the name of the connection definition in the connections file. The connection definition in the
+      connections file must exist. Tab completion is supported for the NAME argument.
+
+      If the NAME argument is omitted, a list of all connection definitions from the connections file is displayed and the
+      user is prompted for selecting one of them.
 
       If the --set-default option is set, the default connection is set to the selected connection definition, in addition.
       Once defined, the default connection will be used as a default in future executions of pywbemcli if none of the
@@ -841,13 +846,15 @@ Help text for ``pywbemcli connection set-default`` (see :ref:`connection set-def
 
     Usage: pywbemcli [GENERAL-OPTIONS] connection set-default NAME [COMMAND-OPTIONS]
 
-      Set a connection as the default connection.
+      Set a connection definition as the default connection.
 
-      Sets either the connection defined in the NAME argument as the default current connection definition or, if there is
-      no NAME argument on the command it sets the current connection (if there is one) as the default connection.
+      The NAME argument is the name of the connection definition in the connections file. The connection definition in the
+      connections file must exist. Tab completion is supported for the NAME argument.
 
-      The character "?" may be used as the name argument to allow selecting the connection to be set as the default
-      connection interactively from all of the existing connection definitions.
+      If the NAME argument is omitted, the current connection is used.
+
+      If the NAME argument is '?', a list of all connection definitions from the connections file is displayed and the user
+      is prompted for selecting one of them.
 
     Command Options:
       --clear       Clear default connection name.
@@ -869,17 +876,15 @@ Help text for ``pywbemcli connection show`` (see :ref:`connection show command`)
 
     Usage: pywbemcli [GENERAL-OPTIONS] connection show NAME [COMMAND-OPTIONS]
 
-      Show a WBEM connection definition or the current connection.
+      Show a connection definition.
 
-      Show the name and attributes of a WBEM connection definition or the current connection, as follows:
+      The NAME argument is the name of the connection definition in the connections file. The connection definition in the
+      connections file must exist. Tab completion is supported for the NAME argument.
 
-      * If the NAME argument is specified, display the connection information   with that name from the connections file or
-      the current connection if it   is the same name.
+      If the NAME argument is omitted, the current connection is used.
 
-      * If the NAME argument is '?', the command presents a list of connection   definitions from the connections file and
-      prompts the user to   select one, which is then displayed.
-
-      * If the NAME argument is omitted, displays the current connection   information if there is a current connection.
+      If the NAME argument is '?', a list of all connection definitions from the connections file is displayed and the user
+      is prompted for selecting one of them.
 
       Example showing a named connection definition:
 

@@ -92,20 +92,21 @@ CONNECTION_HELP_LINES = [
     'Command group for WBEM connection definitions.',
     CMD_OPTION_HELP_HELP_LINE,
     'export  Export the current connection.',
-    'show    Show a WBEM connection definition or the current connection.',
-    'delete  Delete a WBEM connection definition.',
-    'select  Select a WBEM connection definition as current or default.',
+    'show    Show a connection definition.',
+    'delete  Delete a connection definition.',
+    'select  Select a connection definition as current or default.',
     'test    Test the current connection with a predefined WBEM request.',
-    'save    Save the current connection parameters to a named connection',
-    'list    List the WBEM connection definitions.',
-    'set-default Set a connection as the default connection.'
+    'save    Save the current connection parameters to a named connection '
+    'definition.',
+    'list    List the connection definitions.',
+    'set-default Set a connection definition as the default connection.'
 ]
 
 
 CONNECTION_DELETE_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] connection delete NAME '
     '[COMMAND-OPTIONS]',
-    'Delete a WBEM connection definition.',
+    'Delete a connection definition.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
@@ -117,28 +118,28 @@ CONNECTION_EXPORT_HELP_LINES = [
 
 CONNECTION_LIST_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] connection list [COMMAND-OPTIONS]',
-    'List the WBEM connection definitions.',
+    'List the connection definitions.',
     '-f, --full  If set, display the full table. Otherwise display  a brief',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
 CONNECTION_SAVE_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] connection save NAME [COMMAND-OPTIONS]',
-    'Save the current connection parameters to a named connection.',
+    'Save the current connection parameters to a named connection definition.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
 CONNECTION_SELECT_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] connection select NAME '
     '[COMMAND-OPTIONS]',
-    'Select a WBEM connection definition as current or default.',
+    'Select a connection definition as current or default.',
     '-d, --set-default  If set, the connection is set to be the default ',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
 CONNECTION_SHOW_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] connection show NAME [COMMAND-OPTIONS]',
-    'Show a WBEM connection definition or the current connection.',
+    'Show a connection definition.',
     '--show-password  If set, show existing password in results.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
@@ -152,7 +153,7 @@ CONNECTION_TEST_HELP_LINES = [
 CONNECTION_SET_DEFAULT_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] connection set-default NAME '
     '[COMMAND-OPTIONS]',
-    'Set a connection as the default connection.',
+    'Set a connection definition as the default connection.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
