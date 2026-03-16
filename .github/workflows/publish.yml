@@ -32,7 +32,7 @@ jobs:
     #-------- Info gathering and checks
     - name: Set pushed tag
       id: set-tag
-      uses: actions/github-script@v6
+      uses: actions/github-script@v8
       with:
         result-encoding: string
         script: |
@@ -49,7 +49,7 @@ jobs:
         fi
     - name: Determine whether releasing the master branch
       id: set-is-master-branch
-      uses: actions/github-script@v6
+      uses: actions/github-script@v8
       with:
         result-encoding: string
         script: |
@@ -65,7 +65,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Determine name of stable branch for pushed tag
       id: set-stable-branch
-      uses: actions/github-script@v6
+      uses: actions/github-script@v8
       with:
         result-encoding: string
         script: |
@@ -74,7 +74,7 @@ jobs:
           return result
     - name: Determine whether releasing stable branch for pushed tag
       id: set-is-stable-branch
-      uses: actions/github-script@v6
+      uses: actions/github-script@v8
       with:
         result-encoding: string
         script: |
@@ -103,7 +103,7 @@ jobs:
         fi
     - name: Set update version
       id: set-update-version
-      uses: actions/github-script@v6
+      uses: actions/github-script@v8
       with:
         result-encoding: string
         script: |
@@ -127,11 +127,11 @@ jobs:
 
     #-------- Setup of work environment
     - name: Checkout repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
     - name: Set up Python 3.12
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v6
       with:
         python-version: "3.12"
     - name: Development setup
@@ -177,7 +177,7 @@ jobs:
     #       not set.
     - name: Create new stable branch when releasing master branch
       if: steps.set-is-master-branch.outputs.result == 'true'
-      uses: actions/github-script@v6
+      uses: actions/github-script@v8
       with:
         script: |
           github.rest.git.createRef({
