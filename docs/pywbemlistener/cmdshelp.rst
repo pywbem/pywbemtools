@@ -215,7 +215,8 @@ Help text for ``pywbemlistener show`` (see :ref:`pywbemlistener show command`):
 
       Show a named WBEM indication listener.
 
-      A listener with that name must be running, otherwise the command fails.
+      The NAME argument is the name of a WBEM indication listener previously started with the pywbemlistener command. Tab
+      completion is supported for the NAME argument.
 
       Examples:
 
@@ -240,6 +241,8 @@ Help text for ``pywbemlistener start`` (see :ref:`pywbemlistener start command`)
     Usage: pywbemlistener [GENERAL-OPTIONS] start NAME [COMMAND-OPTIONS]
 
       Start a named WBEM indication listener in the background.
+
+      The NAME argument wil be used as the name of the new WBEM indication listener.
 
       A listener with that name must not be running, otherwise the command fails.
 
@@ -295,7 +298,8 @@ Help text for ``pywbemlistener stop`` (see :ref:`pywbemlistener stop command`):
 
       The listener will shut down gracefully.
 
-      A listener with that name must be running, otherwise the command fails.
+      The NAME argument is the name of a WBEM indication listener previously started with the pywbemlistener command. Tab
+      completion is supported for the NAME argument.
 
       Examples:
 
@@ -323,6 +327,9 @@ Help text for ``pywbemlistener test`` (see :ref:`pywbemlistener test command`):
 
       The indication is an alert indication with fixed properties. This allows testing the listener and what it does with
       the indication.
+
+      The NAME argument is the name of a WBEM indication listener previously started with the pywbemlistener command. Tab
+      completion is supported for the NAME argument.
 
       Examples:
 
