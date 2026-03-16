@@ -684,7 +684,7 @@ Help text for ``pywbemcli connection delete`` (see :ref:`connection delete comma
       connections file must exist. Tab completion is supported for the NAME argument.
 
       If the NAME argument is omitted, a list of all connection definitions from the connections file is displayed and the
-      user is prompted for selecting one of them.
+      user is prompted to select one of them.
 
       Example:
 
@@ -803,7 +803,7 @@ Help text for ``pywbemcli connection select`` (see :ref:`connection select comma
       connections file must exist. Tab completion is supported for the NAME argument.
 
       If the NAME argument is omitted, a list of all connection definitions from the connections file is displayed and the
-      user is prompted for selecting one of them.
+      user is prompted to select one of them.
 
       If the --set-default option is set, the default connection is set to the selected connection definition, in addition.
       Once defined, the default connection will be used as a default in future executions of pywbemcli if none of the
@@ -854,7 +854,7 @@ Help text for ``pywbemcli connection set-default`` (see :ref:`connection set-def
       If the NAME argument is omitted, the current connection is used.
 
       If the NAME argument is '?', a list of all connection definitions from the connections file is displayed and the user
-      is prompted for selecting one of them.
+      is prompted to select one of them.
 
     Command Options:
       --clear       Clear default connection name.
@@ -884,16 +884,21 @@ Help text for ``pywbemcli connection show`` (see :ref:`connection show command`)
       If the NAME argument is omitted, the current connection is used.
 
       If the NAME argument is '?', a list of all connection definitions from the connections file is displayed and the user
-      is prompted for selecting one of them.
+      is prompted to select one of them.
 
       Example showing a named connection definition:
 
+        # show based on full name of connection (ex. svr1)
         pywbemcli connection show svr1
           name: svr1
           ...
 
-      Example for prompting for a connection definition:
+        # complete name with tab-completion and show (tab-completion active)
+        pywbemcli connection show svr<TAB><TAB>
+        svr1 svr2    prompting with known connection svr1 and svr2:
+        <enter 1 to select mock1 connection>
 
+        # request that pywbemcli display all names and select from returned list
         pywbemcli connection show ?
           0: svr1
           1: svr2
