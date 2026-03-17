@@ -284,6 +284,14 @@ jobs:
         RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
       run: |
         make safety
+    - name: Check for uncommitted changes to tracked files
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      env:
+        PACKAGE_LEVEL: ${{ matrix.package_level }}
+        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
+      run: |
+        git status
+        git diff HEAD --quiet
 
   test_finish:
     needs: test
