@@ -888,12 +888,17 @@ Help text for ``pywbemcli connection show`` (see :ref:`connection show command`)
 
       Example showing a named connection definition:
 
+        # show based on full name of connection (ex. svr1)
         pywbemcli connection show svr1
           name: svr1
           ...
 
-      Example for prompting for a connection definition:
+        # complete name with tab-completion and show (tab-completion active)
+        pywbemcli connection show svr<TAB><TAB>
+        svr1 svr2    prompting with known connection svr1 and svr2:
+        <enter 1 to select mock1 connection>
 
+        # request that pywbemcli display all names and select from returned list
         pywbemcli connection show ?
           0: svr1
           1: svr2
