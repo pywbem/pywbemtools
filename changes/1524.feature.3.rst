@@ -1,0 +1,23 @@
+Correct some documentation errors in the documentation section of pr 1524
+as follows:
+
+1. On "This is done through the following statement:": This is actually a
+   command to be executed in the shell. I suggest changing "statement" to "command".
+
+2. The command _<PROG-NAME>_COMPLETE = _<SHELL-NAME>_source  <prog-name> has
+   two errors:
+
+    It has an underscore before <SHELL-NAME> which needs to be removed.
+    The = is surrounded by blanks. The blanks need to be removed.
+
+3. Most importantly though, that command only displays the completion function,
+   and does not activate shell completion at all. So the introduction "To activate
+   shell tab-completion..." is misleading.
+
+4. The description of the command variables has two occurrences of "name of the
+   pywbemtool". Change that to "name of the pywbemtools command".
+
+5. Instead of saying "The above method may be difficult ..." I suggest that we
+   simply state the requirement that the commands must be in the PATH. That can be
+   satisfied by having the virtualenv active or by installing with pipx.
+
