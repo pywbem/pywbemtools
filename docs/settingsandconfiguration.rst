@@ -72,11 +72,10 @@ pywbemlistener.
 .. index:: tab-completion
 .. index:: Activating tab-completion
 
-To activate shell tab-completion, you inform the shell that completion is
-available for each pywbemtools command. This is done through the following
-statement:
+To activate shell tab-completion, the following script magic variable  must
+be defined:
 
-    ``_<PROG-NAME>_COMPLETE = _<SHELL-NAME>_source  <prog-name>``
+    ``_<PROG-NAME>_COMPLETE=<SHELL-NAME>_source  <prog-name>``
 
     where:
 
@@ -84,11 +83,11 @@ statement:
       * ``<SHELL-NAME>`` is the name of the shell (ex. bash, zsh, or fish)
       * ``<prog-name`` the name of the pywbemtools command in lower case
 
-This magic variable notifies the shell that this is a shell tab-completion
-variable and the shell then calls back to ``<prog-name>`` with arguments
-containing ``_<PROG-NAME>_COMPLETE`` and ``_<SHELL-NAME>_source`` and other
-tab-completion information in environment variables.  The pywbemtools command
-then returns the completion script specific for that shell.
+The existence of  magic variable notifies the shell that this is a shell
+tab-completion variable and the shell then calls back to ``<prog-name>`` with
+arguments containing ``_<PROG-NAME>_COMPLETE`` and ``_<SHELL-NAME>_source`` and
+other tab-completion information in environment variables.  The pywbemtools
+command then returns the the correct completion script specific for that shell.
 
 Once tab-completion is activated for a shell type , hitting <TAB> or <TAB><TAB>
 initiates tab-completion for command names, option names, and some
@@ -108,11 +107,13 @@ Activation of tab-completion involves the following but with different
 formats for each shell type:
 
 1. Getting from pywbemcli the body of a completion script for the terminal's
-   shell type as defined above using the magic variable.
+   shell type as defined above using the magic variable. This script file
+   contains the shell-specific logic to activate tab-completion and process
+   tab-completion calls.
 2. Notifying the shell of this completion script by either:
    * notifying the shell with a shell  ``eval`` statement or,
    * saving the script to a completion script file and notifying the shell later
-   by sourcing the resulting completion script file.
+     by sourcing the resulting completion script file.
 
 Activation with eval statement
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -136,17 +137,16 @@ with a bash shell:
   fish    ~/.config/fish/completions/foo-bar.fish  eval (env _<PROG_NAME>_COMPLETE=fish_source pywbemcli)
   ======  =======================================  =========================================================
 
-The above method may be difficult when the location of the pywbemcli
-executable is not in the path (ex. when pywbemtools is in a virtual environment)
+The above method requires that the pywbemtool command be in the in the PATH
 since the ``eval`` statement initiates a callback to the pywbemcli/pywbemlistener and
-the location of those executables may not be publially available. Also it can
+the location of those executables may not be publicly available. Also it can
 slow down terminal startup because pywbemcli must be called on each terminal
 startup to get the completion script definition.
 
 Activation by creating a complete script file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-An alternative is to create a complete script file using the same statement
+An alternative is to create a complete tab-completion script file using the same statement
 (ex. ``_<PROG-NAME>_COMPLETE=<shell-type>_source pywbemcli``) but saving the
 resulting complete script in a file.  This file contains the shell-specific
 logic to activate tab-completion and process tab-completion calls. The user
@@ -200,7 +200,7 @@ available whenever the terminal is started:
 
 or by creating a completion script file one time as follows when pywbemlistener
 and pywbemcli are publically avialable and then sourcing the script when,
-for example, the terminal window is opened.:
+for example, the terminal window is opened:
 
 .. code-block::
 
