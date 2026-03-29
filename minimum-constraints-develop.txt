@@ -133,7 +133,9 @@ linecache2==1.0.0
 # Jinja2 3.x requires MarkupSafe>=2.0
 MarkupSafe==2.0.0
 mistune==0.8.1
-nltk==3.9.1
+# Need to comment out nltk==3.9.2 due to issue https://github.com/pyupio/safety/issues/847
+# nltk==3.9.2; python_version == '3.9'
+nltk==3.9.3; python_version >= '3.10'
 pandocfilters==1.4.1
 pathlib2==2.2.1
 pbr==1.8.0
