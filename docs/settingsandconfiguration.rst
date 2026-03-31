@@ -50,7 +50,7 @@ pywbemcli, for the following shells:
 
 Tab-completion is not supported in the :ref:`Interactive mode` of pywbemcli.
 
-Tab-completion allows to:
+Tab-completion allows the terminal user to:
 
 * Complete the static elements of the command line including:
 
@@ -61,7 +61,7 @@ Tab-completion allows to:
 * Complete the value of arguments and options that depend on
   local data to complete the commands (i.e where a WBEM server is not contacted).
   Thus, the pywbemcli option ``--name`` which defines the name of a connection
-  in a connection file can be completed (pywbemcli search the names
+  in a connection file can be completed (pywbemcli searches the names
   in the file). But the value of the class in ``class get`` does not support
   tab-completion because that involves a connection to the WBEM server.
 
@@ -73,17 +73,19 @@ pywbemlistener.
 .. index:: Activating tab-completion
 
 To activate shell tab-completion, the following script magic variable  must
-be defined:
+be defined for the shell:
 
-    ``_<PROG-NAME>_COMPLETE=<SHELL-NAME>_source  <prog-name>``
+.. code-block:: text
 
-    where:
+    _<PROG-NAME>_COMPLETE=<SHELL-NAME>_source  <prog-name>``
 
-      * ``<PROG-NAME>`` is the name of the pywbemtools command in uppercase
-      * ``<SHELL-NAME>`` is the name of the shell (ex. bash, zsh, or fish)
-      * ``<prog-name`` the name of the pywbemtools command in lower case
+where:
 
-The existence of  magic variable notifies the shell that this is a shell
+    <PROG-NAME> is the name of the pywbemtools command in uppercase(i.e. PYWBEMCLI or PYWBEMLISTENER)
+    <SHELL-NAME> is the name of the shell (i.e. bash, zsh, or fish)
+    <prog-name>  is the name of the pywbemtools command in lower case (pywbemcli or pywbemlistener)
+
+The existence of the magic variable notifies the shell that this is a shell
 tab-completion variable and the shell then calls back to ``<prog-name>`` with
 arguments containing ``_<PROG-NAME>_COMPLETE`` and ``_<SHELL-NAME>_source`` and
 other tab-completion information in environment variables.  The pywbemtools
@@ -97,9 +99,9 @@ completions, the shell returns the list or do nothing until a second <TAB> is
 entered.
 
 If hitting <TAB> or <TAB><TAB> when tab-completion is active returns nothing,
-either the word at the terminal cursor does is not matched with a possible
-target (ex. ``pywbemcli --name xxx<TAB>`` for pywbemcli connection name when
-there is no connection name that starts with ``xxx`) or there is no
+either the word at the terminal cursor is not matched with a possible
+target (ex. ``pywbemcli --name xxx<TAB>``) for pywbemcli connection name when
+there is no connection name that starts with ``xxx`` or there is no
 tab-completion (ex. for example for the class name in ``get class
 <class-name>``)
 
@@ -110,20 +112,24 @@ formats for each shell type:
    shell type as defined above using the magic variable. This script file
    contains the shell-specific logic to activate tab-completion and process
    tab-completion calls.
+
 2. Notifying the shell of this completion script by either:
+
    * notifying the shell with a shell  ``eval`` statement or,
    * saving the script to a completion script file and notifying the shell later
      by sourcing the resulting completion script file.
 
-Activation with eval statement
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Activation with shell eval statement
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Table table:ref:`tab-complete-eval-statement` defines the ``eval`` statement
 for the shells that pywbemcli/pywbemlistener support for tab-completion that
 would be added to a shell startup file defined in the table, for example
 with a bash shell:
 
-  _COMPLETE_PYWBEMCLI=bash_source pywbemcli
+.. code-block:: text
+
+    PYWBEMCLI_COMPLETE=bash_source pywbemcli
 
 .. _tab-complete-eval-statement:
 
@@ -132,31 +138,32 @@ with a bash shell:
   ======  =======================================  =========================================================
   Shell   File to insert eval statement            Eval command
   ======  =======================================  =========================================================
-  bash    ~/.bashrc                                eval "$(_<PROG_NAME>_COMPLETE=bash_source pywbemcli)"
-  zsh     ~/.zshrc                                 eval "$(_<PROG_NAME>_COMPLETE=zsh_source pywbemcli)"
-  fish    ~/.config/fish/completions/foo-bar.fish  eval (env _<PROG_NAME>_COMPLETE=fish_source pywbemcli)
+  bash    ~/.bashrc                                eval "$(_<PYWBEMCLI>_COMPLETE=bash_source pywbemcli)"
+  zsh     ~/.zshrc                                 eval "$(_<PYWBEMCLI>_COMPLETE=zsh_source pywbemcli>_COMPLETE=zsh_source pywbemcli)"
+  fish    ~/.config/fish/completions/foo-bar.fish  eval (env _<PYWBEMCLI>_COMPLETE=fish_source pywbemcli>_COMPLETE=fish_source pywbemcli)
   ======  =======================================  =========================================================
 
-The above method requires that the pywbemtool command be in the in the PATH
+The above method requires that the pywbemtools command be in the in the PATH
 since the ``eval`` statement initiates a callback to the pywbemcli/pywbemlistener and
-the location of those executables may not be publicly available. Also it can
+the location of those executables must be publicly available. Also it can
 slow down terminal startup because pywbemcli must be called on each terminal
 startup to get the completion script definition.
 
-Activation by creating a complete script file
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Activation by creating a script file
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-An alternative is to create a complete tab-completion script file using the same statement
-(ex. ``_<PROG-NAME>_COMPLETE=<shell-type>_source pywbemcli``) but saving the
-resulting complete script in a file.  This file contains the shell-specific
-logic to activate tab-completion and process tab-completion calls. The user
-then activates tab-completion by sourcing that file (ex. ``source
+An alternative is to create a complete tab-completion script file using the
+same statement (ex. ``_<PROG-NAME>_COMPLETE=<shell-type>_source pywbemcli``)
+but saving the resulting complete script in a file
+(ex: ``~/.pywbemcli-complete.bash``).  This file contains the shell-specific logic
+to activate tab-completion and process tab-completion calls. The user then
+activates tab-completion by sourcing that file (ex. ``source
 ~/.pywbemcli-complete.bash``) which is independent of whether
-pywbemcli/pywbemlistener are public.
+pywbemcli and pywbemlistener are public.
 
 The following table defines the shell command for supported shells to create the
-complete script file.  The naming and exact location of the file is arbitray and
-the locations shown in the table are examples.  However, 1. the file is different
+complete script file.  The naming and exact location of the file is arbitrary and
+the locations shown in the table are examples.  However, the file is different
 for each shell.
 
 .. _shell-completion-script:
@@ -174,7 +181,7 @@ for each shell.
   =====  ===========================================================================
 
 Once the complete script file has been created, tab-completion activation is completed
-by sourcing the complete script file to notify the shellof the complete file
+by sourcing the complete script file to notify the shell of the complete file
 each time a terminal is opened. For example as follows:
 
 .. code-block:: text
@@ -199,7 +206,7 @@ available whenever the terminal is started:
     eval "$(_PYWBEMCLI_COMPLETE=bash_source pywbemcli)"
 
 or by creating a completion script file one time as follows when pywbemlistener
-and pywbemcli are publically avialable and then sourcing the script when,
+and pywbemcli are publically available and then sourcing the script when,
 for example, the terminal window is opened:
 
 .. code-block::
