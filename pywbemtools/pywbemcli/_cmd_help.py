@@ -77,9 +77,9 @@ def help_subjects(ctx, subject):   # pylint: disable=unused-argument
 
 # pylint: disable=invalid-name
 activate_shell_help_msg = '''
-Pywbemcli shell tab-completion must be activated after installation by notifying
-the shell before the <TAB> becomes active when entering a pywbemcli command in
-the shell.
+Pywbemcli shell tab-completion must be activated after installation by
+notifying the shell and pywbemcli before the <TAB> becomes active when
+entering a pywbemcli command in the shell.
 
 Tab-completion is only available for certain shells including: bash (version
 4.4 or greater), zsh, and fish shells since pywbemcli defines the completer
@@ -90,15 +90,14 @@ each shell type:
 
 1. Getting from pywbemcli the body of a completion script that defines
    activation for the shell. This is done by executing the script statement
-     '_PYWBEMCLI_COMPLETE=<shell>_source pywbemcli'
-     where <shell> can be 'bash', 'zsh', or 'fish'.
-    This causes the shell to call back to pywbemcli with '_PYEBEMCLI_COMPLETE'
-    and '<shell>_source' arguments wherein pywbemcli returns the completion
-    script.
+   '_PYWBEMCLI_COMPLETE=<shell>_source pywbemcli' where <shell> can be 'bash',
+   'zsh', or 'fish'. This causes the shell to call back to pywbemcli with
+   '_PYWBEMCLI_COMPLETE' and '<shell>_source' arguments wherein pywbemcli
+   returns the completion script.
 2. Setting up the shell of this completion script by either:
    * an 'eval' statement in the terminal startup
      (ex. .bashrc ) that defines the completion script or,
-   * Creating a completion script file and sourcing that file later to activate.
+   * Creating the completion script file and sourcing that file later to activate.
 
 The 'eval' statement for each of the shells supported is as follows and can
 be inserted into the corresponding shell startup script defined below.

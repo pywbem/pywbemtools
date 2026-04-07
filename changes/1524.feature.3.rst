@@ -1,0 +1,14 @@
+Correct documentation formatting errors in the documentation section
+defining pywbemtools tab completion including:
+
+Consistently use the word command to represent pywbemcli and pywbemtools.
+
+Fix issues where the formatting of a shell activation command definitions has
+an error.
+
+Fix formatting of the shell commands that activate tab completion..
+
+Clarify that this does not actually activate tab-completion.
+
+Simplify a definition of where the activation script must be relative to the
+pywbemtools command.
