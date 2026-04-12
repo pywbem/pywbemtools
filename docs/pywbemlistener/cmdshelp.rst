@@ -105,7 +105,7 @@ Help text for ``pywbemlistener help`` (see :ref:`pywbemlistener help command`):
 
       Show help for specific pywbemlistener subjects.  This is in addition to the help messages that are available with the
       -h or --help option for every command group and command in pywbemlistener. It helps document pywbemlistener subjects
-      that are more general than specific commands and configuration subjects that do not have specific commands
+      that are more general than specific commands and configuration subjects that do not have specific commands.
 
       If there is no argument provided, outputs a list and summary of the existing help subjects.
 

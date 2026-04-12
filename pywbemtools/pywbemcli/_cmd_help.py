@@ -63,7 +63,7 @@ def help_subjects(ctx, subject):   # pylint: disable=unused-argument
     help messages that are available with the -h or --help option for every
     command group and command in pywbemcli. It helps document pywbemcli
     subjects that are more general than specific commands and configuration
-    subjects that do not have specific commands
+    subjects that do not have specific commands.
 
     If there is no argument provided, outputs a list and summary of the
     existing help subjects.
@@ -76,8 +76,9 @@ def help_subjects(ctx, subject):   # pylint: disable=unused-argument
 
 
 # pylint: disable=invalid-name
+
 activate_shell_help_msg = '''
-Pywbemcli shell tab-completion must be activated after installation by
+Pywbemcli tab-completion must be activated after installation by
 notifying the shell and pywbemcli before the <TAB> becomes active when
 entering a pywbemcli command in the shell.
 
@@ -91,9 +92,7 @@ inserting the following into the shell initialization (ex. .bashrc)
     eval "$(_PYWBEMCLI>_COMPLETE=bash_source pywbemcli)"
     eval "$(_PYWBEMLISTENER_COMPLETE=bash_source pywbemlistener)"
 
-
-
-The activation  'eval' statement for each of the shells supported is as follows
+The activation 'eval' statement for each of the shells supported is as follows
 and can be inserted into the corresponding shell startup script defined below.
 
 =====  ============  ===========================================================
@@ -118,10 +117,10 @@ Activate pywbemcli tab-completion as follows:
           ``complete -o nosort -F _pywbemcli_completion pywbemcli``
 
 Executing ``eval`` directly in the shell startup file requires that the
-pywbemcli executable location must be known when opening a terminal . This may
-not be consistent with executing pywbemcli in virtual environments. See
-the pywbemtools documentation for more information and alternate ways to
-activate tab-completion is special circumstances.
+pywbemcli executable must be publicly available, itslocation must be known when
+opening a terminal . This may not be consistent with executing pywbemcli
+in virtual environments. See the pywbemtools documentation for more information
+and alternate ways to activate tab-completion is special circumstances.
 
 '''
 # pylint: enable=invalid-name
@@ -185,8 +184,8 @@ Example:
 
 # pylint: disable=invalid-name
 tab_completion_help_msg = """
-Tab completion is not supported in the interactive mode.
-Tab completion is supported in the command mode, when activated.
+Tab completion is supported in the command mode, when activated but it is not
+available in the repl mode (interactive mode)
 
 Tab completion for option values and arguments exists when the data is local.
 It is not provided for option values and arguments where access to a WBEM
@@ -194,9 +193,9 @@ server is required.
 
 Tab completion is available for:
 
-* the command group names
-* the command names
-* the option names
+* The command group names
+* The command names
+* The option names
 * The values of some general options including:
     * --name
     * --mock-server
@@ -205,7 +204,7 @@ Tab completion is available for:
     * --keyfile
     * --certfile
     * --outputformat
-* the values of some arguements
+* The values of some arguements
     * help <subject> argument
 
 When tab completion is not available for an argument or option value, entering
