@@ -114,6 +114,7 @@ TEST_CASES = [
      None, OK],
 ]
 
+
 # pylint: disable=too-few-public-methods
 class TestPywbemcliCmdHelp(CLITestsBase):
     """
