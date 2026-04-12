@@ -59,6 +59,9 @@ def help_subjects(ctx, subject):   # pylint: disable=unused-argument
     """
     Show help for pywbemcli subjects.
 
+    If an argument is provided, it outputs the help for the subject(s) defined
+    by the argument.
+
     Show help for specific pywbemcli subjects.  This is in addition to the
     help messages that are available with the -h or --help option for every
     command group and command in pywbemcli. It helps document pywbemcli
