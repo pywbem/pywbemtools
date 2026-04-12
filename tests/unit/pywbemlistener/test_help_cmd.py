@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Test the help command that displays help text on specific pywbemcli
+Test the help command that displays help text on specific pywbemlistener
 subjects.
 
 """
@@ -51,9 +51,7 @@ SHOW_HELP_SUMMARY_PATTERNS = [
 ]
 
 SHOW_HELP_ACTIVATE_PATTERNS = [
-    r"activate - Activating shell tab completion",
-    r"Pywbemlistener includes tab-completion capability",
-    r"Manually executing the sourcing statement when required."
+    r"Pywbemlistener tab-completion must be activated after installation by"
 ]
 
 
