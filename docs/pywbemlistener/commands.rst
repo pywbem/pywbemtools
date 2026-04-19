@@ -79,7 +79,7 @@ indication listener on the local system, by specifying the listener name.
 
 The running listeners are identified as the processes executing the
 ``pywbemlistener run`` command. The listener name is also identified from
-the process command line.
+the command argument in the process command line.
 
 Example:
 
@@ -115,20 +115,22 @@ See :ref:`pywbemlistener show --help` for the exact help output of the command.
 The ``pywbemlistener start`` command starts a new WBEM indication listener on
 the local system.
 
-The listener is running as a normal user process in the background, inheriting
+The listener is run as a normal user process in the background, inheriting
 the group and user context from the process that runs the ``pywbemlistener start``
 command (usually the shell process in a terminal session).
 
 Example:
 
 .. code-block:: text
-
     $ pywbemlistener start lis1 --cert-file .../certs/server_cert.pem --key-file .../certs/server_key.pem
     Running listener lis1 at https://localhost:25989
 
-The previous example started a listener for HTTPS (the default) on the default
+The previous example started a listener named lis1 for HTTPS (the default) on the default
 port 25989. Because HTTPS was used, it was necessary to specify an X.509 server
 certificate and its key file.
+
+The listener name must be unique as it defines the listener target for other
+commands (ex. ``show listener lis1``)
 
 The ``-p, --port`` option specifies the port on which the listener will
 receive indicaitons.
@@ -238,9 +240,9 @@ Example:
     $ pywbemlistener stop lis1
     Shut down listener lis1 running at http://localhost:25989
 
-On Windows, the listener process is stopped immediately without giving the
-process control to clean up. On other platforms, the listener process is stopped
-gracefully, giving the process control to clean up.
+On Windows, the listener process named ``lis1`` is stopped immediately without
+giving the process control to clean up. On other platforms, the listener
+process is stopped gracefully, giving the process control to clean up.
 
 See :ref:`pywbemlistener stop --help` for the exact help output of the command.
 
@@ -335,7 +337,7 @@ command groups, and commands.
     $ pywbemcli help
 
     Help subjects:
-    Subject name    ubject description
+    Subject name    Subject description
     --------------  --------------------------------------------
     activate        How to activate tab-completion
     tab-completion  Using tab-completion

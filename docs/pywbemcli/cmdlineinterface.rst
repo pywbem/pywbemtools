@@ -27,15 +27,8 @@ within the pywbemtools package.
 
 Pywbemcli provides a command line interface(CLI) interaction with WBEM servers.
 
-The pywbemcli command is invoked with a command  and arguments/options:
-
-.. code-block:: text
-
-    $ pywbemcli [GENERAL-OPTIONS] COMMAND [COMMAND-OPTIONS] [ARGS]
-
-Where the components are:
-
-The pywbemcli command is invoked with a command and arguments/options:
+The pywbemcli command is invoked from a command line terminal with a command
+and arguments/options in the order shown here:
 
 .. code-block:: text
 
@@ -48,7 +41,7 @@ Where the components are:
 
 .. index:: pair: General Options; command components
 
-* **GENERAL-OPTIONS** - General options; they apply to all commands.
+* **GENERAL-OPTIONS** - General options apply to all commands.
   See :ref:`Using the pywbemcli command line general options` for information
   on the pywbemcli general options.
 
@@ -57,28 +50,24 @@ Where the components are:
 * **COMMAND** - A name of a command which may consist of:
    * <group name> <command name> for commands that are defined within
      groups (ex. ``class find``).
-   * <group name> (ex. ``class``) to show group help including list of  command
-     within the group.
-   * <command name> for those commands that are not part of a group. For
+
+   * <command name> for commands that are not part of a group. For
      example ``repl`` and ``help`` that are not in any command group.
 
 .. index:: pair: command arguments; command components
 
-* **ARGUMENTS** - Arguments may be defineda specific command. Arguments
-  are not individually
-  documented in the help and do not have preceeding dashes. In pywbemcli
-  arguments are only used in commands. There are no general arguments.
-  Specifically they are used to specify request object names (ex. class namme
-  or instance name for specifice commands.
+* **ARGUMENTS** - Arguments may be defined for specific commands. Arguments
+  do not have preceeding dashes. In pywbemcli arguments are only used in
+  commands; here are no general arguments. For pywbemcli they are used to
+  specify request object names (ex. class namme or instance name for specific
+  commands.
 
 .. index:: pair: command interface; Command Options
 
 * **COMMAND-OPTIONS** - Options that apply only to a particular
-  COMMAND.
-
-Options are prefixed with the characters ``-`` for the short form or ``--`` for
-the long form (ex. ``-n`` or ``--namespace``). The other command line components
-do not begin with ``-``.
+  COMMAND. Options are prefixed with the characters ``-`` for the short form or
+  ``--`` for the long form (ex. ``-n`` or ``--namespace``). The other command
+  line components do not begin with ``-``.
 
 .. index:: pair: command groups; command interface
 
@@ -119,17 +108,19 @@ and ``--namespace`` is a command option.
    single: auto-suggestion
 
 Pywbemcli supports  :term:`tab-completion` and :term:`auto-suggestion`
-depending on whether it is in command mode or interactive mode.
+depending on whether it is in command mode or interactive mode:
 
-  * :ref:`interactive mode` - both tab-completion and auto-suggestion are always
-    available.
   * :ref:`command mode` - tab-completion is available with some command shells
-    and only when activated for the shell type.  Auto-suggestion is not
-    available.
+    and only when activated for the shell type. It is available for bash,
+    zsh, and fish shells.  Auto-suggestion is not enabled at installation. To enable
+    tab-completion see :ref:`Activating shell tab-completion`.
+  * :ref:`interactive mode` - auto-suggestions are always available.
+
+.. index:: tab-completion
 
 Tab-completion is available in pywbemcli for:
     * All comand group and command names
-    * All option names
+    * All general and command specific option names
     * At least the following general options values:
         * --name
         * --mock-server - The completion uses the default connection file
@@ -160,15 +151,17 @@ Tab-completion is available in pywbemcli for:
     $ pywbemcli class <TAB><TAB>
     ... <shows the class commands to select from>
 
-    $ pywbemcli -n moc <TAB><TAB>  (Only only with Python 3)
-    ... returns connection names in the default connection file that start
-    ... with moc
+    $ pywbemcli -n moc <TAB><TAB>
+    ... returns ``mock``
+    $ pywbemcli -n mock a<TAB><TAB>
+    ... returns list of defined connection names that start with ``a``.
 
-Tab-completion for ``pywbemcli`` is used like any other tab-completion by
+
+Tab-completion for ``pywbemcli`` is used like bash tab-completion by
 hitting <TAB> or <TAB><TAB> where completion is possible. Generally <TAB>
 returns a complete response completion if there is only one available while
 <TAB><TAB> returns a list if there are multiple possible completions but the
-exact behavior depends on the shell and any number of shell flags, extensions
+exact behavior depends on the shell, any number of shell flags, and extensions
 that are particular to each shell.
 
 .. index::
@@ -236,10 +229,11 @@ activating shell completion.
 Interactive mode
 ----------------
 
-In interactive mode (also known as :term:`REPL` mode), pywbem provides an
-interactive shell environment that allows typing pywbemcli commands, internal
-commands (for operating the pywbemcli shell), and external commands (that are
-executed in the standard shell of the user).
+In interactive mode (also known as :term:`REPL` mode), pywbemcli provides an
+interactive shell environment within an executing pywbemcli instance that
+allows typing pywbemcli commands, internal commands (for operating the
+pywbemcli shell), and external commands (that are executed in the standard
+shell of the user).
 
 The pywbemcli shell uses the prompt ``pywbemcli>``. The cursor is shown in
 the examples as an underscore (``_``) in the following examples in this document.
@@ -399,11 +393,10 @@ The pywbemcli shell in the interactive mode always supports tab-completion and
 usually with popup help text for commands, arguments, and options typing, where
 the valid choices are shown based upon what was typed so far, and where an item
 from the popup list can be picked with <TAB> or with the cursor keys. It can be
-used to select from the list of general options. Interacitve
-mode tab-completion may differ from command mode tab-completion because the
-support is provided by a python package and not the shell. The following
-examples show interactive mode tab-completion; an
-underscore ``_`` is shown as the cursor:
+used to select from the list of general options. Interactive mode
+tab-completion may differ from command mode tab-completion because the support
+is provided by a python package and not the shell. The following examples show
+interactive mode tab-completion; an underscore ``_`` is shown as the cursor:
 
 .. code-block:: text
 
@@ -417,7 +410,7 @@ underscore ``_`` is shown as the cursor:
                   class
 
 Interactive mode uses a combination of tab-completion and auto-suggestion  for
-aut completion which are both always active:
+auto-completion which are both always active:
 
   * :term:`tab-completion` - In this mode, a single <TAB> enables the display of
     available completion possibilities for command groups, commands, options
