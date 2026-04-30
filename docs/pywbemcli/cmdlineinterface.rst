@@ -59,7 +59,7 @@ Where the components are:
 * **ARGUMENTS** - Arguments may be defined for specific commands. Arguments
   do not have preceeding dashes. In pywbemcli arguments are only used in
   commands; here are no general arguments. For pywbemcli they are used to
-  specify request object names (ex. class namme or instance name for specific
+  specify request object names (ex. class name or instance name for specific
   commands.
 
 .. index:: pair: command interface; Command Options
@@ -119,18 +119,18 @@ depending on whether it is in command mode or interactive mode:
 .. index:: tab-completion
 
 Tab-completion is available in pywbemcli for:
-    * All comand group and command names
+    * All command group and command names
     * All general and command specific option names
     * At least the following general options values:
-        * --name
-        * --mock-server - The completion uses the default connection file
+        * ``--name``
+        * ``--mock-server`` - The completion uses the default connection file
           unless the --connection-file general option has already been defined
           for an alternate connection file on the command line.
-        * --connection-file
-        * --keyfile
-        * --certfile
-        * --use-pull
-        * --output-format
+        * ``--connection-file``
+        * ``--keyfile``
+        * ``--certfile``
+        * ``--use-pull``
+        * ``--output-format``
     * At least the following command arguments
         * help <subject-argument>
     * At least the following command options
@@ -146,7 +146,7 @@ Tab-completion is available in pywbemcli for:
     ... <shows the command groups to select from>
 
     $ pywbemcli clas<TAB>
-    ... completes the command group class
+    ... completes the command group command ``class``
 
     $ pywbemcli class <TAB><TAB>
     ... <shows the class commands to select from>
@@ -163,6 +163,11 @@ returns a complete response completion if there is only one available while
 <TAB><TAB> returns a list if there are multiple possible completions but the
 exact behavior depends on the shell, any number of shell flags, and extensions
 that are particular to each shell.
+
+Tab-completion is available for several shells including bash, zsh and fish.
+
+Upon installation, shell tab-completion is not active. It can be activated post
+installation as defined in section :ref:`Activating shell tab-completion`.
 
 .. index::
     pair: Modes of operation; Command mode

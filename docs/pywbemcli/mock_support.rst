@@ -12,10 +12,10 @@ Mock WBEM server overview
 
 `pywbemcli` implements an in-process mock WBEM Server using the pywbem
 :ref:`pywbem:Mock WBEM server` which defines a local mock WBEM server
-environment. The mock sever provides WBEM server request responses to pywbmcli
+environment. The mock sever provides WBEM server request responses to pywbemcli
 commands. The configuration and contents of the mock server are defined by the
 pywbemcli :ref:`--mock-server general option` which defines a mock script
-mof or python file that defines the CIM model and functional characteristics
+MOF or python file that defines the CIM model and functional characteristics
 of the mock WBEM server.
 
 .. index:: pair: mock server; start
@@ -501,7 +501,7 @@ For example:
         for fn in dependent_file_names:
             dep_path = os.path.join(os.path.dirname(this_file_path), fn)
             conn.provider_dependent_registry.add_dependents(this_file_path,
-                                                        dep_path)
+                                                            dep_path)
 
     def _setup(conn, server, verbose):
 
@@ -577,7 +577,6 @@ should operate on depending on the Python version:
    in several ways including:
 
    * prevents caching of the mock environment.
-   * TODO
 
    Old-style mock scripts are executed as Python scripts in Python namespace
    ``__builtin__``, with the following Python global variables made available:
@@ -1134,8 +1133,6 @@ Caching mock WBEM servers connection definitions
 .. index:: pair: mock-server cache; cache mock-server
 .. index:: pair: mock-server cache; connection definition
 
-TODO: add index entries for connection definition
-
 Pywbemcli automatically attempts to cache the contents of a mock WBEM server
 definition when:
 
@@ -1179,8 +1176,8 @@ The caches for the connection definitions are maintained in the
 ``.pywbemcli_mockcache`` directory in the user's home directory in separate
 files with names of the form <guid>.<connection name>.
 
-If a connection definition is used as the wbem server (:ref:`--name general
-option`) , pywbemcli verifies whether its mock WBEM server has been cached, and
+If a connection definition is used as the wbem server (:ref:`--name general option`),
+pywbemcli verifies whether its mock WBEM server has been cached, and
 if so, whether the cache is up to date. If it is not up to date, it is not used
 but re-generated.
 
@@ -1199,5 +1196,3 @@ are also used to determine whether the mock cache is up to date.
 See :ref:`pywbem:Registry for provider dependent files` for more details on how
 to register dependent files. Generally all the files used in the setup script
 and the script itself should be registered as dependent files.
-
-# TODO: Why in pywbem

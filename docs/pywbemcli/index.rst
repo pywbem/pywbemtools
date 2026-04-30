@@ -41,7 +41,8 @@ It provides functionality using the WBEM protocol to:
   can access multiple WBEM servers by name.
 
 * Provide both a command line mode and an interactive mode where multiple
-  pywbemcli commands can be executed within the context of a WBEM server.
+  pywbemcli commands can be executed within the context of a WBEM serverin a
+  execution of pywbemcli.
 
 * Use an integrated mock WBEM server to try out commands. The mock server
   can be loaded with CIM objects defined in MOF files or via Python scripts.
