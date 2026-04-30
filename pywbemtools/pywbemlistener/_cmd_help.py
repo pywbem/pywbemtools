@@ -86,8 +86,8 @@ notifying the shell and pywbemlistener before the <TAB> becomes active when
 entering a pywbemlistener command in the shell.
 
 Tab-completion is only available for certain shells including: bash (version
-4.4 or greater), zsh, and fish shells since pywbemlistener defines the completer
-script specifically for each shell.
+4.4 or greater), zsh, and fish shells since pywbemlistener defines the
+completer script specifically for each shell.
 
 Tab-completion can easily be activated for both pywbemtools commnds by
 inserting the following into the shell initialization (ex. .bashrc)
@@ -112,8 +112,8 @@ fish  ~/.config/fish/completions/foo-bar.fish
 
 Activate pywbemlistener tab-completion as follows:
 
-  1. Edit the eval command in the startup file
-  2. Close the file and restart the terminal
+  1. Edit the eval command in the startup file.
+  2. Close the file and restart the terminal.
   3. Test existence of tab-completion by:
      a. Test completion with a command such as "pywbemlistener li<TAB> which should
         complete the "list" command group name.
@@ -123,9 +123,9 @@ Activate pywbemlistener tab-completion as follows:
           ``complete -o nosort -F _pywbemlistener_completion pywbemlistener``
 
 Executing ``eval`` directly in the shell startup file requires that the
-pywbemlistener executable location must be known when opening a terminal . This may
-not be consistent with executing pywbemlistener in virtual environments. See
-the pywbemtools documentation for more information and alternate ways to
+pywbemlistener executable location must be known when opening a terminal . This
+may not be consistent with executing pywbemlistener in virtual environments.
+See the pywbemtools documentation for more information and alternate ways to
 activate tab-completion is special circumstances.
 '''
 # pylint: enable=invalid-name

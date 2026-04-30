@@ -412,7 +412,7 @@ using :term:`CIM object output formats`.
 
 If the ``--deep-inheritance``/``--di`` command option is set, all direct and
 indirect subclasses are included in the result. Otherwise, only one level of
-the class hierarchy is in the result.
+the class hierarchy is included in the result.
 
 .. index:: pair: result filters; class enumerate command
 
@@ -1012,7 +1012,7 @@ The command options are:
 *  ``--object-order`` - This option modifies the order of the display of
    instances when there are multiple namespaces displayed to order by classname
    and then namespace where the normal display order is  to order by
-   namespace and then classname
+   namespace and then classname.
 
 index:
     pair --namespace option; command option --namespace
@@ -1023,7 +1023,7 @@ index:
    :term:`current connection`. This option accepts single or multiple namespaces
    and displays the results for the list of namespaces supplied.
    See :ref: `Pywbemcli special command line features` for more information
-   on using multiple namespaces
+   on using multiple namespaces.
 
 *  ``-s``/``--summary`` - Show only a summary (count) of the objects.
 
@@ -1034,9 +1034,9 @@ index:
 *  ``--fql``/``--filter-query-language QUERY-LANGUAGE`` = The filter query
    language to be used with ``--filter-query``. Default: DMTF:FQL.
 
-*  ``--show-null`` -In the TABLE output formats, show propertieswith no value
+*  ``--show-null`` -In the TABLE output formats, show properties with no value
    (i.e. Null) in all of the instances to be displayed. Otherwise only
-   properties at least one instance has a non- Null property are displayed
+   properties at least one instance has a non-Null property are displayed
 
 *  ``--help-instancename``/``--hi`` -  Show help message for specifying
    ``INSTANCENAME`` including use of the ``--key`` and ``--namespace``
@@ -1422,7 +1422,7 @@ The command options are:
    to when pull operations are used. Default: DMTF:FQL. This parameter is
    ignored if traditional operations are executed.
 
-*  ``--show-null`` - In the TABLE output formats, show propertieswith no value
+*  ``--show-null`` - In the TABLE output formats, show properties with no value
    (i.e. Null) in all of the instances to be displayed. Otherwise only
    properties at least one instance has a non- Null property are displayed
 
@@ -2110,7 +2110,7 @@ The ``-namespace``/``-n`` command option option defines the term:`Namespace` to
 use for this command, instead of the default namespace of the :term:`current
 connection`.  This option accepts single or multiple namespaces and displays
 the results for the list of namespaces supplied. See :ref: `Pywbemcli special
-command line features` for more information on using multiple namespaces
+command line features` for more information on using multiple namespaces.
 
 The qualifier declaration is displayed using :term:`CIM object output formats`
 or :term:`Table output formats`.
@@ -2646,7 +2646,7 @@ statistics gathering and reporting in pywbemcli:
     interactive mode with the ``statistics show`` command.
 
     For mock environments, artificial operations on the MOF compile time
-    needed for setting up the mock respository are included in the client
+    needed for setting up the mock repository are included in the client
     maintained statistics.
 
 2.  WBEM servers may support two capabilities for managing statistics on WBEM
@@ -2954,7 +2954,7 @@ implementations of WBEM servers such as the implementation of OpenPegasus.
 
 The ``connection`` command group includes commands that manage named :term:`connection
 definitions <connection definition>` that are persisted in a :term:`connections file`.
-This allows maintaining multiple connection :term:`connection definitionss <connection definition>` and then using any
+This allows maintaining multiple connection :term:`connection definitions <connection definition>` and then using any
 one via the :ref:`--name general option`. Only a single connection is
 active (selected) at any point in time but the connection connection can
 be selected on the pywbemcli command line (:ref:`--name general option`) or
@@ -3057,7 +3057,7 @@ The format of this command is:
     pywbemcli [GENERAL-OPTIONS] connection export [COMMAND-OPTIONS]
 
 This is done by displaying the commands to set the environment variables to
-stdout.
+stdout:
 
 .. code-block:: text
 
@@ -3677,7 +3677,7 @@ list by executing subscription list-filters, subscription list_destinations(), o
 subscription list-subscriptions().
 
 **NOTE:** Pywbem_mock used in testing does not remember any of subscription
-instances between  non-interactive commands so that most pywbemcli mock testing
+instances between non-interactive commands so that most pywbemcli mock testing
 is done in interactive mode.
 
 Identifying destinations, filters, and subscriptions on the command line
@@ -4109,7 +4109,7 @@ The ``subscription ``list-destinations`` command displays the existing
 destination instances ((CIM class ``CIM_ListenerDestinationCIMXML``)) on
 the current WBEM server.
 
-**NOTE:** pywbemcli works only with the  ``CIM_ListenerDestinationCIMXML``
+**NOTE:** pywbemcli works only with the ``CIM_ListenerDestinationCIMXML``
 class so that any indication destination instances defined with the superclass
 ``CIM_ListenerDestination`` are not visible.
 
@@ -4538,7 +4538,6 @@ the filter is part of an existing subscription.
 See :ref:`pywbemcli subscription remove-filter --help` for the help output
 of the command.
 
-
 .. index::
     pair: subscription commands; subscription remove-subscription
     pair: remove-subscription command; subscription command group
@@ -4567,7 +4566,7 @@ where the two required arguments:
 
 * ``DESTINATIONID`` is the ``IDENTITY`` for the listener destination instance to be
   attached to the subscription. See :ref:`subscription add-destination
-  command`: for the definition of ``DESTINATIONID``
+  command`: for the definition of ``DESTINATIONID``.
 * ``FILTERID`` is the ``IDENTITY`` for the indication filter instance to be
   attached to the subscription.  See :ref:`subscription add-filter command`:
   for the definition of ``FILTERID``.
@@ -4662,7 +4661,7 @@ of the command.
 ``Subscription remove-server`` command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This command unregisters owned listeners from the WBEM server and removes
+This command deregisters owned listeners from the WBEM server and removes
 all owned indication subscriptions, owned indication filters, and owned
 listener destinations for this currently active pywbemcli WBEM server from
 that WBEM server.
@@ -4681,10 +4680,10 @@ The currently active WBEM server is the WBEM server to which pywbemcli is
 currently attached; the WBEM server defined by  the :ref:`--name general option`,
 :ref:`--server general option`, or :ref:`--mock-server general option`.
 
-The identity of the current wbem server id visible in the title of
+The identity of the current WBEM server id visible in the title of
 each of the subscription list table outputs.
 
-Thus, for example current server is defined by svr_id and is actually
+Thus, for example the current server is defined by svr_id and is actually
 the fixed name ``http://FakedUrl:5988`` of the mock server.
 
 .. code-block:: text
@@ -4820,14 +4819,14 @@ Thus, for example:
 ----------------
 
 .. index::
-    single: docs command
+    single: docs command``
     pair: docs; command
 
 The ``docs`` command provides a simple way to access the pywbemtools
-documentation  publically available on the WEB.  This command calls the
+documentation  publicly available on the WEB.  This command calls the
 system default WEB browser with the URL of the pywbemtools documentation
 to open a new browser window with the top level page of that documentation and
-immediatly terminates or returns to the repl command line.
+immmediately terminates or returns to the ``repl`` command line.
 
 This is ``experimental`` as of pywbemtools 1.2.0.
 

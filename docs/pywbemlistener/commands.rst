@@ -122,8 +122,9 @@ command (usually the shell process in a terminal session).
 Example:
 
 .. code-block:: text
+
     $ pywbemlistener start lis1 --cert-file .../certs/server_cert.pem --key-file .../certs/server_key.pem
-    Running listener lis1 at https://localhost:25989
+    # Running listener lis1 at https://localhost:25989
 
 The previous example started a listener named lis1 for HTTPS (the default) on the default
 port 25989. Because HTTPS was used, it was necessary to specify an X.509 server
