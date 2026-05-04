@@ -30,8 +30,9 @@ safety-schemas>=0.0.16
 dparse>=0.6.4
 ruamel.yaml>=0.17.21
 # click is handled in install
-Authlib>=1.6.7
-marshmallow>=3.26.2
+Authlib>=1.6.11
+marshmallow>=4.0.1; python_version == '3.9'
+marshmallow>=4.3.0; python_version >= '3.10'
 pydantic>=2.12.0
 pydantic_core>=2.41.1
 # typer >=0.17.0 causes import issue for safety, see https://github.com/pyupio/safety/issues/778
@@ -40,7 +41,7 @@ typer-cli>=0.12.1,<0.17.0
 typer-slim>=0.12.1,<0.17.0
 # psutil is handled in install
 filelock>=3.16.1; python_version == '3.9'
-filelock>=3.20.3; python_version >= '3.10'
+filelock>=3.24.2; python_version >= '3.10'
 
 # Tox
 tox==3.21.0
@@ -48,13 +49,14 @@ tox==3.21.0
 more-itertools>=4.0.0
 
 # Virtualenv
-virtualenv>=20.36.1
+virtualenv>=21.3.0
+python-discovery>=1.2.2
 
 # Sphinx (no imports, invoked via sphinx-build script):
 Sphinx>=7.2.0
 docutils>=0.18.1
 sphinx-git>=10.1.1
-GitPython>=3.1.41
+GitPython>=3.1.47
 Pygments>=2.15.0
 sphinx-rtd-theme>=2.0.0
 sphinxcontrib-applehelp>=1.0.4
@@ -76,7 +78,7 @@ astroid>=4.0.2; python_version >= '3.10'
 lazy-object-proxy>=1.4.3
 wrapt>=1.14
 # platformdirs is also used by tox
-platformdirs>=4.1.0
+platformdirs>=4.3.6
 isort>=5.0.9
 tomlkit>=0.10.1
 dill>=0.3.7
