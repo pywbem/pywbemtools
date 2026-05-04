@@ -286,7 +286,7 @@ the following arguments :
 
     defines the use of the pywbemcli mock WBEM server script ``myscript.py`` and
     executes the pywbem command ``class enumerate`` to show the first level
-    of the class hiearchy class names in the default namespace.
+    of the class hierarchy class names in the default namespace.
 
 2. Define connection characteristics for a WBEM server by using the
 
@@ -950,12 +950,12 @@ for details.
 """"""""""""""""""""""""
 
 The ``--pdb`` general option is a boolean option that enables debugging
-with the built-in pdb debugger.
+with the built-inugger.
 
 If debugging is enabled, execution of each pywbemcli command will pause just
 before the command within pywbemcli is executed, and the pdb debugger prompt
 will appear. See `pdb debugger commands`_ for details on how to operate the
-built-in pdb debugger.
+built-in Python pdb debugger.
 
 In addition to the ``--pdb`` option,
 
@@ -1060,7 +1060,7 @@ shell commands to set all of the environment variables:
 This can be used to set those environment variables and thus to persist
 the connection name in the shell environment, from where it will be used in
 any subsequent pywbemcli commands until removed. The following shows the
-display of the pywbbemcli environment variables that are set :
+display of the pywbemcli environment variables that are set :
 
 .. code-block:: text
 
@@ -1199,7 +1199,7 @@ The output formats fall into the following groups:
   format.  The tree format is not supported by any other command today.
 
 * **TEXT format** - The :ref:`Text formats` is used for commands that output
-  small quantites of text (ex. the interop namespace name) and that could be
+  small quantities of text (ex. the interop namespace name) and that could be
   used as part of a command line redirection.
 
 When an unsupported output format is specified for a command response, it is
@@ -1237,7 +1237,7 @@ class      get           'mof'    objects        See Note 1 below
 class      invokemethod  'mof'    objects        See Note 1 below
 class      references    'mof'    objects        See Note 1 below
 class      tree          None     None           Only outputs as ascii tree
-instance   associators   'mof'    objects, table Output as cim object or table of properties
+instance   associators   'mof'    objects, table Output as CIM object or table of properties
 instance   count         'simple' table
 instance   create        None     None           Nothing returned
 instance   delete        None     None           Nothing returned

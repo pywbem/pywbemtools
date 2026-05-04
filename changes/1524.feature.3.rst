@@ -12,3 +12,6 @@ Clarify that this does not actually activate tab-completion.
 
 Simplify a definition of where the activation script must be relative to the
 pywbemtools command.
+
+Updated the text for the pywbemcli help activate and pywbemtools help activate
+to match the other tab-activation documentation changes.

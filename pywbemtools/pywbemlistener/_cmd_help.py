@@ -58,11 +58,14 @@ def help_subjects(ctx, subject):   # pylint: disable=unused-argument
     """
     Show help for pywbemlistener subjects.
 
+    If an argument is provided, it outputs the help for the subject(s) defined
+    by the argument.
+
     Show help for specific pywbemlistener subjects.  This is in addition to the
     help messages that are available with the -h or --help option for every
     command group and command in pywbemlistener. It helps document
     pywbemlistener subjects that are more general than specific commands and
-    configuration subjects that do not have specific commands
+    configuration subjects that do not have specific commands.
 
     If there is no argument provided, outputs a list and summary of the
     existing help subjects.
@@ -70,38 +73,30 @@ def help_subjects(ctx, subject):   # pylint: disable=unused-argument
     If an argument is provided, it outputs the help for the subject(s) defined
     by the argument.
     """
+
     click.echo(help_subjects_action(ctx.obj, subject,
                                     PYWBEMLISTENER_HELP_SUBJECTS_DICT))
 
 
-# pylint: disable=invalid-name,
+# pylint: disable=invalid-name
+
 activate_shell_help_msg = '''
-Pywbemlistener includes tab-completion capability for all commands for certain
-shell types program being used by the command line terminal.
+Pywbemlistener tab-completion must be activated after installation by
+notifying the shell and pywbemlistener before the <TAB> becomes active when
+entering a pywbemlistener command in the shell.
 
-Tab-completion is active only when it is activated by
-notifying the command shell of the pywbemlistener tab-completion
-characteristics. Further, it is only usable with those shells that include
-tab-completion as part of the shell functionality.  On Linux based systems this
-includes shells like bash (version 4.0 or greater), zsh, and fish.
+Tab-completion is only available for certain shells including: bash (version
+4.4 or greater), zsh, and fish shells since pywbemlistener defines the completer
+script specifically for each shell.
 
-Activation of pywbemlistener involves the following but with different formats
-for each shell type:
+Tab-completion can easily be activated for both pywbemtools commnds by
+inserting the following into the shell initialization (ex. .bashrc)
 
-* Getting from pywbemlistener the body of a completion script for the shell to
-  be activated. This is done by executing a script statement of form
-  ``_PYWBEMLISTENER_COMPLETE=bash_source pywbemlistener``.
-* Notifying the shell of this completion script with an eval statement or
-  saving the script and notifying the shell later by sourcing the resulting
-  completion script file.
+    eval "$(_PYWBEMCLI>_COMPLETE=bash_source pywbemcli)"
+    eval "$(_PYWBEMLISTENER_COMPLETE=bash_source pywbemlistener)"
 
-Tab-completion can be activated either by:
-
-* Installing the activation script with an eval statement into .bashrc
-* Creating a completion script file and sourcing that file at a later time.
-
-The ``eval`` statement for each of the shells supported is as follows and can
-be inserted into the corresponding shell startup script defined below.
+The activation 'eval' statement for each of the shells supported is as follows
+and can be inserted into the corresponding shell startup script defined below.
 
 =====  ============  ===========================================================
 shell  startup file  eval command
@@ -115,45 +110,23 @@ fish  ~/.config/fish/completions/foo-bar.fish
                            fish_source pywbemlistener)"
 =====  ===========  ===========================================================
 
-To activate pywbemlistener tab-completion:
+Activate pywbemlistener tab-completion as follows:
 
-  1. Edit the eval command in the startup file or
-  2. Close the file and restart the terminal or
+  1. Edit the eval command in the startup file
+  2. Close the file and restart the terminal
   3. Test existence of tab-completion by:
-     a. Test completion with a command such as "pywbemlistener cl<TAB> which
-        should complete the "pywbemlistener li<TAB>" command group name.
-     b. In bash executing "complete -p pywbemlistener". An entry for
-        pywbemlistener must exist for pywbemlistener as follows:
-        complete -o nosort -F _pywbemlistener_completion pywbemlistener
+     a. Test completion with a command such as "pywbemlistener li<TAB> which should
+        complete the "list" command group name.
+     b. In bash executing "complete -p pywbemlistener". An entry for pywbemlistener must
+        be returned for pywbemlistener as follows:
 
-Executing the eval directly in the shell startup file has the issue that the
-pywbemlistener executable location must be known when opening a terminal . This
-may not be consistent with executing pywbemlistener in virtual environments.
+          ``complete -o nosort -F _pywbemlistener_completion pywbemlistener``
 
-To activate tab-completion using a completion file execute the command defined
-below for the desired shell. This  creates the completion script for
-pywbemlistener in ``~/pywbemlistener-complete.bash``. This command requires
-that pywbemlistener is publicly available :
-
-=====  =====================================================================
-shell  completion file creating command
-=====  =====================================================================
-bash   _PYWBEMLISTENER_COMPLETE=bash_source pywbemlistener >
-            ~/.pywbemcli-complete.bash
-zsh    _PYWBEMLISTENER_COMPLETE=zsh_source pywbemlistener >
-            ~/.pywbemcli-complete.zsh
-fish   _PYWBEMLISTENER_COMPLETE=fish_source pywbemlistener >
-          ~/.config/fish/completions/pywbemcli.fish
-=====  =====================================================================
-
-Once the completion script file is created, pywbemlistener tab-completion can
-be activated by sourcing this script:
-   (ex. ''source ~/.pywbemlistener-complete.bash'').
-This does not call pywbemlistener and can be done by, for for example:
-
-* Include the sourcing statement in the shell startup script (ex. ~/.bashrc)
-* Execute the statement as part of the startup of virtual envrionments.
-* Manually executing the sourcing statement when required.
+Executing ``eval`` directly in the shell startup file requires that the
+pywbemlistener executable location must be known when opening a terminal . This may
+not be consistent with executing pywbemlistener in virtual environments. See
+the pywbemtools documentation for more information and alternate ways to
+activate tab-completion is special circumstances.
 '''
 # pylint: enable=invalid-name
 

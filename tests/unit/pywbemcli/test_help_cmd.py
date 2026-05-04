@@ -45,12 +45,12 @@ INSTANCENAME_HELP_LINES = [
 ]
 
 TABCOMPLETION_HELP_LINES = [
-    "Tab completion is not supported in the interactive mode.",
-    "Tab completion is supported in the command mode, when activated."
+    "Tab completion is supported in the command mode, when activated",
+    "Tab completion is available for:"
 ]
 
 ACTIVATE_HELP_LINES = [
-    "Pywbemcli includes tab-completion capability for all commands for certain"
+    "Pywbemcli tab-completion must be activated after installation by"
 ]
 
 
@@ -115,7 +115,8 @@ TEST_CASES = [
 ]
 
 
-class TestCmdHelp(CLITestsBase):  # pylint: disable=too-few-public-methods
+# pylint: disable=too-few-public-methods
+class TestPywbemcliCmdHelp(CLITestsBase):
     """
     Test the help command
     """

@@ -18,8 +18,8 @@
 Pywbemcli command
 =================
 
-Pywbemcli provides access to WBEM servers from the command line.
-It provides functionality to:
+Pywbemcli provides access to WBEM servers from the terminal command line.
+It provides functionality using the WBEM protocol to:
 
 * Explore the CIM data of WBEM servers. It can manage/inspect the CIM model
   components including CIM classes, CIM instances, and CIM qualifiers and
@@ -41,7 +41,8 @@ It provides functionality to:
   can access multiple WBEM servers by name.
 
 * Provide both a command line mode and an interactive mode where multiple
-  pywbemcli commands can be executed within the context of a WBEM server.
+  pywbemcli commands can be executed within the context of a WBEM serverin a
+  execution of pywbemcli.
 
 * Use an integrated mock WBEM server to try out commands. The mock server
   can be loaded with CIM objects defined in MOF files or via Python scripts.
