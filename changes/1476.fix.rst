@@ -1,2 +1,0 @@
-Fixed that the --nq, --no-qualifiers option was ignored for class operations,
-and qualifiers were always included.

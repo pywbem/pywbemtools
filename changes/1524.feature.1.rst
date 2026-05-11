@@ -1,5 +1,0 @@
-For the pywbemcli 'connection' commands, improved the command help texts and
-added tab completion support for the connection NAME argument of the following
-'connection' commands: 'show', 'select', 'set-default'. Changed tab completion
-for the 'connection' NAME argument to tolerate it if a connections file does
-not exist.
