@@ -10,7 +10,8 @@
 
 # Base dependencies (must be consistent with base-requirements.txt)
 
-pip==26.0
+pip==26.0.1; python_version == '3.9'
+pip==26.1; python_version >= '3.10'
 setuptools==78.1.1
 setuptools-scm==9.2.0
 wheel==0.46.2
@@ -54,7 +55,8 @@ mock==3.0.0
 
 pyparsing==2.3.1
 
-urllib3==2.6.3
+urllib3==2.6.3; python_version == '3.9'
+urllib3==2.7.0; python_version >= '3.10'
 
 
 # All other indirect dependencies for install that are not in requirements.txt
