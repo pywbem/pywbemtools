@@ -137,7 +137,7 @@ Help text for ``pywbemcli``:
       subscription  Command group to manage WBEM indication subscriptions.
       connection    Command group for WBEM connection definitions.
       repl          Enter interactive mode (default).
-      help          Show help for pywbemcli subjects.
+      help          Show help for specific pywbemcli subjects.
       docs          Get pywbemtools documentation in web browser.
 
 
@@ -978,15 +978,13 @@ Help text for ``pywbemcli help`` (see :ref:`help command`):
 
     Usage: pywbemcli [GENERAL-OPTIONS] help SUBJECT
 
-      Show help for pywbemcli subjects.
+      Show help for specific pywbemcli subjects.
 
-      Show help for specific pywbemcli subjects.  This is in addition to the help messages that are available with the -h or
-      --help option for every command group and command in pywbemcli. It helps document pywbemcli subjects that are more
-      general than specific commands and configuration subjects that do not have specific commands
+      This is in addition to the help messages that are available with the -h or --help option for every command group and
+      command in pywbemcli. It helps document pywbemcli subjects that are more general than specific commands and
+      configuration subjects that do not have specific commands.
 
-      If there is no argument provided, outputs a list and summary of the existing help subjects.
-
-      If an argument is provided, it outputs the help for the subject(s) defined by the argument.
+      If there is no argument provided, a list and summary of the existing help subjects is displayed.
 
     Command Options:
       -h, --help  Show this help message.
