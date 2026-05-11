@@ -62,7 +62,7 @@ python-discovery==1.2.2
 Sphinx==7.2.0
 docutils==0.18.1
 sphinx-git==10.1.1
-GitPython==3.1.47
+GitPython==3.1.50
 Pygments==2.15.0
 sphinx-rtd-theme==2.0.0
 sphinxcontrib-applehelp==1.0.4
