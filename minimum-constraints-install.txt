@@ -75,4 +75,4 @@ typing-extensions>=4.14.1
 
 # requests 2.31 requires idna>=2.5,<4
 # idna>3 requires using requests >=2.26.0
-idna==3.7
+idna==3.15
