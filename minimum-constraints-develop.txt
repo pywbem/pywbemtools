@@ -169,6 +169,7 @@ tomli==2.0.1
 tqdm==4.66.3
 traceback2==1.4.0
 traitlets==4.3.1
+truststore==0.9.1
 webencodings==0.5.1
 widgetsnbextension==1.2.6
 zipp==3.19.1
