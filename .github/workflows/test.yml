@@ -285,7 +285,7 @@ jobs:
       run: |
         make safety
     - name: Check for uncommitted changes to tracked files
-      if: ${{ matrix.os == 'ubuntu-latest' }}
+      if: "startsWith(matrix.os, 'ubuntu-') && matrix.python-version == '3.14'"
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
         RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
