@@ -4,5 +4,5 @@ Sorted list of authors derived from git commit history:
 ```
 Andreas Maier <andreas.r.maier@gmx.de>
 Karl Schopmeyer <karl.schopmeyer@gmail.com>
-dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
 ```
