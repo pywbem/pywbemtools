@@ -120,7 +120,6 @@ appnope==0.1.0
 args==0.1.0
 atomicwrites==1.2.1
 attrs==19.2.0
-bleach==3.3.0
 chardet==3.0.2
 clint==0.5.1
 contextlib2==0.6.0
