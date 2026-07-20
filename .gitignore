@@ -44,3 +44,4 @@ setuptools-*.zip
 /try/
 /issues/
 /end2endindication_output.txt
+/extra_reqs*.txt
