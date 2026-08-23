@@ -49,112 +49,112 @@ TEST_TESTCASES = [
 
     (
         "Verify output of 'test --help'",
-        dict(
-            args=['test', '--help'],
-        ),
-        dict(
-            stdout=TEST_HELP_PATTERNS,
-            test='contains',
-        ),
+        {
+            "args": ['test', '--help'],
+        },
+        {
+            "stdout": TEST_HELP_PATTERNS,
+            "test": 'contains',
+        },
         RUN,
     ),
     (
         "Verify output of 'test -h'",
-        dict(
-            args=['test', '-h'],
-        ),
-        dict(
-            stdout=TEST_HELP_PATTERNS,
-            test='contains',
-        ),
+        {
+            "args": ['test', '-h'],
+        },
+        {
+            "stdout": TEST_HELP_PATTERNS,
+            "test": 'contains',
+        },
         RUN,
     ),
     (
         "Verify 'test' with no listener running",
-        dict(
-            args=['test', 'lis1'],
-            listeners=[]
-        ),
-        dict(
-            rc=1,
-            stderr=[
+        {
+            "args": ['test', 'lis1'],
+            "listeners": []
+        },
+        {
+            "rc": 1,
+            "stderr": [
                 r"^Error: No running listener found with name lis1$",
             ],
-            test='all',
-        ),
+            "test": 'all',
+        },
         RUN,
     ),
     (
         "Verify 'test' with one http listener running",
-        dict(
-            args=['test', 'lis1'],
-            listeners=[
+        {
+            "args": ['test', 'lis1'],
+            "listeners": [
                 ['lis1', '--scheme', 'http', '--port', '50001'],
             ]
-        ),
-        dict(
-            stdout=[
+        },
+        {
+            "stdout": [
                 r"^Sending the following test indication:$",
                 r"^instance of ",
                 r"^Sent test indication #1 to listener lis1 at ",
             ],
-            test='contains',
-        ),
+            "test": 'contains',
+        },
         RUN_NO_WIN,
     ),
     (
         "Verify 'test' with one http listener running and -c 2",
-        dict(
-            args=['test', 'lis1', '-c', '2'],
-            listeners=[
+        {
+            "args": ['test', 'lis1', '-c', '2'],
+            "listeners": [
                 ['lis1', '--scheme', 'http', '--port', '50001'],
             ]
-        ),
-        dict(
-            stdout=[
+        },
+        {
+            "stdout": [
                 r"^Sending the following test indication:$",
                 r"^instance of ",
                 r"^Sent test indication #1 to listener lis1 at ",
                 r"^Sent test indication #2 to listener lis1 at ",
             ],
-            test='contains',
-        ),
+            "test": 'contains',
+        },
         RUN_NO_WIN,
     ),
     (
         "Verify 'test' with one http listener running and --count 2",
-        dict(
-            args=['test', 'lis1', '--count', '2'],
-            listeners=[
+        {
+            "args": ['test', 'lis1', '--count', '2'],
+            "listeners": [
                 ['lis1', '--scheme', 'http', '--port', '50001'],
             ]
-        ),
-        dict(
-            stdout=[
+        },
+        {
+            "stdout": [
                 r"^Sending the following test indication:$",
                 r"^instance of ",
                 r"^Sent test indication #1 to listener lis1 at ",
                 r"^Sent test indication #2 to listener lis1 at ",
             ],
-            test='contains',
-        ),
+            "test": 'contains',
+        },
         RUN_NO_WIN,
     ),
     (
         "Verify 'test' with one http listener running and invalid --count 0",
-        dict(
-            args=['test', 'lis1', '--count', '0'],
-            listeners=[
+        {
+            "args": ['test', 'lis1', '--count', '0'],
+            "listeners": [
                 ['lis1', '--scheme', 'http', '--port', '50001'],
             ]
-        ),
-        dict(
-            rc=1,
-            stderr=[
+        },
+        {
+            "rc": 1,
+            "stderr": [
                 r"^Error: Invalid count specified: 0$",
             ],
-            test='all',
-        ),
+            "test": 'all',
+        },
         RUN_NO_WIN,
     ),
 ]

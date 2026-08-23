@@ -14,7 +14,6 @@ import pywbem_mock
 assert "CONN" in globals()
 assert 'SERVER' in globals()
 assert 'VERBOSE' in globals()
-global CONN  # pylint: disable=global-at-module-level
 
 
 class CIM_AllTypesMethodProvider(pywbem_mock.MethodProvider):

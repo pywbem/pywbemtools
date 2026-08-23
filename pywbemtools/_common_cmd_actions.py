@@ -93,7 +93,7 @@ def help_subjects_action(obj, subject, help_subjects_dict):
         return format_table(rows, ("Subject name", "Subject description"),
                             title=title, table_format=output_format)
 
-    all_subjects = sorted(list(help_subjects_dict.keys()))
+    all_subjects = sorted(help_subjects_dict.keys())
 
     # If there is no subject argument, output a table of all of the subjects
     # and short descriptions.

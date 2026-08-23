@@ -116,7 +116,7 @@ def pywbemlistener_test(desc, inputs, exp_results, condition):
     assert isinstance(input_listeners, Sequence)
 
     verbose = (condition == 'verbose')
-    capture = not (condition == 'pdb')
+    capture = condition != 'pdb'
 
     args = []
     if condition == 'pdb':

@@ -91,11 +91,8 @@ def _setup(conn, server, verbose):
 
 # New-style setup
 
-# If the function is defined directly, it will be detected and refused
-# by the check for setup() functions on Python <3.5, despite being defined
-# only conditionally. The indirect approach with exec() addresses that.
-# pylint: disable=exec-used
-exec("""
 def setup(conn, server, verbose):
+    """
+    New-stype setup function for pywbem mock scripts.
+    """
     _setup(conn, server, verbose)
-""")

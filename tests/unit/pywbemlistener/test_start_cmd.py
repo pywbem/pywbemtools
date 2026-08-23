@@ -90,199 +90,199 @@ START_TESTCASES = [
     # Test help options
     (
         "Verify output of 'start --help'",
-        dict(
-            args=['start', '--help'],
-        ),
-        dict(
-            stdout=START_HELP_PATTERNS,
-            test='contains',
-        ),
+        {
+            'args': ['start', '--help'],
+        },
+        {
+            'stdout': START_HELP_PATTERNS,
+            'test': 'contains',
+        },
         RUN,
     ),
     (
         "Verify output of 'start -h'",
-        dict(
-            args=['start', '-h'],
-        ),
-        dict(
-            stdout=START_HELP_PATTERNS,
-            test='contains',
-        ),
+        {
+            'args': ['start', '-h'],
+        },
+        {
+            'stdout': START_HELP_PATTERNS,
+            'test': 'contains',
+        },
         RUN,
     ),
     (
         "Verify output of 'start --help-call'",
-        dict(
-            args=['start', '--help-call'],
-        ),
-        dict(
-            stdout=START_HELP_CALL_PATTERNS,
-            test='contains',
-        ),
+        {
+            'args': ['start', '--help-call'],
+        },
+        {
+            'stdout': START_HELP_CALL_PATTERNS,
+            'test': 'contains',
+        },
         RUN,
     ),
     (
         "Verify output of 'start --help-format'",
-        dict(
-            args=['start', '--help-format'],
-        ),
-        dict(
-            stdout=START_HELP_FORMAT_PATTERNS,
-            test='contains',
-        ),
+        {
+            'args': ['start', '--help-format'],
+        },
+        {
+            'stdout': START_HELP_FORMAT_PATTERNS,
+            'test': 'contains',
+        },
         RUN,
     ),
 
     # Test starting listeners with http and https
     (
         "Verify failure of 'start' with invalid scheme",
-        dict(
-            args=['start', 'lis1', '--scheme', 'badscheme'],
-        ),
-        dict(
-            rc=2,
-            stderr=[r"'badscheme' is not one of 'http', 'https'"],
-            test='contains',
-        ),
+        {
+            'args': ['start', 'lis1', '--scheme', 'badscheme'],
+        },
+        {
+            'rc': 2,
+            'stderr': [r"'badscheme' is not one of 'http', 'https'"],
+            'test': 'contains',
+        },
         RUN_NO_WIN,
     ),
     (
         "Verify failure of 'start' on existing listener",
-        dict(
-            args=['start', 'lis1', '--scheme', 'http', '--port', '50001'],
-            listeners=[
+        {
+            'args': ['start', 'lis1', '--scheme', 'http', '--port', '50001'],
+            'listeners': [
                 ['lis1', '--scheme', 'http', '--port', '50000'],
             ]
-        ),
-        dict(
-            rc=1,
-            stderr=START_EXISTS_PATTERNS,
-            test='all',
-        ),
+        },
+        {
+            'rc': 1,
+            'stderr': START_EXISTS_PATTERNS,
+            'test': 'all',
+        },
         RUN_NO_WIN,
     ),
     (
         "Verify success of 'start' on non-existing listener with http",
-        dict(
-            args=['start', 'lis1', '--scheme', 'http', '--port', '50001'],
-        ),
-        dict(
-            stdout=START_SUCCESS_NOLOG_PATTERNS,
-            test='all',
-        ),
+        {
+            'args': ['start', 'lis1', '--scheme', 'http', '--port', '50001'],
+        },
+        {
+            'stdout': START_SUCCESS_NOLOG_PATTERNS,
+            'test': 'all',
+        },
         RUN_NO_WIN,
     ),
     (
         "Verify success of 'start' on non-existing listener with http and "
         "bind addr",
-        dict(
-            args=['start', 'lis1', '--scheme', 'http', '--bind-addr', '0.0.0.0',
-                  '--port', '50001'],
-        ),
-        dict(
-            stdout=START_SUCCESS_NOLOG_PATTERNS,
-            test='all',
-        ),
+        {
+            'args': ['start', 'lis1', '--scheme', 'http', '--bind-addr',
+                     '0.0.0.0', '--port', '50001'],
+        },
+        {
+            'stdout': START_SUCCESS_NOLOG_PATTERNS,
+            'test': 'all',
+        },
         RUN_NO_WIN,
     ),
     (
         "Verify failure of 'start' with invalid bind host name and http,",
-        dict(
-            args=['start', 'lis1', '--scheme', 'http', '--bind-addr',
-                  'nosuchserver', '--port', '50001'],
-        ),
-        dict(
-            rc=1,
+        {
+            'args': ['start', 'lis1', '--scheme', 'http', '--bind-addr',
+                     'nosuchserver', '--port', '50001'],
+        },
+        {
+            'rc': 1,
             # Note: Text returned is implementation dependent
-            stderr=[r"Cannot start listener .+: .*"],
-            test='all',
-        ),
+            'stderr': [r"Cannot start listener .+: .*"],
+            'test': 'all',
+        },
         RUN_NO_WIN,
     ),
     (
         "Verify failure of 'start' with invalid bind addr ip address",
-        dict(
-            args=['start', 'lis1', '--scheme', 'http', '--bind-addr',
-                  '99.99.99.99', '--port', '50001'],
-        ),
-        dict(
-            rc=1,
+        {
+            'args': ['start', 'lis1', '--scheme', 'http', '--bind-addr',
+                     '99.99.99.99', '--port', '50001'],
+        },
+        {
+            'rc': 1,
             # Note: Text of error is system dependent. word assign is common
-            stderr=[r"Cannot start listener .+: .*assign.*"],
-            test='all',
-        ),
+            'stderr': [r"Cannot start listener .+: .*assign.*"],
+            'test': 'all',
+        },
         RUN_NO_WIN,
     ),
     (
         "Verify failure of 'start' on non-existing listener with https without "
         "specifying a certificate or key file",
-        dict(
-            args=['start', 'lis1', '--scheme', 'https', '--port', '50001'],
-        ),
-        dict(
-            rc=1,
-            stderr=[r"Cannot create WBEMListener for listener .+: "
-                    r"https_port requires certfile"],
-            test='all',
-        ),
+        {
+            'args': ['start', 'lis1', '--scheme', 'https', '--port', '50001'],
+        },
+        {
+            'rc': 1,
+            'stderr': [r"Cannot create WBEMListener for listener .+: "
+                       r"https_port requires certfile"],
+            'test': 'all',
+        },
         RUN_NO_WIN,
     ),
     (
         "Verify failure of 'start' on non-existing listener with https with "
         "a non-existing certificate file",
-        dict(
-            args=['start', 'lis1', '--scheme', 'https', '--port', '50001',
-                  '--certfile', 'nofile.pem'],
-        ),
-        dict(
-            rc=1,
-            stderr=[r"Cannot start listener .+: "
-                    r"Issue opening certificate/key file"],
-            test='all',
-        ),
+        {
+            'args': ['start', 'lis1', '--scheme', 'https', '--port', '50001',
+                     '--certfile', 'nofile.pem'],
+        },
+        {
+            'rc': 1,
+            'stderr': [r"Cannot start listener .+: "
+                       r"Issue opening certificate/key file"],
+            'test': 'all',
+        },
         RUN_NO_WIN,
     ),
     (
         "Verify failure of 'start' on non-existing listener with https and "
         "existing valid cert-only file without key file",
-        dict(
-            args=['start', 'lis1', '--scheme', 'https', '--port', '50001',
-                  '--certfile', 'tests/certs/server_cert.pem'],
-        ),
-        dict(
-            rc=1,
-            stderr=[r"Cannot start listener .+: "
-                    r"Invalid password for key file, bad key file, or bad "
-                    r"certificate file"],
-            test='all',
-        ),
+        {
+            'args': ['start', 'lis1', '--scheme', 'https', '--port', '50001',
+                     '--certfile', 'tests/certs/server_cert.pem'],
+        },
+        {
+            'rc': 1,
+            'stderr': [r"Cannot start listener .+: "
+                       r"Invalid password for key file, bad key file, or bad "
+                       r"certificate file"],
+            'test': 'all',
+        },
         RUN_NO_WIN,
     ),
     (
         "Verify success of 'start' on non-existing listener with https and "
         "existing valid certificate+key file",
-        dict(
-            args=['start', 'lis1', '--scheme', 'https', '--port', '50001',
-                  '--certfile', 'tests/certs/server_cert_key.pem'],
-        ),
-        dict(
-            stdout=START_SUCCESS_NOLOG_PATTERNS,
-            test='all',
-        ),
+        {
+            'args': ['start', 'lis1', '--scheme', 'https', '--port', '50001',
+                     '--certfile', 'tests/certs/server_cert_key.pem'],
+        },
+        {
+            'stdout': START_SUCCESS_NOLOG_PATTERNS,
+            'test': 'all',
+        },
         RUN_NO_WIN,
     ),
     (
         "Verify success of 'start' on non-existing listener with https and "
         "existing valid cert-only file and valid key file",
-        dict(
-            args=['start', 'lis1', '--scheme', 'https', '--port', '50001',
-                  '--certfile', 'tests/certs/server_cert.pem',
-                  '--keyfile', 'tests/certs/server_key.pem'],
-        ),
-        dict(
-            stdout=START_SUCCESS_NOLOG_PATTERNS,
-            test='all',
-        ),
+        {
+            'args': ['start', 'lis1', '--scheme', 'https', '--port', '50001',
+                     '--certfile', 'tests/certs/server_cert.pem',
+                     '--keyfile', 'tests/certs/server_key.pem'],
+        },
+        {
+            'stdout': START_SUCCESS_NOLOG_PATTERNS,
+            'test': 'all',
+        },
         RUN_NO_WIN,
     ),
 
@@ -290,13 +290,13 @@ START_TESTCASES = [
     (
         "Verify success of 'start' with --indi-call on valid module.function, "
         "no log",
-        dict(
-            args=['-v', 'start', 'lis1', '--scheme', 'http', '--bind-addr',
-                  'localhost', '--port', '50001', '--indi-call',
-                  'tests.unit.pywbemlistener.indicall_display.display'],
-        ),
-        dict(
-            stdout=[
+        {
+            'args': ['-v', 'start', 'lis1', '--scheme', 'http', '--bind-addr',
+                     'localhost', '--port', '50001', '--indi-call',
+                     'tests.unit.pywbemlistener.indicall_display.display'],
+        },
+        {
+            'stdout': [
                 r"Inserting current directory into front of Python module "
                 r"search path",
                 r"Added indication handler for calling function "
@@ -304,21 +304,22 @@ START_TESTCASES = [
                 r"indicall_display",
                 r"Started listener lis1 at http://localhost:50001",
             ],
-            test='all',
-        ),
+            'test': 'all',
+        },
         RUN_NO_WIN,
     ),
     (
         "Verify success of 'start' with --indi-call on valid module.function, "
         "with log and localhost bind addr",
-        dict(
-            args=['-v', '-l', '.', 'start', 'lis1', '--scheme', 'http',
-                  '--bind-addr', 'localhost', '--port', '50001', '--indi-call',
-                  'tests.unit.pywbemlistener.indicall_display.display'],
-        ),
-        dict(
-            stdout=START_SUCCESS_LOG_PATTERNS,
-            log=(
+        {
+            'args': ['-v', '-l', '.', 'start', 'lis1', '--scheme', 'http',
+                     '--bind-addr', 'localhost', '--port', '50001',
+                     '--indi-call',
+                     'tests.unit.pywbemlistener.indicall_display.display'],
+        },
+        {
+            'stdout': START_SUCCESS_LOG_PATTERNS,
+            'log': (
                 'pywbemlistener_lis1.log',
                 [
                     r"Opening 'run' output log file at .+",
@@ -348,21 +349,21 @@ START_TESTCASES = [
                     r"Closing 'run' output log file at .+",
                 ],
             ),
-            test='all',
-        ),
+            'test': 'all',
+        },
         RUN_NO_WIN,
     ),
     (
         "Verify success of 'start' with --indi-call on valid module.function, "
         "with log and default bind addr",
-        dict(
-            args=['-v', '-l', '.', 'start', 'lis1', '--scheme', 'http',
-                  '--port', '50001', '--indi-call',
-                  'tests.unit.pywbemlistener.indicall_display.display'],
-        ),
-        dict(
-            stdout=START_SUCCESS_LOG_PATTERNS,
-            log=(
+        {
+            'args': ['-v', '-l', '.', 'start', 'lis1', '--scheme', 'http',
+                     '--port', '50001', '--indi-call',
+                     'tests.unit.pywbemlistener.indicall_display.display'],
+        },
+        {
+            'stdout': START_SUCCESS_LOG_PATTERNS,
+            'log': (
                 'pywbemlistener_lis1.log',
                 [
                     r"Opening 'run' output log file at .+",
@@ -392,103 +393,103 @@ START_TESTCASES = [
                     r"Closing 'run' output log file at .+",
                 ],
             ),
-            test='all',
-        ),
+            'test': 'all',
+        },
         RUN_NO_WIN,
     ),
 
     (
         "Verify failure of 'start' with --indi-call on non-existing module",
-        dict(
-            args=['-v', 'start', 'lis1', '--scheme', 'http',
-                  '--port', '50001', '--indi-call',
-                  'nomodule.display'],
-        ),
-        dict(
-            rc=1,
-            stderr=[r"Cannot import module nomodule: "
-                    r"No module named .?nomodule.?"],
-            test='all',
-        ),
+        {
+            'args': ['-v', 'start', 'lis1', '--scheme', 'http',
+                     '--port', '50001', '--indi-call',
+                     'nomodule.display'],
+        },
+        {
+            'rc': 1,
+            'stderr': [r"Cannot import module nomodule: "
+                       r"No module named .?nomodule.?"],
+            'test': 'all',
+        },
         RUN_NO_WIN,
     ),
     (
         "Verify failure of 'start' with --indi-call on existing module with "
         "non-existing function",
-        dict(
-            args=['-v', 'start', 'lis1', '--scheme', 'http',
-                  '--port', '50001', '--indi-call',
-                  'tests.unit.pywbemlistener.indicall_display.nofunction'],
-        ),
-        dict(
-            rc=1,
-            stderr=[r"Function nofunction\(\) not found in module "
-                    r"tests\.unit\.pywbemlistener\.indicall_display"],
-            test='all',
-        ),
+        {
+            'args': ['-v', 'start', 'lis1', '--scheme', 'http',
+                     '--port', '50001', '--indi-call',
+                     'tests.unit.pywbemlistener.indicall_display.nofunction'],
+        },
+        {
+            'rc': 1,
+            'stderr': [r"Function nofunction\(\) not found in module "
+                       r"tests\.unit\.pywbemlistener\.indicall_display"],
+            'test': 'all',
+        },
         RUN_NO_WIN,
     ),
     (
         "Verify failure of 'start' with --indi-call on existing module that "
         "cannot be imported",
-        dict(
-            args=['-v', 'start', 'lis1', '--scheme', 'http',
-                  '--port', '50001', '--indi-call',
-                  'tests.unit.pywbemlistener.indicall_importerror.display'],
-        ),
-        dict(
-            rc=1,
-            stderr=[r"Cannot import module tests\.unit\.pywbemlistener\."
-                    r"indicall_importerror: ImportError"],
-            test='all',
-        ),
+        {
+            'args': ['-v', 'start', 'lis1', '--scheme', 'http',
+                     '--port', '50001', '--indi-call',
+                     'tests.unit.pywbemlistener.indicall_importerror.display'],
+        },
+        {
+            'rc': 1,
+            'stderr': [r"Cannot import module tests\.unit\.pywbemlistener\."
+                       r"indicall_importerror: ImportError"],
+            'test': 'all',
+        },
         RUN_NO_WIN,
     ),
     (
         "Verify success of 'start' with --indi-file on non-existing file, no "
         "log",
-        dict(
-            args=['-v', 'start', 'lis1', '--scheme', 'http',
-                  '--port', '50001', '--indi-file', 'new.log'],
-        ),
-        dict(
-            stdout=[
+        {
+            'args': ['-v', 'start', 'lis1', '--scheme', 'http',
+                     '--port', '50001', '--indi-file', 'new.log'],
+        },
+        {
+            'stdout': [
                 r"Run process: Added indication handler for appending to file "
                 fr"new\.log with format .{DEFAULT_INDI_FORMAT}.",
                 r"Started listener lis1 at http://\(any\):50001",
             ],
-            test='all',
-        ),
+            'test': 'all',
+        },
         RUN_NO_WIN,
     ),
     (
         "Verify success of 'start' with --indi-file on non-existing file, no "
         "log, bind to localhost",
-        dict(
-            args=['-v', 'start', 'lis1', '--scheme', 'http',
-                  '--bind-addr', 'localhost', '--port', '50001', '--indi-file',
-                  'new.log'],
-        ),
-        dict(
-            stdout=[
+        {
+            'args': ['-v', 'start', 'lis1', '--scheme', 'http',
+                     '--bind-addr', 'localhost', '--port', '50001',
+                     '--indi-file', 'new.log'],
+        },
+        {
+            'stdout': [
                 r"Run process: Added indication handler for appending to file "
                 fr"new\.log with format .{DEFAULT_INDI_FORMAT}.",
                 r"Started listener lis1 at http://localhost:50001",
             ],
-            test='all',
-        ),
+            'test': 'all',
+        },
         RUN_NO_WIN,
     ),
 
     # Test starting listeners with -vv and bind to localhost
     (
         "Verify success of 'start' with --vv",
-        dict(
-            args=['-vv', 'start', 'lis1', '--scheme', 'http', '--bind-addr',
-                  'localhost', '--port', '50001'],
-        ),
-        dict(
-            stdout=[
+        {
+            'args': ['-vv', 'start', 'lis1', '--scheme', 'http', '--bind-addr',
+                     'localhost', '--port', '50001'],
+        },
+        {
+            'stdout': [
                 r"Start process( [0-9]+)?: Starting run process: .*",
                 r"Start process( [0-9]+)?: Waiting for run process [0-9]+ to "
                 r"complete startup",
@@ -503,26 +504,26 @@ START_TESTCASES = [
                 r"succeeded",
                 r"Started listener lis1 at http://localhost:50001",
             ],
-            test='all',
-        ),
+            'test': 'all',
+        },
         RUN_NO_WIN,
     ),
     (
         "Verify failure of 'start' with --vv and same port as existing "
         "listener",
-        dict(
-            args=['-vv', 'start', 'lis2', '--scheme', 'http',
-                  '--port', '50001'],
-            listeners=[
+        {
+            'args': ['-vv', 'start', 'lis2', '--scheme', 'http',
+                     '--port', '50001'],
+            'listeners': [
                 ['lis1', '--scheme', 'http', '--port', '50001'],
             ]
-        ),
-        dict(
-            rc=1,
-            stderr=[r"Error: Cannot start listener .+: "
-                    r"WBEM listener port 50001 is already in use"],
-            test='all',
-        ),
+        },
+        {
+            'rc': 1,
+            'stderr': [r"Error: Cannot start listener .+: "
+                       r"WBEM listener port 50001 is already in use"],
+            'test': 'all',
+        },
         RUN_NO_WIN,
     ),
 ]

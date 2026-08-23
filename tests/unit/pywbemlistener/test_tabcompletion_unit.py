@@ -48,27 +48,43 @@ TESTCASES_LISTENER_NAME_COMPLETE = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('Verify with partial valid incomplete name, returns good name',
-     dict(listeners=[['lis1', '--scheme', 'http', '--port', '50001'],
-                     ['lis2', '--scheme', 'http', '--port', '50002'],
-                     ['fred', '--scheme', 'http', '--port', '50003'], ],
-          incomplete="fre",
-          exp_rtn=['fred']),
-     None, None, RUN),
-
-    ('Verify with empty listener name, returns list',
-     dict(listeners=[['lis1', '--scheme', 'http', '--port', '50001'],
-                     ['lis2', '--scheme', 'http', '--port', '50002'],
-                     ['fred', '--scheme', 'http', '--port', '50003'], ],
-          incomplete="",
-          exp_rtn=['lis1', 'lis2', 'fred']),
-     None, None, RUN),
-
-    ('Verify with incorrect listener name, returns empty list',
-     dict(listeners=[['fred', '--scheme', 'http', '--port', '50003'], ],
-          incomplete="blah",
-          exp_rtn=[]),
-     None, None, RUN),
+    (
+        'Verify with partial valid incomplete name, returns good name',
+        {
+            'listeners': [
+                ['lis1', '--scheme', 'http', '--port', '50001'],
+                ['lis2', '--scheme', 'http', '--port', '50002'],
+                ['fred', '--scheme', 'http', '--port', '50003'],
+            ],
+            'incomplete': "fre",
+            'exp_rtn': ['fred']
+        },
+        None, None, RUN
+    ),
+    (
+        'Verify with empty listener name, returns list',
+        {
+            'listeners': [
+                ['lis1', '--scheme', 'http', '--port', '50001'],
+                ['lis2', '--scheme', 'http', '--port', '50002'],
+                ['fred', '--scheme', 'http', '--port', '50003'],
+            ],
+            'incomplete': "",
+            'exp_rtn': ['lis1', 'lis2', 'fred']
+        },
+        None, None, RUN
+    ),
+    (
+        'Verify with incorrect listener name, returns empty list',
+        {
+            'listeners': [
+                ['fred', '--scheme', 'http', '--port', '50003'],
+            ],
+            'incomplete': "blah",
+            'exp_rtn': []
+        },
+        None, None, RUN
+    ),
 ]
 
 

@@ -51,133 +51,186 @@ TESTCASES_VALID_OUTPUT_FORMAT = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('Verify cmd input, None, default None returns mof',
-     dict(fmt=None,
-          default=None,
-          groups=['CIM'],
-          exp_rtn='mof'),
-     None, None, True),
-
-    ('Verify cmd input, None, default mof returns mof',
-     dict(fmt=None,
-          default='mof',
-          groups=['CIM'],
-          exp_rtn='mof'),
-     None, None, True),
-
-
-    ('Verify cmd input, None, default mof groups TABLE returns mof',
-     dict(fmt=None,
-          default=None,
-          groups=['TABLE'],
-          exp_rtn='simple'),
-     None, None, True),
-
-    ('Verify cmd input, None, default mof returns mof',
-     dict(fmt=None,
-          default='table',
-          groups=['TABLE'],
-          exp_rtn='table'),
-     None, None, True),
-
-    ('Verify cmd input, mof, default mof returns mof',
-     dict(fmt='mof',
-          default='mof',
-          groups=['CIM'],
-          exp_rtn='mof'),
-     None, None, True),
-
-    ('Verify cmd input, mof, default xml returns mof',
-     dict(fmt='mof',
-          default='mof',
-          groups=['CIM'],
-          exp_rtn='mof'),
-     None, None, True),
-
-    ('Verify cmd input xml returns xml',
-     dict(fmt='xml',
-          default='mof',
-          groups=['CIM'],
-          exp_rtn='xml'),
-     None, None, True),
-
-    ('Verify cmd input None default xml returns xml',
-     dict(fmt=None,
-          default='xml',
-          groups=['CIM'],
-          exp_rtn='xml'),
-     None, None, True),
-
-    ('Verify cmd input None default xml group table fails, AssertionError',
-     dict(fmt=None,
-          default='xml',
-          groups=['Table'],
-          exp_rtn='xml'),
-     AssertionError, None, True),
-
-    ('Verify cmd input blah default xml group table fails, AssertionError',
-     dict(fmt='Blah',
-          default='xml',
-          groups=['Table'],
-          exp_rtn='xml'),
-     AssertionError, None, True),
-
-    ('Verify cmd input None default xml group blah fails, AssertionError',
-     dict(fmt='simple',
-          default='xml',
-          groups=['Blah'],
-          exp_rtn='xml'),
-     AssertionError, None, True),
-
-    ('Verify cmd input None default xml group blah fails, AssertionError',
-     dict(fmt='simple',
-          default='blah',
-          groups=['Table'],
-          exp_rtn='xml'),
-     AssertionError, None, True),
-
-    ('Verify cmd input table group CIM fails',
-     dict(fmt='table',
-          default='xml',
-          groups=['CIM'],
-          exp_rtn='xml'),
-     click.ClickException, None, True),
-
-    ('Verify cmd input mof group TABLE fails',
-     dict(fmt='mof',
-          default='xml',
-          groups=['TABLE'],
-          exp_rtn=''),
-     click.ClickException, None, True),
-
-    ('Verify cmd input None, default xml group None OK',
-     dict(fmt=None,
-          default='xml',
-          groups=None,
-          exp_rtn='xml'),
-     None, None, True),
-
-    ('Verify cmd input xml, default xml group None OK',
-     dict(fmt='xml',
-          default='xml',
-          groups=None,
-          exp_rtn='xml'),
-     None, None, True),
-
-    ('Verify cmd input None, default xml group TABLE, CIM OK',
-     dict(fmt=None,
-          default='xml',
-          groups=['TABLE', 'CIM'],
-          exp_rtn='xml'),
-     None, None, True),
-
-    ('Verify cmd input None, default xml group None OK',
-     dict(fmt=None,
-          default=None,
-          groups=None,
-          exp_rtn='mof'),
-     None, None, True),
-
+    (
+        'Verify cmd input, None, default None returns mof',
+        {
+            'fmt': None,
+            'default': None,
+            'groups': ['CIM'],
+            'exp_rtn': 'mof'
+        },
+        None, None, True
+    ),
+    (
+        'Verify cmd input, None, default mof returns mof',
+        {
+            'fmt': None,
+            'default': 'mof',
+            'groups': ['CIM'],
+            'exp_rtn': 'mof'
+        },
+        None, None, True
+    ),
+    (
+        'Verify cmd input, None, default mof groups TABLE returns mof',
+        {
+            'fmt': None,
+            'default': None,
+            'groups': ['TABLE'],
+            'exp_rtn': 'simple'
+        },
+        None, None, True
+    ),
+    (
+        'Verify cmd input, None, default mof returns mof',
+        {
+            'fmt': None,
+            'default': 'table',
+            'groups': ['TABLE'],
+            'exp_rtn': 'table'
+        },
+        None, None, True
+    ),
+    (
+        'Verify cmd input, mof, default mof returns mof',
+        {
+            'fmt': 'mof',
+            'default': 'mof',
+            'groups': ['CIM'],
+            'exp_rtn': 'mof'
+        },
+        None, None, True
+    ),
+    (
+        'Verify cmd input, mof, default xml returns mof',
+        {
+            'fmt': 'mof',
+            'default': 'mof',
+            'groups': ['CIM'],
+            'exp_rtn': 'mof'
+        },
+        None, None, True
+    ),
+    (
+        'Verify cmd input xml returns xml',
+        {
+            'fmt': 'xml',
+            'default': 'mof',
+            'groups': ['CIM'],
+            'exp_rtn': 'xml'
+        },
+        None, None, True
+    ),
+    (
+        'Verify cmd input None default xml returns xml',
+        {
+            'fmt': None,
+            'default': 'xml',
+            'groups': ['CIM'],
+            'exp_rtn': 'xml'
+        },
+        None, None, True
+    ),
+    (
+        'Verify cmd input None default xml group table fails, AssertionError',
+        {
+            'fmt': None,
+            'default': 'xml',
+            'groups': ['Table'],
+            'exp_rtn': 'xml'
+        },
+        AssertionError, None, True
+    ),
+    (
+        'Verify cmd input blah default xml group table fails, AssertionError',
+        {
+            'fmt': 'Blah',
+            'default': 'xml',
+            'groups': ['Table'],
+            'exp_rtn': 'xml'
+        },
+        AssertionError, None, True
+    ),
+    (
+        'Verify cmd input None default xml group blah fails, AssertionError',
+        {
+            'fmt': 'simple',
+            'default': 'xml',
+            'groups': ['Blah'],
+            'exp_rtn': 'xml'
+        },
+        AssertionError, None, True
+    ),
+    (
+        'Verify cmd input None default xml group blah fails, AssertionError',
+        {
+            'fmt': 'simple',
+            'default': 'blah',
+            'groups': ['Table'],
+            'exp_rtn': 'xml'
+        },
+        AssertionError, None, True
+    ),
+    (
+        'Verify cmd input table group CIM fails',
+        {
+            'fmt': 'table',
+            'default': 'xml',
+            'groups': ['CIM'],
+            'exp_rtn': 'xml'
+        },
+        click.ClickException, None, True
+    ),
+    (
+        'Verify cmd input mof group TABLE fails',
+        {
+            'fmt': 'mof',
+            'default': 'xml',
+            'groups': ['TABLE'],
+            'exp_rtn': ''
+        },
+        click.ClickException, None, True
+    ),
+    (
+        'Verify cmd input None, default xml group None OK',
+        {
+            'fmt': None,
+            'default': 'xml',
+            'groups': None,
+            'exp_rtn': 'xml'
+        },
+        None, None, True
+    ),
+    (
+        'Verify cmd input xml, default xml group None OK',
+        {
+            'fmt': 'xml',
+            'default': 'xml',
+            'groups': None,
+            'exp_rtn': 'xml'
+        },
+        None, None, True
+    ),
+    (
+        'Verify cmd input None, default xml group TABLE, CIM OK',
+        {
+            'fmt': None,
+            'default': 'xml',
+            'groups': ['TABLE', 'CIM'],
+            'exp_rtn': 'xml'
+        },
+        None, None, True
+    ),
+    (
+        'Verify cmd input None, default xml group None OK',
+        {
+            'fmt': None,
+            'default': None,
+            'groups': None,
+            'exp_rtn': 'mof'
+        },
+        None, None, True
+    ),
 ]
 
 
@@ -213,36 +266,51 @@ TESTCASES_OUTPUT_FORMAT_IN_GROUPS = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('Verify mof in CIM',
-     dict(fmt='mof',
-          groups='CIM',
-          exp_rtn=True),
-     None, None, True),
-
-    ('Verify mof CIM as a list',
-     dict(fmt='mof',
-          groups=['CIM'],
-          exp_rtn=True),
-     None, None, True),
-
-    ('Verify mof CIM as a tuple',
-     dict(fmt='mof',
-          groups=('CIM'),
-          exp_rtn=True),
-     None, None, True),
-
-    ('Verify table not in CIM',
-     dict(fmt='table',
-          groups=['CIM'],
-          exp_rtn=False),
-     None, None, False),
-
-    ('Verify table not in CIM or TEXT',
-     dict(fmt='table',
-          groups=['CIM', 'TEXT'],
-          exp_rtn=False),
-     None, None, False),
-
+    (
+        'Verify mof in CIM',
+        {
+            'fmt': 'mof',
+            'groups': 'CIM',
+            'exp_rtn': True
+        },
+        None, None, True
+    ),
+    (
+        'Verify mof CIM as a list',
+        {
+            'fmt': 'mof',
+            'groups': ['CIM'],
+            'exp_rtn': True
+        },
+        None, None, True
+    ),
+    (
+        'Verify mof CIM as a tuple',
+        {
+            'fmt': 'mof',
+            'groups': ('CIM'),
+            'exp_rtn': True
+        },
+        None, None, True
+    ),
+    (
+        'Verify table not in CIM',
+        {
+            'fmt': 'table',
+            'groups': ['CIM'],
+            'exp_rtn': False
+        },
+        None, None, False
+    ),
+    (
+        'Verify table not in CIM or TEXT',
+        {
+            'fmt': 'table',
+            'groups': ['CIM', 'TEXT'],
+            'exp_rtn': False
+        },
+        None, None, False
+    ),
 ]
 
 
@@ -278,75 +346,108 @@ TESTCASES_FORMAT_KEYS = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('Verify simple keybinding',
-     dict(kb=[('kEY1', 'Ham')],
-          width=100,
-          exp_rtn='kEY1="Ham"'),
-     None, None, True),
-
-    ('Verify multiple keys keybinding',
-     dict(kb=[('kEY1', 'Ham'), ('key2', 3)],
-          width=100,
-          exp_rtn='kEY1="Ham",key2=3'),
-     None, None, True),
-
-    ('Verify multiple keys binding with spaces in keys',
-     dict(kb=[('kEY1', 'Ham and eggs'), ('key2', 'More eggs')],
-          width=100,
-          exp_rtn='kEY1="Ham and eggs",key2="More eggs"'),
-     None, None, True),
-
-    ('Verify multiple unsorted keys binding multiple key types, pywbem >=1.0',
-     dict(kb=[('Name', 'Foo'),
-              ('Number', Uint8(42)),
-              ('Boolean', False),
-              ('Ref', CIMInstanceName('CIM_Bar',
-                                      keybindings={'Chicken': 'Ham'}))],
-          width=100,
-          exp_rtn='Boolean=FALSE,Name="Foo",Number=42,'
-          'Ref="/:CIM_Bar.Chicken=\\"Ham\\""'),
-     None, None, True),
-
-    ('Verify mutliple keys that fold into multiple lines',
-     dict(kb=[('kEY1', 'Ham'), ('key2', 3)],
-          width=14,
-          exp_rtn='kEY1="Ham"\nkey2=3'),
-     None, None, True),
-
-    ('Verify multiple keys binding with spaces in keys that fold',
-     dict(kb=[('kEY1', 'Ham and eggs'), ('key2', 'More eggs')],
-          width=25,
-          exp_rtn='kEY1="Ham and eggs"\nkey2="More eggs"'),
-     None, None, True),
-
-    ('Verify multiple keys binding with many keys keys without fold',
-     dict(kb=[('k1', 1), ('k2', 2), ('k3', 3), ('k4', 4), ('k5', 5),
-              ('k6', 6), ('k7', 7), ('k8', 8)],
-          width=100,
-          exp_rtn=('k1=1,k2=2,k3=3,k4=4,k5=5,k6=6,k7=7,k8=8')),
-     None, None, True),
-
-    ('Verify multiple keys binding with many keys every key folds',
-     dict(kb=[('k1', 1), ('k2', 2), ('k3', 3), ('k4', 4), ('k5', 5),
-              ('k6', 6), ('k7', 7), ('k8', 8)],
-          width=3,
-          exp_rtn=('k1=1\nk2=2\nk3=3\nk4=4\nk5=5\nk6=6\nk7=7\nk8=8')),
-     None, None, True),
-
-
-    ('Verify multiple keys binding with many keys keys some fold',
-     dict(kb=[('k1', 1), ('k2', 2), ('k3', 3), ('k4', 4), ('k5', 5),
-              ('k6', 6), ('k7', 7), ('k8', 8)],
-          width=8,
-          exp_rtn=('k1=1,k2=2\nk3=3,k4=4\nk5=5,k6=6\nk7=7,k8=8')),
-     None, None, False),
+    (
+        'Verify simple keybinding',
+        {
+            'kb': [('kEY1', 'Ham')],
+            'width': 100,
+            'exp_rtn': 'kEY1="Ham"'
+        },
+        None, None, True
+    ),
+    (
+        'Verify multiple keys keybinding',
+        {
+            'kb': [('kEY1', 'Ham'), ('key2', 3)],
+            'width': 100,
+            'exp_rtn': 'kEY1="Ham",key2=3'
+        },
+        None, None, True
+    ),
+    (
+        'Verify multiple keys binding with spaces in keys',
+        {
+            'kb': [('kEY1', 'Ham and eggs'), ('key2', 'More eggs')],
+            'width': 100,
+            'exp_rtn': 'kEY1="Ham and eggs",key2="More eggs"'
+        },
+        None, None, True
+    ),
+    (
+        'Verify multiple unsorted keys binding multiple key types, '
+        'pywbem >=1.0',
+        {
+            'kb': [
+                ('Name', 'Foo'),
+                ('Number', Uint8(42)),
+                ('Boolean', False),
+                ('Ref', CIMInstanceName('CIM_Bar',
+                                        keybindings={'Chicken': 'Ham'}))
+            ],
+            'width': 100,
+            'exp_rtn': 'Boolean=FALSE,Name="Foo",Number=42,'
+            'Ref="/:CIM_Bar.Chicken=\\"Ham\\""'
+        },
+        None, None, True
+    ),
+    (
+        'Verify mutliple keys that fold into multiple lines',
+        {
+            'kb': [('kEY1', 'Ham'), ('key2', 3)],
+            'width': 14,
+            'exp_rtn': 'kEY1="Ham"\nkey2=3'
+        },
+        None, None, True
+    ),
+    (
+        'Verify multiple keys binding with spaces in keys that fold',
+        {
+            'kb': [('kEY1', 'Ham and eggs'), ('key2', 'More eggs')],
+            'width': 25,
+            'exp_rtn': 'kEY1="Ham and eggs"\nkey2="More eggs"'
+        },
+        None, None, True
+    ),
+    (
+        'Verify multiple keys binding with many keys keys without fold',
+        {
+            'kb': [('k1', 1), ('k2', 2), ('k3', 3), ('k4', 4), ('k5', 5),
+                   ('k6', 6), ('k7', 7), ('k8', 8)],
+            'width': 100,
+            'exp_rtn': ('k1=1,k2=2,k3=3,k4=4,k5=5,k6=6,k7=7,k8=8')},
+        None, None, True
+    ),
+    (
+        'Verify multiple keys binding with many keys every key folds',
+        {
+            'kb': [('k1', 1), ('k2', 2), ('k3', 3), ('k4', 4), ('k5', 5),
+                   ('k6', 6), ('k7', 7), ('k8', 8)],
+            'width': 3,
+            'exp_rtn': ('k1=1\nk2=2\nk3=3\nk4=4\nk5=5\nk6=6\nk7=7\nk8=8')
+        },
+        None, None, True
+    ),
+    (
+        'Verify multiple keys binding with many keys keys some fold',
+        {
+            'kb': [('k1', 1), ('k2', 2), ('k3', 3), ('k4', 4), ('k5', 5),
+                   ('k6', 6), ('k7', 7), ('k8', 8)],
+            'width': 8,
+            'exp_rtn': ('k1=1,k2=2\nk3=3,k4=4\nk5=5,k6=6\nk7=7,k8=8')
+        },
+        None, None, False
+    ),
 
     # Test no keys
-    ('Verify no keys. Causes MissingKeybindingWarning',
-     dict(kb=[],
-          width=100,
-          exp_rtn=''),
-     None, MissingKeybindingsWarning, True),
+    (
+        'Verify no keys. Causes MissingKeybindingWarning',
+        {
+            'kb': [],
+            'width': 100,
+            'exp_rtn': ''
+        },
+        None, MissingKeybindingsWarning, True
+    ),
 ]
 
 
@@ -384,93 +485,134 @@ TESTCASES_HIDE_EMPTY_COLUMNS = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('Verify deletes nothing with integers in rows',
-     dict(rows=[[1, 2, 3],
-                [4, 5, 6],
-                [7, 8, 9]],
-          headers=['h1', 'h2', 'h3'],
-          exp_rtn={'rows': [[1, 2, 3],
-                            [4, 5, 6],
-                            [7, 8, 9]],
-                   'headers': ['h1', 'h2', 'h3']}),
-     None, None, True),
-
-    ('Verify deletes nothing with integers in rows',
-     dict(rows=[[1, 2, 0],
-                [4, 5, 0],
-                [7, 8, 0]],
-          headers=['h1', 'h2', 'h3'],
-          exp_rtn={'rows': [[1, 2, 0],
-                            [4, 5, 0],
-                            [7, 8, 0]],
-                   'headers': ['h1', 'h2', 'h3']}),
-     None, None, True),
-
-    ('Verify deletes nothing with strings in rows',
-     dict(rows=[['1', '2', '3'],
-                ['4', '5', '6'],
-                ['7', '8', '9']],
-          headers=['h1', 'h2', 'h3'],
-          exp_rtn={'rows': [['1', '2', '3'],
-                            ['4', '5', '6'],
-                            ['7', '8', '9']],
-                   'headers': ['h1', 'h2', 'h3']}),
-     None, None, True),
-
-    ('Verify deletes nothing with strings in rows',
-     dict(rows=[['1', '2', ''],
-                ['4', '5', ''],
-                ['7', '8', '']],
-          headers=['h1', 'h2', 'h3'],
-          exp_rtn={'rows': [['1', '2'],
-                            ['4', '5'],
-                            ['7', '8']],
-                   'headers': ['h1', 'h2']}),
-     None, None, True),
-
-    ('Verify deletes nothing with strings in rows',
-     dict(rows=[['1', '2', '3'],
-                ['4', '5', ''],
-                ['7', '8', '']],
-          headers=['h1', 'h2', 'h3'],
-          exp_rtn={'rows': [['1', '2', '3'],
-                            ['4', '5', ''],
-                            ['7', '8', '']],
-                   'headers': ['h1', 'h2', 'h3']}),
-     None, None, True),
-
-    ('Verify deletes 3rd with strings in rows',
-     dict(rows=[['1', '2', None],
-                ['4', '5', None],
-                ['7', '8', None]],
-          headers=['h1', 'h2', 'h3'],
-          exp_rtn={'rows': [['1', '2'],
-                            ['4', '5'],
-                            ['7', '8']],
-                   'headers': ['h1', 'h2']}),
-     None, None, True),
-
-    ('Verify deletes 2nd with strings in rows',
-     dict(rows=[['1', None, '3'],
-                ['4', None, '6'],
-                ['7', None, '9']],
-          headers=['h1', 'h2', 'h3'],
-          exp_rtn={'rows': [['1', '3'],
-                            ['4', '6'],
-                            ['7', '9']],
-                   'headers': ['h1', 'h3']}),
-     None, None, True),
-
-    ('Verify deletes 1st 2nd with strings in rows',
-     dict(rows=[[None, None, '3'],
-                [None, None, '6'],
-                [None, None, '9']],
-          headers=['h1', 'h2', 'h3'],
-          exp_rtn={'rows': [['3'],
-                            ['6'],
-                            ['9']],
-                   'headers': ['h3']}),
-     None, None, True),
+    (
+        'Verify deletes nothing with integers in rows',
+        {
+            'rows': [[1, 2, 3],
+                     [4, 5, 6],
+                     [7, 8, 9]],
+            'headers': ['h1', 'h2', 'h3'],
+            'exp_rtn': {
+                'rows': [[1, 2, 3],
+                         [4, 5, 6],
+                         [7, 8, 9]],
+                'headers': ['h1', 'h2', 'h3']
+            }
+        },
+        None, None, True
+    ),
+    (
+        'Verify deletes nothing with integers in rows',
+        {
+            'rows': [[1, 2, 0],
+                     [4, 5, 0],
+                     [7, 8, 0]],
+            'headers': ['h1', 'h2', 'h3'],
+            'exp_rtn': {
+                'rows': [[1, 2, 0],
+                         [4, 5, 0],
+                         [7, 8, 0]],
+                'headers': ['h1', 'h2', 'h3']
+            }
+        },
+        None, None, True
+    ),
+    (
+        'Verify deletes nothing with strings in rows',
+        {
+            'rows': [['1', '2', '3'],
+                     ['4', '5', '6'],
+                     ['7', '8', '9']],
+            'headers': ['h1', 'h2', 'h3'],
+            'exp_rtn': {
+                'rows': [['1', '2', '3'],
+                         ['4', '5', '6'],
+                         ['7', '8', '9']],
+                'headers': ['h1', 'h2', 'h3']
+            }
+        },
+        None, None, True
+    ),
+    (
+        'Verify deletes nothing with strings in rows',
+        {
+            'rows': [['1', '2', ''],
+                     ['4', '5', ''],
+                     ['7', '8', '']],
+            'headers': ['h1', 'h2', 'h3'],
+            'exp_rtn': {
+                'rows': [['1', '2'],
+                         ['4', '5'],
+                         ['7', '8']],
+                'headers': ['h1', 'h2']
+            }
+        },
+        None, None, True
+    ),
+    (
+        'Verify deletes nothing with strings in rows',
+        {
+            'rows': [['1', '2', '3'],
+                     ['4', '5', ''],
+                     ['7', '8', '']],
+            'headers': ['h1', 'h2', 'h3'],
+            'exp_rtn': {
+                'rows': [['1', '2', '3'],
+                         ['4', '5', ''],
+                         ['7', '8', '']],
+                'headers': ['h1', 'h2', 'h3']
+            }
+        },
+        None, None, True
+    ),
+    (
+        'Verify deletes 3rd with strings in rows',
+        {
+            'rows': [['1', '2', None],
+                     ['4', '5', None],
+                     ['7', '8', None]],
+            'headers': ['h1', 'h2', 'h3'],
+            'exp_rtn': {
+                'rows': [['1', '2'],
+                         ['4', '5'],
+                         ['7', '8']],
+                'headers': ['h1', 'h2']
+            }
+        },
+        None, None, True
+    ),
+    (
+        'Verify deletes 2nd with strings in rows',
+        {
+            'rows': [['1', None, '3'],
+                     ['4', None, '6'],
+                     ['7', None, '9']],
+            'headers': ['h1', 'h2', 'h3'],
+            'exp_rtn': {
+                'rows': [['1', '3'],
+                         ['4', '6'],
+                         ['7', '9']],
+                'headers': ['h1', 'h3']
+            }
+        },
+        None, None, True
+    ),
+    (
+        'Verify deletes 1st 2nd with strings in rows',
+        {
+            'rows': [[None, None, '3'],
+                     [None, None, '6'],
+                     [None, None, '9']],
+            'headers': ['h1', 'h2', 'h3'],
+            'exp_rtn': {
+                'rows': [['3'],
+                         ['6'],
+                         ['9']],
+                'headers': ['h3']
+            }
+        },
+        None, None, True
+    ),
 ]
 
 
@@ -513,233 +655,292 @@ TESTCASES_FOLD_STRINGS = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('Verify String does not change with max_len > string length',
-     dict(input_str='The red fox jumped over the fence',
-          max_width=100,
-          brk_long_wds=False,
-          brk_hyphen=False,
-          fold_list=None,
-          separator=None,
-          init_indent=None,
-          sub_indent=None,
-          exp_rtn='The red fox jumped over the fence'),
-     None, None, True),
-
-    ('Verify String folds with small len',
-     dict(input_str='The red fox jumped over the fence',
-          max_width=5,
-          brk_long_wds=False,
-          brk_hyphen=False,
-          fold_list=None,
-          separator=None,
-          init_indent=None,
-          sub_indent=None,
-          exp_rtn='The\nred\nfox\njumped\nover\nthe\nfence'),
-     None, None, True),
-
-    ('Verify String folds once',
-     dict(input_str='The red fox jumped over the fence',
-          max_width=18,
-          brk_long_wds=False,
-          brk_hyphen=False,
-          fold_list=None,
-          separator=None,
-          init_indent=None,
-          sub_indent=None,
-          exp_rtn='The red fox jumped\nover the fence'),
-     None, None, True),
-
-    ('Verify String with fold already in string',
-     dict(input_str='The red fox jumped\nover the fence',
-          max_width=19,
-          brk_long_wds=False,
-          brk_hyphen=False,
-          fold_list=None,
-          separator=None,
-          init_indent=None,
-          sub_indent=None,
-          exp_rtn='The red fox jumped\nover the fence'),
-     None, None, True),
-
-    ('Verify String with existing fold refolds',
-     dict(input_str='The red\nfox jumped over\nthe fence',
-          max_width=19,
-          brk_long_wds=False,
-          brk_hyphen=False,
-          fold_list=None,
-          separator=None,
-          init_indent=None,
-          sub_indent=None,
-          exp_rtn='The red fox jumped\nover the fence'),
-     None, None, True),
-
-    ('Verify String with existing fold refolds with initial indent string',
-     dict(input_str='The red\nfox jumped over\nthe fence',
-          max_width=19,
-          brk_long_wds=False,
-          brk_hyphen=False,
-          fold_list=None,
-          separator=None,
-          init_indent='    ',
-          sub_indent=None,
-          exp_rtn='    The red fox\njumped over the\nfence'),
-     None, None, True),
-
-    ('Verify String with existing fold refolds with initial indent integer',
-     dict(input_str='The red\nfox jumped over\nthe fence',
-          max_width=19,
-          brk_long_wds=False,
-          brk_hyphen=False,
-          fold_list=None,
-          separator=None,
-          init_indent=4,
-          sub_indent=None,
-          exp_rtn='    The red fox\njumped over the\nfence'),
-     None, None, True),
-
-    ('Verify String with existing fold refolds with subsequent indent string',
-     dict(input_str='The red\nfox jumped over\nthe fence',
-          max_width=19,
-          brk_long_wds=False,
-          brk_hyphen=False,
-          fold_list=None,
-          separator=None,
-          init_indent=None,
-          sub_indent='    ',
-          exp_rtn='The red fox jumped\n    over the fence'),
-     None, None, True),
-
-    ('Verify String with existing fold refolds with subsequent indent integer',
-     dict(input_str='The red\nfox jumped over\nthe fence',
-          max_width=19,
-          brk_long_wds=False,
-          brk_hyphen=False,
-          fold_list=None,
-          separator=None,
-          init_indent=None,
-          sub_indent=4,
-          exp_rtn='The red fox jumped\n    over the fence'),
-     None, None, True),
-
-    ('Verify String folds with longword',
-     dict(input_str='Theredfoxjumped over the fence',
-          max_width=10,
-          brk_long_wds=True,
-          brk_hyphen=False,
-          fold_list=None,
-          separator=None,
-          init_indent=None,
-          sub_indent=None,
-          exp_rtn='Theredfoxj\numped over\nthe fence'),
-     None, None, True),
-
-    ('Verify String folds with hyphen in words but brk_hyphen=False',
-     dict(input_str='The red-green-blue fox jumped over the '
-                    'pink-orange-white fence',
-          max_width=10,
-          brk_long_wds=False,
-          brk_hyphen=False,
-          fold_list=None,
-          separator=None,
-          init_indent=None,
-          sub_indent=None,
-          exp_rtn='The\nred-green-blue\nfox jumped\nover the\n'
-                  'pink-orange-white\nfence'),
-     None, None, True),
-
-    ('Verify String folds with hyphen in words but brk_hyphen=True',
-     dict(input_str='The red-green-blue fox jumped over the '
-                    'pink-orange-white fence',
-          max_width=10,
-          brk_long_wds=False,
-          brk_hyphen=True,
-          fold_list=None,
-          separator=None,
-          init_indent=None,
-          sub_indent=None,
-          exp_rtn='The red-\ngreen-blue\nfox jumped\nover the\n'
-                  'pink-\norange-\nwhite\nfence'),
-     None, None, True),
-
-    ('Verify String list folds each item into single string separator=" "',
-     dict(input_str=['The red fox jumped over the fence.',
-                     'The red fox jumped over the fence.'],
-          max_width=27,
-          brk_long_wds=False,
-          brk_hyphen=False,
-          fold_list=None,
-          separator=" ",
-          init_indent=None,
-          sub_indent=None,
-          exp_rtn='The red fox jumped over the\nfence. The red fox jumped\n'
-                  'over the fence.'),
-     None, None, True),
-
-    ('Verify String list folds each item into separate line separator=" "',
-     dict(input_str=['The red fox jumped over the fence.',
-                     'The red fox jumped over the fence.'],
-          max_width=27,
-          brk_long_wds=False,
-          brk_hyphen=False,
-          fold_list=True,
-          separator=None,
-          init_indent=None,
-          sub_indent=None,
-          exp_rtn='The red fox jumped over the\nfence.\nThe red fox jumped '
-                  'over the\nfence.'),
-     None, None, True),
-
-    ('Verify String list folds each item into separate line separator=" "  with'
-     'with subsequent indent',
-     dict(input_str=['The red fox jumped over the fence.',
-                     'The red fox jumped over the fence.'],
-          max_width=27,
-          brk_long_wds=False,
-          brk_hyphen=False,
-          fold_list=True,
-          separator=None,
-          init_indent=0,
-          sub_indent=4,
-          exp_rtn='The red fox jumped over the\n    fence.\nThe red fox '
-                  'jumped over the\n    fence.'),
-     None, None, True),
-
-    ('Verify String list of words folds properly',
-     dict(input_str=['The', 'red', 'fox', 'jumped', 'over', 'the', 'fence.'],
-          max_width=10,
-          brk_long_wds=False,
-          brk_hyphen=False,
-          fold_list=False,
-          separator=" ",
-          init_indent=0,
-          sub_indent=0,
-          exp_rtn='The red\nfox jumped\nover the\nfence.'),
-     None, None, True),
-
-    ('Verify String list of words folds properly',
-     dict(input_str=['The', 'red', 'fox', 'jumped', 'over', 'the', 'fence.'],
-          max_width=3,
-          brk_long_wds=False,
-          brk_hyphen=False,
-          fold_list=False,
-          separator=" ",
-          init_indent=0,
-          sub_indent=0,
-          exp_rtn='The\nred\nfox\njumped\nover\nthe\nfence.'),
-     None, None, True),
-
-    ('Verify String list of words folds properly',
-     dict(input_str=['The', 'red', 'fox', 'jumped', 'over', 'the', 'fence.'],
-          max_width=90,
-          brk_long_wds=False,
-          brk_hyphen=False,
-          fold_list=False,
-          separator=" ",
-          init_indent=None,
-          sub_indent=None,
-          exp_rtn='The red fox jumped over the fence.'),
-     None, None, True),
-
+    (
+        'Verify String does not change with max_len > string length',
+        {
+            'input_str': 'The red fox jumped over the fence',
+            'max_width': 100,
+            'brk_long_wds': False,
+            'brk_hyphen': False,
+            'fold_list': None,
+            'separator': None,
+            'init_indent': None,
+            'sub_indent': None,
+            'exp_rtn': 'The red fox jumped over the fence'
+        },
+        None, None, True
+    ),
+    (
+        'Verify String folds with small len',
+        {
+            'input_str': 'The red fox jumped over the fence',
+            'max_width': 5,
+            'brk_long_wds': False,
+            'brk_hyphen': False,
+            'fold_list': None,
+            'separator': None,
+            'init_indent': None,
+            'sub_indent': None,
+            'exp_rtn': 'The\nred\nfox\njumped\nover\nthe\nfence'
+        },
+        None, None, True
+    ),
+    (
+        'Verify String folds once',
+        {
+            'input_str': 'The red fox jumped over the fence',
+            'max_width': 18,
+            'brk_long_wds': False,
+            'brk_hyphen': False,
+            'fold_list': None,
+            'separator': None,
+            'init_indent': None,
+            'sub_indent': None,
+            'exp_rtn': 'The red fox jumped\nover the fence'
+        },
+        None, None, True
+    ),
+    (
+        'Verify String with fold already in string',
+        {
+            'input_str': 'The red fox jumped\nover the fence',
+            'max_width': 19,
+            'brk_long_wds': False,
+            'brk_hyphen': False,
+            'fold_list': None,
+            'separator': None,
+            'init_indent': None,
+            'sub_indent': None,
+            'exp_rtn': 'The red fox jumped\nover the fence'
+        },
+        None, None, True
+    ),
+    (
+        'Verify String with existing fold refolds',
+        {
+            'input_str': 'The red\nfox jumped over\nthe fence',
+            'max_width': 19,
+            'brk_long_wds': False,
+            'brk_hyphen': False,
+            'fold_list': None,
+            'separator': None,
+            'init_indent': None,
+            'sub_indent': None,
+            'exp_rtn': 'The red fox jumped\nover the fence'
+        },
+        None, None, True
+    ),
+    (
+        'Verify String with existing fold refolds with initial indent string',
+        {
+            'input_str': 'The red\nfox jumped over\nthe fence',
+            'max_width': 19,
+            'brk_long_wds': False,
+            'brk_hyphen': False,
+            'fold_list': None,
+            'separator': None,
+            'init_indent': '    ',
+            'sub_indent': None,
+            'exp_rtn': '    The red fox\njumped over the\nfence'
+        },
+        None, None, True
+    ),
+    (
+        'Verify String with existing fold refolds with initial indent integer',
+        {
+            'input_str': 'The red\nfox jumped over\nthe fence',
+            'max_width': 19,
+            'brk_long_wds': False,
+            'brk_hyphen': False,
+            'fold_list': None,
+            'separator': None,
+            'init_indent': 4,
+            'sub_indent': None,
+            'exp_rtn': '    The red fox\njumped over the\nfence'
+        },
+        None, None, True
+    ),
+    (
+        'Verify String with existing fold refolds with subsequent indent '
+        'string',
+        {
+            'input_str': 'The red\nfox jumped over\nthe fence',
+            'max_width': 19,
+            'brk_long_wds': False,
+            'brk_hyphen': False,
+            'fold_list': None,
+            'separator': None,
+            'init_indent': None,
+            'sub_indent': '    ',
+            'exp_rtn': 'The red fox jumped\n    over the fence'
+        },
+        None, None, True
+    ),
+    (
+        'Verify String with existing fold refolds with subsequent indent '
+        'integer',
+        {
+            'input_str': 'The red\nfox jumped over\nthe fence',
+            'max_width': 19,
+            'brk_long_wds': False,
+            'brk_hyphen': False,
+            'fold_list': None,
+            'separator': None,
+            'init_indent': None,
+            'sub_indent': 4,
+            'exp_rtn': 'The red fox jumped\n    over the fence'
+        },
+        None, None, True
+    ),
+    (
+        'Verify String folds with longword',
+        {
+            'input_str': 'Theredfoxjumped over the fence',
+            'max_width': 10,
+            'brk_long_wds': True,
+            'brk_hyphen': False,
+            'fold_list': None,
+            'separator': None,
+            'init_indent': None,
+            'sub_indent': None,
+            'exp_rtn': 'Theredfoxj\numped over\nthe fence'
+        },
+        None, None, True
+    ),
+    (
+        'Verify String folds with hyphen in words but brk_hyphen=False',
+        {
+            'input_str': 'The red-green-blue fox jumped over the '
+                         'pink-orange-white fence',
+            'max_width': 10,
+            'brk_long_wds': False,
+            'brk_hyphen': False,
+            'fold_list': None,
+            'separator': None,
+            'init_indent': None,
+            'sub_indent': None,
+            'exp_rtn': 'The\nred-green-blue\nfox jumped\nover the\n'
+                       'pink-orange-white\nfence'
+        },
+        None, None, True
+    ),
+    (
+        'Verify String folds with hyphen in words but brk_hyphen=True',
+        {
+            'input_str': 'The red-green-blue fox jumped over the '
+                         'pink-orange-white fence',
+            'max_width': 10,
+            'brk_long_wds': False,
+            'brk_hyphen': True,
+            'fold_list': None,
+            'separator': None,
+            'init_indent': None,
+            'sub_indent': None,
+            'exp_rtn': 'The red-\ngreen-blue\nfox jumped\nover the\n'
+                       'pink-\norange-\nwhite\nfence'
+        },
+        None, None, True
+    ),
+    (
+        'Verify String list folds each item into single string separator=" "',
+        {
+            'input_str': ['The red fox jumped over the fence.',
+                          'The red fox jumped over the fence.'],
+            'max_width': 27,
+            'brk_long_wds': False,
+            'brk_hyphen': False,
+            'fold_list': None,
+            'separator': " ",
+            'init_indent': None,
+            'sub_indent': None,
+            'exp_rtn': 'The red fox jumped over the\nfence. '
+                       'The red fox jumped\nover the fence.'
+        },
+        None, None, True
+    ),
+    (
+        'Verify String list folds each item into separate line separator=" "',
+        {
+            'input_str': ['The red fox jumped over the fence.',
+                          'The red fox jumped over the fence.'],
+            'max_width': 27,
+            'brk_long_wds': False,
+            'brk_hyphen': False,
+            'fold_list': True,
+            'separator': None,
+            'init_indent': None,
+            'sub_indent': None,
+            'exp_rtn': 'The red fox jumped over the\nfence.\n'
+                       'The red fox jumped over the\nfence.'
+        },
+        None, None, True
+    ),
+    (
+        'Verify String list folds each item into separate line separator=" " '
+        'with subsequent indent',
+        {
+            'input_str': ['The red fox jumped over the fence.',
+                          'The red fox jumped over the fence.'],
+            'max_width': 27,
+            'brk_long_wds': False,
+            'brk_hyphen': False,
+            'fold_list': True,
+            'separator': None,
+            'init_indent': 0,
+            'sub_indent': 4,
+            'exp_rtn': 'The red fox jumped over the\n    fence.\n'
+                       'The red fox jumped over the\n    fence.'
+        },
+        None, None, True
+    ),
+    (
+        'Verify String list of words folds properly',
+        {
+            'input_str': ['The', 'red', 'fox', 'jumped', 'over', 'the',
+                          'fence.'],
+            'max_width': 10,
+            'brk_long_wds': False,
+            'brk_hyphen': False,
+            'fold_list': False,
+            'separator': " ",
+            'init_indent': 0,
+            'sub_indent': 0,
+            'exp_rtn': 'The red\nfox jumped\nover the\nfence.'
+        },
+        None, None, True
+    ),
+    (
+        'Verify String list of words folds properly',
+        {
+            'input_str': ['The', 'red', 'fox', 'jumped', 'over', 'the',
+                          'fence.'],
+            'max_width': 3,
+            'brk_long_wds': False,
+            'brk_hyphen': False,
+            'fold_list': False,
+            'separator': " ",
+            'init_indent': 0,
+            'sub_indent': 0,
+            'exp_rtn': 'The\nred\nfox\njumped\nover\nthe\nfence.'
+        },
+        None, None, True
+    ),
+    (
+        'Verify String list of words folds properly',
+        {
+            'input_str': ['The', 'red', 'fox', 'jumped', 'over', 'the',
+                          'fence.'],
+            'max_width': 90,
+            'brk_long_wds': False,
+            'brk_hyphen': False,
+            'fold_list': False,
+            'separator': " ",
+            'init_indent': None,
+            'sub_indent': None,
+            'exp_rtn': 'The red fox jumped over the fence.'
+        },
+        None, None, True
+    ),
 ]
 
 

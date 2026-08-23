@@ -220,55 +220,55 @@ TESTCASES_BUILD_MOCKENV = [
     (
         "Mock env with MOF file and old-style mock script, "
         "cache does not exist",
-        dict(
-            test_mode='build',
-            verbose=False,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_OLD_NAMESPACE,
-            mock_files=SIMPLE_V1_OLD_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
-            exp_stdout_lines=[],
-            exp_stdout_lines_all=True,
-            exp_stderr_lines=[],
-        ),
+        {
+            "test_mode": 'build',
+            "verbose": False,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_OLD_NAMESPACE,
+            "mock_files": SIMPLE_V1_OLD_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_OLD_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_OLD_EXP_PROVIDERS,
+            "exp_stdout_lines": [],
+            "exp_stdout_lines_all": True,
+            "exp_stderr_lines": [],
+        },
         None, DeprecatedSetupWarning, OK
     ),
     (
         "Mock env with MOF file and old-style mock script, "
         "cache exists, and load succeeds",
-        dict(
-            test_mode='load',
-            verbose=False,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_OLD_NAMESPACE,
-            mock_files=SIMPLE_V1_OLD_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
-            exp_stdout_lines=[],
-            exp_stdout_lines_all=True,
-            exp_stderr_lines=[],
-        ),
+        {
+            "test_mode": 'load',
+            "verbose": False,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_OLD_NAMESPACE,
+            "mock_files": SIMPLE_V1_OLD_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_OLD_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_OLD_EXP_PROVIDERS,
+            "exp_stdout_lines": [],
+            "exp_stdout_lines_all": True,
+            "exp_stderr_lines": [],
+        },
         None, DeprecatedSetupWarning, OK
     ),
     (
         "Mock env with MOF file and old-style mock script, "
         "cache exists, but load results in rebuild due to missing pkl file",
-        dict(
-            test_mode='load_rebuild_missing_pklfile',
-            verbose=False,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_OLD_NAMESPACE,
-            mock_files=SIMPLE_V1_OLD_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
-            exp_stdout_lines=[],
-            exp_stdout_lines_all=True,
-            exp_stderr_lines=[],
-        ),
+        {
+            "test_mode": 'load_rebuild_missing_pklfile',
+            "verbose": False,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_OLD_NAMESPACE,
+            "mock_files": SIMPLE_V1_OLD_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_OLD_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_OLD_EXP_PROVIDERS,
+            "exp_stdout_lines": [],
+            "exp_stdout_lines_all": True,
+            "exp_stderr_lines": [],
+        },
         # This testcase removes the pkl file from the mock cache as a
         # preparation for executing the code to be tested. If the mock env is
         # not cached, there is no pkl file that can be removed, so this
@@ -278,19 +278,19 @@ TESTCASES_BUILD_MOCKENV = [
     (
         "Mock env with MOF file and old-style mock script, "
         "cache exists, but load results in rebuild due to missing md5 file",
-        dict(
-            test_mode='load_rebuild_missing_md5file',
-            verbose=False,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_OLD_NAMESPACE,
-            mock_files=SIMPLE_V1_OLD_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
-            exp_stdout_lines=[],
-            exp_stdout_lines_all=True,
-            exp_stderr_lines=[],
-        ),
+        {
+            "test_mode": 'load_rebuild_missing_md5file',
+            "verbose": False,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_OLD_NAMESPACE,
+            "mock_files": SIMPLE_V1_OLD_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_OLD_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_OLD_EXP_PROVIDERS,
+            "exp_stdout_lines": [],
+            "exp_stdout_lines_all": True,
+            "exp_stderr_lines": [],
+        },
         # This testcase removes the md5 file from the mock cache as a
         # preparation for executing the code to be tested. If the mock env is
         # not cached, there is no md5 file that can be removed, so this
@@ -300,55 +300,55 @@ TESTCASES_BUILD_MOCKENV = [
     (
         "Mock env with MOF file and old-style mock script, "
         "cache exists, but load results in rebuild due to changed MOF file",
-        dict(
-            test_mode='load_rebuild_changed_moffile',
-            verbose=False,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_OLD_NAMESPACE,
-            mock_files=SIMPLE_V1_OLD_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
-            exp_stdout_lines=[],
-            exp_stdout_lines_all=True,
-            exp_stderr_lines=[],
-        ),
+        {
+            "test_mode": 'load_rebuild_changed_moffile',
+            "verbose": False,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_OLD_NAMESPACE,
+            "mock_files": SIMPLE_V1_OLD_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_OLD_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_OLD_EXP_PROVIDERS,
+            "exp_stdout_lines": [],
+            "exp_stdout_lines_all": True,
+            "exp_stderr_lines": [],
+        },
         None, DeprecatedSetupWarning, OK
     ),
     (
         "Mock env with MOF file and old-style mock script, "
         "cache exists, but load results in rebuild due to changed .py file",
-        dict(
-            test_mode='load_rebuild_changed_pyfile',
-            verbose=False,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_OLD_NAMESPACE,
-            mock_files=SIMPLE_V1_OLD_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
-            exp_stdout_lines=[],
-            exp_stdout_lines_all=True,
-            exp_stderr_lines=[],
-        ),
+        {
+            "test_mode": 'load_rebuild_changed_pyfile',
+            "verbose": False,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_OLD_NAMESPACE,
+            "mock_files": SIMPLE_V1_OLD_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_OLD_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_OLD_EXP_PROVIDERS,
+            "exp_stdout_lines": [],
+            "exp_stdout_lines_all": True,
+            "exp_stderr_lines": [],
+        },
         None, DeprecatedSetupWarning, OK
     ),
     (
         "Mock env with MOF file and new-style mock script, "
         "cache does not exist",
-        dict(
-            test_mode='build',
-            verbose=False,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_NEW_NAMESPACE,
-            mock_files=SIMPLE_V1_NEW_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
-            exp_stdout_lines=[],
-            exp_stdout_lines_all=True,
-            exp_stderr_lines=[],
-        ),
+        {
+            "test_mode": 'build',
+            "verbose": False,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_NEW_NAMESPACE,
+            "mock_files": SIMPLE_V1_NEW_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_NEW_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_NEW_EXP_PROVIDERS,
+            "exp_stdout_lines": [],
+            "exp_stdout_lines_all": True,
+            "exp_stderr_lines": [],
+        },
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
         DeprecationWarning if RETRY_DEPRECATION else None,
         OK
@@ -356,19 +356,19 @@ TESTCASES_BUILD_MOCKENV = [
     (
         "Mock env with MOF file and new-style mock script, "
         "cache exists, and load succeeds",
-        dict(
-            test_mode='load',
-            verbose=False,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_NEW_NAMESPACE,
-            mock_files=SIMPLE_V1_NEW_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
-            exp_stdout_lines=[],
-            exp_stdout_lines_all=True,
-            exp_stderr_lines=[],
-        ),
+        {
+            "test_mode": 'load',
+            "verbose": False,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_NEW_NAMESPACE,
+            "mock_files": SIMPLE_V1_NEW_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_NEW_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_NEW_EXP_PROVIDERS,
+            "exp_stdout_lines": [],
+            "exp_stdout_lines_all": True,
+            "exp_stderr_lines": [],
+        },
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
         DeprecationWarning if RETRY_DEPRECATION else None,
         OK
@@ -376,19 +376,19 @@ TESTCASES_BUILD_MOCKENV = [
     (
         "Mock env with MOF file and new-style mock script, "
         "cache exists, but load results in rebuild due to missing pkl file",
-        dict(
-            test_mode='load_rebuild_missing_pklfile',
-            verbose=False,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_NEW_NAMESPACE,
-            mock_files=SIMPLE_V1_NEW_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
-            exp_stdout_lines=[],
-            exp_stdout_lines_all=True,
-            exp_stderr_lines=[],
-        ),
+        {
+            "test_mode": 'load_rebuild_missing_pklfile',
+            "verbose": False,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_NEW_NAMESPACE,
+            "mock_files": SIMPLE_V1_NEW_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_NEW_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_NEW_EXP_PROVIDERS,
+            "exp_stdout_lines": [],
+            "exp_stdout_lines_all": True,
+            "exp_stderr_lines": [],
+        },
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
         DeprecationWarning if RETRY_DEPRECATION else None,
         OK
@@ -396,19 +396,19 @@ TESTCASES_BUILD_MOCKENV = [
     (
         "Mock env with MOF file and new-style mock script, "
         "cache exists, but load results in rebuild due to missing md5 file",
-        dict(
-            test_mode='load_rebuild_missing_md5file',
-            verbose=False,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_NEW_NAMESPACE,
-            mock_files=SIMPLE_V1_NEW_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
-            exp_stdout_lines=[],
-            exp_stdout_lines_all=True,
-            exp_stderr_lines=[],
-        ),
+        {
+            "test_mode": 'load_rebuild_missing_md5file',
+            "verbose": False,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_NEW_NAMESPACE,
+            "mock_files": SIMPLE_V1_NEW_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_NEW_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_NEW_EXP_PROVIDERS,
+            "exp_stdout_lines": [],
+            "exp_stdout_lines_all": True,
+            "exp_stderr_lines": [],
+        },
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
         DeprecationWarning if RETRY_DEPRECATION else None,
         OK
@@ -416,19 +416,19 @@ TESTCASES_BUILD_MOCKENV = [
     (
         "Mock env with MOF file and new-style mock script, "
         "cache exists, but load results in rebuild due to missing dep file",
-        dict(
-            test_mode='load_rebuild_missing_depfile',
-            verbose=False,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_NEW_NAMESPACE,
-            mock_files=SIMPLE_V1_NEW_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
-            exp_stdout_lines=[],
-            exp_stdout_lines_all=True,
-            exp_stderr_lines=[],
-        ),
+        {
+            "test_mode": 'load_rebuild_missing_depfile',
+            "verbose": False,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_NEW_NAMESPACE,
+            "mock_files": SIMPLE_V1_NEW_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_NEW_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_NEW_EXP_PROVIDERS,
+            "exp_stdout_lines": [],
+            "exp_stdout_lines_all": True,
+            "exp_stderr_lines": [],
+        },
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
         DeprecationWarning if RETRY_DEPRECATION else None,
         OK
@@ -436,19 +436,19 @@ TESTCASES_BUILD_MOCKENV = [
     (
         "Mock env with MOF file and new-style mock script, "
         "cache exists, but load results in rebuild due to changed MOF file",
-        dict(
-            test_mode='load_rebuild_changed_moffile',
-            verbose=False,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_NEW_NAMESPACE,
-            mock_files=SIMPLE_V1_NEW_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
-            exp_stdout_lines=[],
-            exp_stdout_lines_all=True,
-            exp_stderr_lines=[],
-        ),
+        {
+            "test_mode": 'load_rebuild_changed_moffile',
+            "verbose": False,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_NEW_NAMESPACE,
+            "mock_files": SIMPLE_V1_NEW_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_NEW_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_NEW_EXP_PROVIDERS,
+            "exp_stdout_lines": [],
+            "exp_stdout_lines_all": True,
+            "exp_stderr_lines": [],
+        },
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
         DeprecationWarning if RETRY_DEPRECATION else None,
         OK
@@ -456,19 +456,19 @@ TESTCASES_BUILD_MOCKENV = [
     (
         "Mock env with MOF file and new-style mock script, "
         "cache exists, but load results in rebuild due to changed .py file",
-        dict(
-            test_mode='load_rebuild_changed_pyfile',
-            verbose=False,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_NEW_NAMESPACE,
-            mock_files=SIMPLE_V1_NEW_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
-            exp_stdout_lines=[],
-            exp_stdout_lines_all=True,
-            exp_stderr_lines=[],
-        ),
+        {
+            "test_mode": 'load_rebuild_changed_pyfile',
+            "verbose": False,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_NEW_NAMESPACE,
+            "mock_files": SIMPLE_V1_NEW_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_NEW_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_NEW_EXP_PROVIDERS,
+            "exp_stdout_lines": [],
+            "exp_stdout_lines_all": True,
+            "exp_stderr_lines": [],
+        },
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
         DeprecationWarning if RETRY_DEPRECATION else None,
         OK
@@ -478,16 +478,16 @@ TESTCASES_BUILD_MOCKENV = [
     (
         "Mock env with MOF file and old-style mock script, "
         "cache does not exist",
-        dict(
-            test_mode='build',
-            verbose=True,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_OLD_NAMESPACE,
-            mock_files=SIMPLE_V1_OLD_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
-            exp_stdout_lines=[
+        {
+            "test_mode": 'build',
+            "verbose": True,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_OLD_NAMESPACE,
+            "mock_files": SIMPLE_V1_OLD_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_OLD_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_OLD_EXP_PROVIDERS,
+            "exp_stdout_lines": [
                 "Mock environment .* will be built because it was not cached.",
                 "Mock environment .* has been written to cache.",
             ] if NEWSTYLE_SUPPORTED else [
@@ -495,24 +495,24 @@ TESTCASES_BUILD_MOCKENV = [
                 "Mock environment .* will be built because it is not "
                 "cacheable",
             ],
-            exp_stdout_lines_all=False,
-            exp_stderr_lines=[],
-        ),
+            "exp_stdout_lines_all": False,
+            "exp_stderr_lines": [],
+        },
         None, DeprecatedSetupWarning, OK
     ),
     (
         "Mock env with MOF file and old-style mock script, "
         "cache exists, and load succeeds",
-        dict(
-            test_mode='load',
-            verbose=True,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_OLD_NAMESPACE,
-            mock_files=SIMPLE_V1_OLD_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
-            exp_stdout_lines=[
+        {
+            "test_mode": 'load',
+            "verbose": True,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_OLD_NAMESPACE,
+            "mock_files": SIMPLE_V1_OLD_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_OLD_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_OLD_EXP_PROVIDERS,
+            "exp_stdout_lines": [
                 "Mock environment .* will be rebuilt because it is not "
                 "cacheable",
             ] if NEWSTYLE_SUPPORTED else [
@@ -520,30 +520,30 @@ TESTCASES_BUILD_MOCKENV = [
                 "Mock environment .* will be built because it is not "
                 "cacheable",
             ],
-            exp_stdout_lines_all=False,
-            exp_stderr_lines=[],
-        ),
+            "exp_stdout_lines_all": False,
+            "exp_stderr_lines": [],
+        },
         None, DeprecatedSetupWarning, OK
     ),
     (
         "Mock env with MOF file and old-style mock script, "
         "cache exists, but load results in rebuild due to missing pkl file",
-        dict(
-            test_mode='load_rebuild_missing_pklfile',
-            verbose=True,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_OLD_NAMESPACE,
-            mock_files=SIMPLE_V1_OLD_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
-            exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
+        {
+            "test_mode": 'load_rebuild_missing_pklfile',
+            "verbose": True,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_OLD_NAMESPACE,
+            "mock_files": SIMPLE_V1_OLD_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_OLD_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_OLD_EXP_PROVIDERS,
+            "exp_stdout_lines": [  # Only NEWSTYLE_SUPPORTED
                 "Mock environment .* will be built because it was not cached.",
                 "Mock environment .* has been written to cache.",
             ],
-            exp_stdout_lines_all=False,
-            exp_stderr_lines=[],
-        ),
+            "exp_stdout_lines_all": False,
+            "exp_stderr_lines": [],
+        },
         # This testcase removes the pkl file from the mock cache as a
         # preparation for executing the code to be tested. If the mock env is
         # not cached, there is no pkl file that can be removed, so this
@@ -553,22 +553,22 @@ TESTCASES_BUILD_MOCKENV = [
     (
         "Mock env with MOF file and old-style mock script, "
         "cache exists, but load results in rebuild due to missing md5 file",
-        dict(
-            test_mode='load_rebuild_missing_md5file',
-            verbose=True,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_OLD_NAMESPACE,
-            mock_files=SIMPLE_V1_OLD_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
-            exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
+        {
+            "test_mode": 'load_rebuild_missing_md5file',
+            "verbose": True,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_OLD_NAMESPACE,
+            "mock_files": SIMPLE_V1_OLD_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_OLD_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_OLD_EXP_PROVIDERS,
+            "exp_stdout_lines": [  # Only NEWSTYLE_SUPPORTED
                 "Mock environment .* will be built because it was not cached.",
                 "Mock environment .* has been written to cache.",
             ],
-            exp_stdout_lines_all=False,
-            exp_stderr_lines=[],
-        ),
+            "exp_stdout_lines_all": False,
+            "exp_stderr_lines": [],
+        },
         # This testcase removes the md5 file from the mock cache as a
         # preparation for executing the code to be tested. If the mock env is
         # not cached, there is no md5 file that can be removed, so this
@@ -579,22 +579,22 @@ TESTCASES_BUILD_MOCKENV = [
     (
         "Mock env with MOF file and old-style mock script, "
         "cache exists, but load results in rebuild due to missing dep file",
-        dict(
-            test_mode='load_rebuild_missing_depfile',
-            verbose=True,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_OLD_NAMESPACE,
-            mock_files=SIMPLE_V1_OLD_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
-            exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
+        {
+            "test_mode": 'load_rebuild_missing_depfile',
+            "verbose": True,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_OLD_NAMESPACE,
+            "mock_files": SIMPLE_V1_OLD_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_OLD_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_OLD_EXP_PROVIDERS,
+            "exp_stdout_lines": [  # Only NEWSTYLE_SUPPORTED
                 "Mock environment .* will be built because it was not cached.",
                 "Mock environment .* has been written to cache.",
             ],
-            exp_stdout_lines_all=False,
-            exp_stderr_lines=[],
-        ),
+            "exp_stdout_lines_all": False,
+            "exp_stderr_lines": [],
+        },
         # This testcase removes the dep file from the mock cache as a
         # preparation for executing the code to be tested. If the mock env is
         # not cached, there is no dep file that can be removed, so this
@@ -605,16 +605,16 @@ TESTCASES_BUILD_MOCKENV = [
     (
         "Mock env with MOF file and old-style mock script, "
         "cache exists, but load results in rebuild due to changed MOF file",
-        dict(
-            test_mode='load_rebuild_changed_moffile',
-            verbose=True,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_OLD_NAMESPACE,
-            mock_files=SIMPLE_V1_OLD_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
-            exp_stdout_lines=[
+        {
+            "test_mode": 'load_rebuild_changed_moffile',
+            "verbose": True,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_OLD_NAMESPACE,
+            "mock_files": SIMPLE_V1_OLD_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_OLD_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_OLD_EXP_PROVIDERS,
+            "exp_stdout_lines": [
                 "Mock environment .* will be rebuilt because the mock files "
                 "have changed.",
                 "Mock environment .* has been written to cache.",
@@ -623,24 +623,24 @@ TESTCASES_BUILD_MOCKENV = [
                 "Mock environment .* will be built because it is not "
                 "cacheable",
             ],
-            exp_stdout_lines_all=False,
-            exp_stderr_lines=[],
-        ),
+            "exp_stdout_lines_all": False,
+            "exp_stderr_lines": [],
+        },
         None, DeprecatedSetupWarning, OK
     ),
     (
         "Mock env with MOF file and old-style mock script, "
         "cache exists, but load results in rebuild due to changed .py file",
-        dict(
-            test_mode='load_rebuild_changed_pyfile',
-            verbose=True,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_OLD_NAMESPACE,
-            mock_files=SIMPLE_V1_OLD_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
-            exp_stdout_lines=[
+        {
+            "test_mode": 'load_rebuild_changed_pyfile',
+            "verbose": True,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_OLD_NAMESPACE,
+            "mock_files": SIMPLE_V1_OLD_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_OLD_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_OLD_EXP_PROVIDERS,
+            "exp_stdout_lines": [
                 "Mock environment .* will be rebuilt because the mock files "
                 "have changed.",
                 "Mock environment .* has been written to cache.",
@@ -649,30 +649,30 @@ TESTCASES_BUILD_MOCKENV = [
                 "Mock environment .* will be built because it is not "
                 "cacheable",
             ],
-            exp_stdout_lines_all=False,
-            exp_stderr_lines=[],
-        ),
+            "exp_stdout_lines_all": False,
+            "exp_stderr_lines": [],
+        },
         None, DeprecatedSetupWarning, OK
     ),
     (
         "Mock env with MOF file and new-style mock script, "
         "cache does not exist",
-        dict(
-            test_mode='build',
-            verbose=True,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_NEW_NAMESPACE,
-            mock_files=SIMPLE_V1_NEW_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
-            exp_stdout_lines=[
+        {
+            "test_mode": 'build',
+            "verbose": True,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_NEW_NAMESPACE,
+            "mock_files": SIMPLE_V1_NEW_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_NEW_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_NEW_EXP_PROVIDERS,
+            "exp_stdout_lines": [
                 "Mock environment .* will be built because it was not cached.",
                 "Mock environment .* has been written to cache.",
             ],
-            exp_stdout_lines_all=False,
-            exp_stderr_lines=[],
-        ),
+            "exp_stdout_lines_all": False,
+            "exp_stderr_lines": [],
+        },
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
         DeprecationWarning if RETRY_DEPRECATION else None, OK
 
@@ -680,111 +680,111 @@ TESTCASES_BUILD_MOCKENV = [
     (
         "Mock env with MOF file and new-style mock script, "
         "cache exists, and load succeeds",
-        dict(
-            test_mode='load',
-            verbose=True,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_NEW_NAMESPACE,
-            mock_files=SIMPLE_V1_NEW_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
-            exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
+        {
+            "test_mode": 'load',
+            "verbose": True,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_NEW_NAMESPACE,
+            "mock_files": SIMPLE_V1_NEW_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_NEW_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_NEW_EXP_PROVIDERS,
+            "exp_stdout_lines": [  # Only NEWSTYLE_SUPPORTED
                 "Mock environment .* has been loaded from cache.",
             ],
-            exp_stdout_lines_all=False,
-            exp_stderr_lines=[],
-        ),
+            "exp_stdout_lines_all": False,
+            "exp_stderr_lines": [],
+        },
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
         DeprecationWarning if RETRY_DEPRECATION else None, OK
     ),
     (
         "Mock env with MOF file and new-style mock script, "
         "cache exists, but load results in rebuild due to missing pkl file",
-        dict(
-            test_mode='load_rebuild_missing_pklfile',
-            verbose=True,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_NEW_NAMESPACE,
-            mock_files=SIMPLE_V1_NEW_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
-            exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
+        {
+            "test_mode": 'load_rebuild_missing_pklfile',
+            "verbose": True,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_NEW_NAMESPACE,
+            "mock_files": SIMPLE_V1_NEW_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_NEW_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_NEW_EXP_PROVIDERS,
+            "exp_stdout_lines": [  # Only NEWSTYLE_SUPPORTED
                 "Mock environment .* will be built because it was not cached.",
                 "Mock environment .* has been written to cache.",
             ],
-            exp_stdout_lines_all=False,
-            exp_stderr_lines=[],
-        ),
+            "exp_stdout_lines_all": False,
+            "exp_stderr_lines": [],
+        },
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
         DeprecationWarning if RETRY_DEPRECATION else None, OK
     ),
     (
         "Mock env with MOF file and new-style mock script, "
         "cache exists, but load results in rebuild due to missing md5 file",
-        dict(
-            test_mode='load_rebuild_missing_md5file',
-            verbose=True,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_NEW_NAMESPACE,
-            mock_files=SIMPLE_V1_NEW_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
-            exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
+        {
+            "test_mode": 'load_rebuild_missing_md5file',
+            "verbose": True,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_NEW_NAMESPACE,
+            "mock_files": SIMPLE_V1_NEW_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_NEW_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_NEW_EXP_PROVIDERS,
+            "exp_stdout_lines": [  # Only NEWSTYLE_SUPPORTED
                 "Mock environment .* will be built because it was not cached.",
                 "Mock environment .* has been written to cache.",
             ],
-            exp_stdout_lines_all=False,
-            exp_stderr_lines=[],
-        ),
+            "exp_stdout_lines_all": False,
+            "exp_stderr_lines": [],
+        },
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
         DeprecationWarning if RETRY_DEPRECATION else None, OK
     ),
     (
         "Mock env with MOF file and new-style mock script, "
         "cache exists, but load results in rebuild due to changed MOF file",
-        dict(
-            test_mode='load_rebuild_changed_moffile',
-            verbose=True,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_NEW_NAMESPACE,
-            mock_files=SIMPLE_V1_NEW_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
-            exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
+        {
+            "test_mode": 'load_rebuild_changed_moffile',
+            "verbose": True,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_NEW_NAMESPACE,
+            "mock_files": SIMPLE_V1_NEW_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_NEW_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_NEW_EXP_PROVIDERS,
+            "exp_stdout_lines": [  # Only NEWSTYLE_SUPPORTED
                 "Mock environment .* will be rebuilt because the mock files "
                 "have changed.",
                 "Mock environment .* has been written to cache.",
             ],
-            exp_stdout_lines_all=False,
-            exp_stderr_lines=[],
-        ),
+            "exp_stdout_lines_all": False,
+            "exp_stderr_lines": [],
+        },
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
         DeprecationWarning if RETRY_DEPRECATION else None, OK
     ),
     (
         "Mock env with MOF file and new-style mock script, "
         "cache exists, but load results in rebuild due to changed .py file",
-        dict(
-            test_mode='load_rebuild_changed_pyfile',
-            verbose=True,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_NEW_NAMESPACE,
-            mock_files=SIMPLE_V1_NEW_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
-            exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
+        {
+            "test_mode": 'load_rebuild_changed_pyfile',
+            "verbose": True,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_NEW_NAMESPACE,
+            "mock_files": SIMPLE_V1_NEW_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_NEW_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_NEW_EXP_PROVIDERS,
+            "exp_stdout_lines": [  # Only NEWSTYLE_SUPPORTED
                 "Mock environment .* will be rebuilt because the mock files "
                 "have changed.",
                 "Mock environment .* has been written to cache.",
             ],
-            exp_stdout_lines_all=False,
-            exp_stderr_lines=[],
-        ),
+            "exp_stdout_lines_all": False,
+            "exp_stderr_lines": [],
+        },
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
         DeprecationWarning if RETRY_DEPRECATION else None, OK
     ),
@@ -792,16 +792,16 @@ TESTCASES_BUILD_MOCKENV = [
     # Testcases with non-cacheable user-specified connections file
     (
         "Mock env with user-specified connections file",
-        dict(
-            test_mode='build',
-            verbose=True,
-            connections_file=USER_CONNECTIONS_FILE,
-            default_namespace=SIMPLE_V1_OLD_NAMESPACE,
-            mock_files=SIMPLE_V1_OLD_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
-            exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
-            exp_stdout_lines=[
+        {
+            "test_mode": 'build',
+            "verbose": True,
+            "connections_file": USER_CONNECTIONS_FILE,
+            "default_namespace": SIMPLE_V1_OLD_NAMESPACE,
+            "mock_files": SIMPLE_V1_OLD_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": SIMPLE_V1_OLD_EXP_CLASSES,
+            "exp_providers": SIMPLE_V1_OLD_EXP_PROVIDERS,
+            "exp_stdout_lines": [
                 "Mock environment .* will be built because user-specified "
                 "connections files are not cached",
             ] if NEWSTYLE_SUPPORTED else [
@@ -810,53 +810,53 @@ TESTCASES_BUILD_MOCKENV = [
                 "Mock environment .* will be built because it is not "
                 "cacheable",
             ],
-            exp_stdout_lines_all=False,
-            exp_stderr_lines=[],
-        ),
+            "exp_stdout_lines_all": False,
+            "exp_stderr_lines": [],
+        },
         None, DeprecatedSetupWarning, OK
     ),
 
     # Testcases with standalone mock script that has dependents
     (
         "Mock env with standalone mock script with deps; normal build",
-        dict(
-            test_mode='build',
-            verbose=True,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=STANDALONE_NAMESPACE,
-            mock_files=STANDALONE_MOCK_FILES,
-            exp_dep_files=[],
-            exp_classes=STANDALONE_EXP_CLASSES,
-            exp_providers=STANDALONE_EXP_PROVIDERS,
-            exp_stdout_lines=[
+        {
+            "test_mode": 'build',
+            "verbose": True,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": STANDALONE_NAMESPACE,
+            "mock_files": STANDALONE_MOCK_FILES,
+            "exp_dep_files": [],
+            "exp_classes": STANDALONE_EXP_CLASSES,
+            "exp_providers": STANDALONE_EXP_PROVIDERS,
+            "exp_stdout_lines": [
                 "Mock environment .* will be built because it was not cached.",
                 "Mock environment .* has been written to cache.",
             ],
-            exp_stdout_lines_all=False,
-            exp_stderr_lines=[],
-        ),
+            "exp_stdout_lines_all": False,
+            "exp_stderr_lines": [],
+        },
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
         DeprecationWarning if RETRY_DEPRECATION else None, OK
     ),
     (
         "Mock env with standalone mock script with deps; change dependent file",
-        dict(
-            test_mode='load_rebuild_changed_depfile',
-            verbose=True,
-            connections_file=DEFAULT_CONNECTIONS_FILE,
-            default_namespace=STANDALONE_NAMESPACE,
-            mock_files=STANDALONE_MOCK_FILES,
-            exp_dep_files=['tests/unit/pywbemcli/simple_mock_model.mof'],
-            exp_classes=STANDALONE_EXP_CLASSES,
-            exp_providers=STANDALONE_EXP_PROVIDERS,
-            exp_stdout_lines=[
+        {
+            "test_mode": 'load_rebuild_changed_depfile',
+            "verbose": True,
+            "connections_file": DEFAULT_CONNECTIONS_FILE,
+            "default_namespace": STANDALONE_NAMESPACE,
+            "mock_files": STANDALONE_MOCK_FILES,
+            "exp_dep_files": ['tests/unit/pywbemcli/simple_mock_model.mof'],
+            "exp_classes": STANDALONE_EXP_CLASSES,
+            "exp_providers": STANDALONE_EXP_PROVIDERS,
+            "exp_stdout_lines": [
                 "Mock environment .* will be rebuilt because the mock files "
                 "have changed.",
                 "Mock environment .* has been written to cache.",
             ],
-            exp_stdout_lines_all=False,
-            exp_stderr_lines=[],
-        ),
+            "exp_stdout_lines_all": False,
+            "exp_stderr_lines": [],
+        },
         # See issue #1440 failure of this test with windows
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
         DeprecationWarning if RETRY_DEPRECATION else None, not "win32"
@@ -1004,7 +1004,7 @@ def test_build_mockenv(testcase, test_mode, verbose, connections_file,
                                connection_name, False)
 
             # Change the MOF file
-            mof_file = [mf for mf in mock_files if mf.endswith('.mof')][0]
+            mof_file = next(mf for mf in mock_files if mf.endswith('.mof'))
             mof_size = os.stat(mof_file).st_size
             with open(mof_file, 'a', encoding='utf-8') as fp:
                 fp.write('\n// test_build_mockenv: Dummy line\n')
@@ -1034,7 +1034,7 @@ def test_build_mockenv(testcase, test_mode, verbose, connections_file,
                                connection_name, False)
 
             # Change the mock script file
-            py_file = [mf for mf in mock_files if mf.endswith('.py')][0]
+            py_file = next(mf for mf in mock_files if mf.endswith('.py'))
             py_size = os.stat(py_file).st_size
             with open(py_file, 'a', encoding='utf-8') as fp:
                 fp.write('\n# test_build_mockenv: Dummy line\n')

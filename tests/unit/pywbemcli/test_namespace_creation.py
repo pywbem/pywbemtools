@@ -71,40 +71,40 @@ TEST_CASES = [
         "Mock environment #1: Command mode 'class get' with no default "
         "namespace specified can retrieve foo class",
         'class',
-        dict(
-            args=['get', MOCK1_CLASS, '--nq'],
-            general=['-v']
-        ),
-        dict(
-            rc=0,
-            stdout=[
+        {
+            'args': ['get', MOCK1_CLASS, '--nq'],
+            'general': ['-v']
+        },
+        {
+            'rc': 0,
+            'stdout': [
                 f"^Compiling file .*{MOCK1_MOF_FILE}",
                 f"^Target namespace '{DEFAULT_DEFAULT_NAMESPACE}'",
                 f"^Creating class {DEFAULT_DEFAULT_NAMESPACE}:{MOCK1_CLASS}$",
                 f"^class {MOCK1_CLASS} {{$",
             ],
-            test='regex'
-        ),
+            'test': 'regex'
+        },
         MOCK1_MOF_FILE, True
     ),
     (
         "Mock environment #1: Command mode 'class get' with default namespace "
         "'foo' specified can retrieve foo class",
         'class',
-        dict(
-            args=['get', MOCK1_CLASS, '--nq'],
-            general=['-v', '-d', MOCK1_FOO_NAMESPACE]
-        ),
-        dict(
-            rc=0,
-            stdout=[
+        {
+            'args': ['get', MOCK1_CLASS, '--nq'],
+            'general': ['-v', '-d', MOCK1_FOO_NAMESPACE]
+        },
+        {
+            'rc': 0,
+            'stdout': [
                 f"^Compiling file .*{MOCK1_MOF_FILE}",
                 f"^Target namespace '{MOCK1_FOO_NAMESPACE}'",
                 f"^Creating class {MOCK1_FOO_NAMESPACE}:{MOCK1_CLASS}$",
                 f"^class {MOCK1_CLASS} {{$",
             ],
-            test='regex'
-        ),
+            'test': 'regex'
+        },
         MOCK1_MOF_FILE, True
     ),
     (
@@ -112,44 +112,44 @@ TEST_CASES = [
         "'foo' specified cannot retrieve foo class because it got created in "
         "default default namespace",
         'class',
-        dict(
-            args=['get', MOCK1_CLASS, '--nq', '-n', MOCK1_FOO_NAMESPACE],
-            general=['-v']
-        ),
-        dict(
-            rc=1,
-            stdout=[
+        {
+            'args': ['get', MOCK1_CLASS, '--nq', '-n', MOCK1_FOO_NAMESPACE],
+            'general': ['-v']
+        },
+        {
+            'rc': 1,
+            'stdout': [
                 f"^Compiling file .*{MOCK1_MOF_FILE}",
                 f"^Target namespace '{DEFAULT_DEFAULT_NAMESPACE}'",
                 f"^Creating class {DEFAULT_DEFAULT_NAMESPACE}:{MOCK1_CLASS}$",
             ],
-            stderr=[
+            'stderr': [
                 "CIM_ERR_INVALID_NAMESPACE.* Namespace does not exist in CIM "
                 f"repository: ''{MOCK1_FOO_NAMESPACE}'",
             ],
-            test='regex'
-        ),
+            'test': 'regex'
+        },
         MOCK1_MOF_FILE, True
     ),
     (
         "Mock environment #1: Interactive mode 'class get' with default "
         "namespace 'foo' specified can retrieve foo class",
         None,
-        dict(
-            stdin=[
+        {
+            'stdin': [
                 f'-v -d {MOCK1_FOO_NAMESPACE} class get {MOCK1_CLASS} --nq'
             ]
-        ),
-        dict(
-            rc=0,
-            stdout=[
+        },
+        {
+            'rc': 0,
+            'stdout': [
                 f"^Compiling file .*{MOCK1_MOF_FILE}",
                 f"^Target namespace '{MOCK1_FOO_NAMESPACE}'",
                 f"^Creating class {MOCK1_FOO_NAMESPACE}:{MOCK1_CLASS}$",
                 f"^class {MOCK1_CLASS} {{$",
             ],
-            test='regex'
-        ),
+            'test': 'regex'
+        },
         MOCK1_MOF_FILE, True
     ),
     (
@@ -157,22 +157,22 @@ TEST_CASES = [
         "line: Interactive mode 'class get' with default namespace 'foo' "
         "specified can retrieve foo class",
         None,
-        dict(
-            general=['-d', 'bar'],
-            stdin=[
+        {
+            'general': ['-d', 'bar'],
+            'stdin': [
                 f'-v -d {MOCK1_FOO_NAMESPACE} class get {MOCK1_CLASS} --nq'
             ]
-        ),
-        dict(
-            rc=0,
-            stdout=[
+        },
+        {
+            'rc': 0,
+            'stdout': [
                 f"^Compiling file .*{MOCK1_MOF_FILE}",
                 f"^Target namespace '{MOCK1_FOO_NAMESPACE}'",
                 f"^Creating class {MOCK1_FOO_NAMESPACE}:{MOCK1_CLASS}$",
                 f"^class {MOCK1_CLASS} {{$",
             ],
-            test='regex'
-        ),
+            'test': 'regex'
+        },
         MOCK1_MOF_FILE, True
     ),
     (
@@ -180,24 +180,24 @@ TEST_CASES = [
         "namespace 'foo' specified cannot retrieve foo class because it got "
         "created in default default namespace",
         None,
-        dict(
-            stdin=[
+        {
+            'stdin': [
                 f'-v class get {MOCK1_CLASS} --nq -n {MOCK1_FOO_NAMESPACE}'
             ]
-        ),
-        dict(
-            rc=0,  # interactive mode rc=1 is not propagated to command line rc
-            stdout=[
+        },
+        {
+            'rc': 0,  # interactive mode rc=1 is not propagated to cmd line rc
+            'stdout': [
                 f"^Compiling file .*{MOCK1_MOF_FILE}",
                 f"^Target namespace '{DEFAULT_DEFAULT_NAMESPACE}'",
                 f"^Creating class {DEFAULT_DEFAULT_NAMESPACE}:{MOCK1_CLASS}$",
             ],
-            stderr=[
+            'stderr': [
                 "CIM_ERR_INVALID_NAMESPACE.* Namespace does not exist in CIM "
                 f"repository: ''{MOCK1_FOO_NAMESPACE}'",
             ],
-            test='regex'
-        ),
+            'test': 'regex'
+        },
         MOCK1_MOF_FILE, True
     ),
     (
@@ -205,13 +205,13 @@ TEST_CASES = [
         "namespace specified cannot retrieve foo class because it accesses "
         "the default default namespace",
         'class',
-        dict(
-            args=['get', MOCK2_FOO_CLASS, '--nq'],
-            general=['-v']
-        ),
-        dict(
-            rc=1,
-            stdout=[
+        {
+            'args': ['get', MOCK2_FOO_CLASS, '--nq'],
+            'general': ['-v']
+        },
+        {
+            'rc': 1,
+            'stdout': [
                 f"^Creating namespace {MOCK2_INTEROP_NAMESPACE} .in mock "
                 "support.",
                 f"^Compiling file .*{MOCK2_INTEROP_MOF_FILE}",
@@ -224,25 +224,25 @@ TEST_CASES = [
                 f"^Creating namespace {MOCK2_FOO_NAMESPACE} .in MOF compiler.",
                 f"^Creating class {MOCK2_FOO_NAMESPACE}:{MOCK2_FOO_CLASS}$",
             ],
-            stderr=[
+            'stderr': [
                 f"CIM_ERR_NOT_FOUND.: Class '{MOCK2_FOO_CLASS}' not found "
                 f"in namespace '{DEFAULT_DEFAULT_NAMESPACE}'",
             ],
-            test='regex'
-        ),
+            'test': 'regex'
+        },
         MOCK2_SCRIPT_FILE, True
     ),
     (
         "Mock environment #2 with default namespace 'foo' specified on "
         "command line: Command mode 'class get' can retrieve foo class",
         'class',
-        dict(
-            args=['get', MOCK2_FOO_CLASS, '--nq'],
-            general=['-v', '-d', MOCK2_FOO_NAMESPACE]
-        ),
-        dict(
-            rc=0,
-            stdout=[
+        {
+            'args': ['get', MOCK2_FOO_CLASS, '--nq'],
+            'general': ['-v', '-d', MOCK2_FOO_NAMESPACE]
+        },
+        {
+            'rc': 0,
+            'stdout': [
                 f"^Creating namespace {MOCK2_INTEROP_NAMESPACE} .in "
                 "mock support.",
                 f"^Compiling file .*{MOCK2_INTEROP_MOF_FILE}",
@@ -255,21 +255,21 @@ TEST_CASES = [
                 f"^Creating class {MOCK2_FOO_NAMESPACE}:{MOCK2_FOO_CLASS}$",
                 f"^class {MOCK2_FOO_CLASS} {{$",
             ],
-            test='regex'
-        ),
+            'test': 'regex'
+        },
         MOCK2_SCRIPT_FILE, True
     ),
     (
         "Mock environment #2: Command mode 'class get' with command namespace "
         "'foo' specified can retrieve foo class",
         'class',
-        dict(
-            args=['get', MOCK2_FOO_CLASS, '--nq', '-n', MOCK2_FOO_NAMESPACE],
-            general=['-v']
-        ),
-        dict(
-            rc=0,
-            stdout=[
+        {
+            'args': ['get', MOCK2_FOO_CLASS, '--nq', '-n', MOCK2_FOO_NAMESPACE],
+            'general': ['-v']
+        },
+        {
+            'rc': 0,
+            'stdout': [
                 f"^Creating namespace {MOCK2_INTEROP_NAMESPACE} .in mock "
                 "support.",
                 f"^Compiling file .*{MOCK2_INTEROP_MOF_FILE}",
@@ -283,8 +283,8 @@ TEST_CASES = [
                 f"^Creating class {MOCK2_FOO_NAMESPACE}:{MOCK2_FOO_CLASS}$",
                 f"^class {MOCK2_FOO_CLASS} {{$",
             ],
-            test='regex'
-        ),
+            'test': 'regex'
+        },
         MOCK2_SCRIPT_FILE, True
     ),
     (
@@ -292,15 +292,15 @@ TEST_CASES = [
         "command line: Interactive mode 'class get' with default namespace "
         "'foo' specified can retrieve foo class",
         None,
-        dict(
-            general=['-d', 'bar'],
-            stdin=[
+        {
+            'general': ['-d', 'bar'],
+            'stdin': [
                 f'-v -d {MOCK2_FOO_NAMESPACE} class get {MOCK2_FOO_CLASS} --nq'
             ]
-        ),
-        dict(
-            rc=0,
-            stdout=[
+        },
+        {
+            'rc': 0,
+            'stdout': [
                 f"^Creating namespace {MOCK2_INTEROP_NAMESPACE} .in mock "
                 "support.",
                 f"^Compiling file .*{MOCK2_INTEROP_MOF_FILE}",
@@ -313,22 +313,22 @@ TEST_CASES = [
                 f"^Creating class {MOCK2_FOO_NAMESPACE}:{MOCK2_FOO_CLASS}$",
                 f"^class {MOCK2_FOO_CLASS} {{$",
             ],
-            test='regex'
-        ),
+            'test': 'regex'
+        },
         MOCK2_SCRIPT_FILE, True
     ),
     (
         "Mock environment #2: Interactive mode 'class get' with command "
         "namespace 'foo' specified can retrieve foo class",
         None,
-        dict(
-            stdin=[
+        {
+            'stdin': [
                 f'-v class get {MOCK2_FOO_CLASS} --nq -n {MOCK2_FOO_NAMESPACE}'
             ]
-        ),
-        dict(
-            rc=0,
-            stdout=[
+        },
+        {
+            'rc': 0,
+            'stdout': [
                 f"^Creating namespace {MOCK2_INTEROP_NAMESPACE} .in mock "
                 "support.",
                 f"^Compiling file .*{MOCK2_INTEROP_MOF_FILE}",
@@ -342,8 +342,8 @@ TEST_CASES = [
                 f"^Creating class {MOCK2_FOO_NAMESPACE}:{MOCK2_FOO_CLASS}$",
                 f"^class {MOCK2_FOO_CLASS} {{$",
             ],
-            test='regex'
-        ),
+            'test': 'regex'
+        },
         MOCK2_SCRIPT_FILE, True
     ),
     (
@@ -351,15 +351,15 @@ TEST_CASES = [
         "Mock environment #2: Interactive mode 'class get' with default "
         "namespace 'interop' specified can retrieve interop class",
         None,
-        dict(
-            stdin=[
+        {
+            'stdin': [
                 f"-v -d {MOCK2_INTEROP_NAMESPACE} class get "
                 f"{MOCK2_INTEROP_CLASS} --nq"
             ]
-        ),
-        dict(
-            rc=0,
-            stdout=[
+        },
+        {
+            'rc': 0,
+            'stdout': [
                 f"^Compiling file .*{MOCK2_INTEROP_MOF_FILE}",
                 f"^Target namespace '{MOCK2_INTEROP_NAMESPACE}'",
                 f"^Creating class {MOCK2_INTEROP_NAMESPACE}:"
@@ -371,8 +371,8 @@ TEST_CASES = [
                 f"^Creating class {MOCK2_FOO_NAMESPACE}:{MOCK2_FOO_CLASS}$",
                 f"^class {MOCK2_INTEROP_CLASS} {{$",
             ],
-            test='regex'
-        ),
+            'test': 'regex'
+        },
         MOCK2_SCRIPT_FILE, True
     ),
     (
@@ -380,15 +380,15 @@ TEST_CASES = [
         "Mock environment #3: Interactive mode 'class get' with default "
         "namespace 'interop' specified can retrieve interop class",
         None,
-        dict(
-            stdin=[
+        {
+            'stdin': [
                 f"-v -d {MOCK3_INTEROP_NAMESPACE} class get "
                 f"{MOCK3_INTEROP_CLASS} --nq"
             ]
-        ),
-        dict(
-            rc=0,
-            stdout=[
+        },
+        {
+            'rc': 0,
+            'stdout': [
                 f"^Compiling file .*{MOCK3_INTEROP_MOF_FILE}",
                 f"^Target namespace '{MOCK3_INTEROP_NAMESPACE}'",
                 f"^Creating class {MOCK3_INTEROP_NAMESPACE}:"
@@ -398,23 +398,23 @@ TEST_CASES = [
                 f"^Creating class {MOCK3_INTEROP_NAMESPACE}:{MOCK3_FOO_CLASS}$",
                 f"^class {MOCK3_INTEROP_CLASS} {{$",
             ],
-            test='regex'
-        ),
+            'test': 'regex'
+        },
         MOCK3_SCRIPT_FILE, True
     ),
     (
         "Mock environment #3 with default namespace 'interop' specified: "
         "Interactive mode 'class get' can retrieve interop class",
         None,
-        dict(
-            general=['-d', MOCK3_INTEROP_NAMESPACE],
-            stdin=[
+        {
+            'general': ['-d', MOCK3_INTEROP_NAMESPACE],
+            'stdin': [
                 f'-v class get {MOCK3_INTEROP_CLASS} --nq'
             ]
-        ),
-        dict(
-            rc=0,
-            stdout=[
+        },
+        {
+            'rc': 0,
+            'stdout': [
                 f"^Compiling file .*{MOCK3_INTEROP_MOF_FILE}",
                 f"^Target namespace '{MOCK3_INTEROP_NAMESPACE}'",
                 f"^Creating class {MOCK3_INTEROP_NAMESPACE}:"
@@ -424,8 +424,8 @@ TEST_CASES = [
                 f"^Creating class {MOCK3_INTEROP_NAMESPACE}:{MOCK3_FOO_CLASS}$",
                 f"^class {MOCK3_INTEROP_CLASS} {{$",
             ],
-            test='regex'
-        ),
+            'test': 'regex'
+        },
         MOCK3_SCRIPT_FILE, True
     ),
 ]

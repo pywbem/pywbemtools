@@ -70,59 +70,59 @@ SHOW_TESTCASES = [
 
     (
         "Verify output of 'help --help'",
-        dict(
-            args=['help', '--help'],
-        ),
-        dict(
-            stdout=SHOW_HELP_PATTERNS,
-            test='contains',
-        ),
+        {
+            "args": ['help', '--help'],
+        },
+        {
+            "stdout": SHOW_HELP_PATTERNS,
+            "test": 'contains',
+        },
         RUN,
     ),
     (
         "Verify output of 'help'",
-        dict(
-            args=['help'],
-        ),
-        dict(
-            stdout=SHOW_HELP_SUMMARY_PATTERNS,
-            test='contains',
-        ),
+        {
+            "args": ['help'],
+        },
+        {
+            "stdout": SHOW_HELP_SUMMARY_PATTERNS,
+            "test": 'contains',
+        },
         RUN,
     ),
     (
         "Verify output of 'help activate'",
-        dict(
-            args=['help', 'activate'],
-        ),
-        dict(
-            stdout=SHOW_HELP_ACTIVATE_PATTERNS,
-            test='contains',
-        ),
+        {
+            "args": ['help', 'activate'],
+        },
+        {
+            "stdout": SHOW_HELP_ACTIVATE_PATTERNS,
+            "test": 'contains',
+        },
         RUN,
     ),
     (
         "Verify output of 'help act' with unique partial command",
-        dict(
-            args=['help', 'act'],
-        ),
-        dict(
-            stdout=SHOW_HELP_ACTIVATE_PATTERNS,
-            test='contains',
-        ),
+        {
+            "args": ['help', 'act'],
+        },
+        {
+            "stdout": SHOW_HELP_ACTIVATE_PATTERNS,
+            "test": 'contains',
+        },
         RUN,
     ),
 
     (
         "Verify output of 'help blah' with invalid subject",
-        dict(
-            args=['help', 'blah'],
-        ),
-        dict(
-            stderr=["Error: 'blah' is not a valid help subject"],
-            rc=1,
-            test='contains',
-        ),
+        {
+            "args": ['help', 'blah'],
+        },
+        {
+            "stderr": ["Error: 'blah' is not a valid help subject"],
+            "rc": 1,
+            "test": 'contains',
+        },
         RUN,
     ),
 ]

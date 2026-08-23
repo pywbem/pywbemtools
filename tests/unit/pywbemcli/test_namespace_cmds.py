@@ -96,35 +96,36 @@ TEST_CASES = [
     (
         "Verify lines in output of command 'namespace --help'",
         ['--help'],
-        dict(
-            rc=0,
-            stdout=NAMESPACE_HELP_LINES,
-            test='innows'
-        ),
+        {
+            'rc': 0,
+            'stdout': NAMESPACE_HELP_LINES,
+            'test': 'innows'
+        },
         None, True
     ),
     (
         "Verify order of commands in output of 'namespace --help'",
         ['--help'],
-        dict(
-            rc=0,
-            stdout=r'Commands:'
-                   '.*\n  list'
-                   '.*\n  create'
-                   '.*\n  delete'
-                   '.*\n  interop',
-            test='regex'
-        ),
+        {
+            'rc': 0,
+            'stdout':
+                r'Commands:'
+                '.*\n  list'
+                '.*\n  create'
+                '.*\n  delete'
+                '.*\n  interop',
+            'test': 'regex'
+        },
         None, True
     ),
     (
         "Verify lines in output of command 'namespace -h'",
         ['-h'],
-        dict(
-            rc=0,
-            stdout=NAMESPACE_HELP_LINES,
-            test='innows'
-        ),
+        {
+            'rc': 0,
+            'stdout': NAMESPACE_HELP_LINES,
+            'test': 'innows'
+        },
         None, True
     ),
 
@@ -134,45 +135,45 @@ TEST_CASES = [
     (
         "Verify lines in output of command 'namespace list --help'",
         ['list', '--help'],
-        dict(
-            rc=0,
-            stdout=NAMESPACE_LIST_HELP_LINES,
-            test='innows'
-        ),
+        {
+            'rc': 0,
+            'stdout': NAMESPACE_LIST_HELP_LINES,
+            'test': 'innows'
+        },
         None, True
     ),
     (
         "Verify lines in output of command 'namespace list -h'",
         ['list', '-h'],
-        dict(
-            rc=0,
-            stdout=NAMESPACE_LIST_HELP_LINES,
-            test='innows'
-        ),
+        {
+            'rc': 0,
+            'stdout': NAMESPACE_LIST_HELP_LINES,
+            'test': 'innows'
+        },
         None, True
     ),
     (
         "Verify that command 'namespace list' shows the expected namespaces",
         ['list'],
-        dict(
-            rc=0,
-            stdout=[
+        {
+            'rc': 0,
+            'stdout': [
                 'root/cimv2',
                 'interop',
             ],
-            test='innows'
-        ),
+            'test': 'innows'
+        },
         TEST_INTEROP_MOCK_FILE, True
     ),
     (
         "Verify that command 'namespace list' fails when there is no "
         "Interop namespace",
         ['list'],
-        dict(
-            rc=1,
-            stderr=['ModelError.*Interop namespace does not exist'],
-            test='regex'
-        ),
+        {
+            'rc': 1,
+            'stderr': ['ModelError.*Interop namespace does not exist'],
+            'test': 'regex'
+        },
         TEST_USER_MOCK_FILE, True
     ),
 
@@ -182,72 +183,72 @@ TEST_CASES = [
     (
         "Verify lines in output of command 'namespace create --help'",
         ['create', '--help'],
-        dict(
-            rc=0,
-            stdout=NAMESPACE_CREATE_HELP_LINES,
-            test='innows'
-        ),
+        {
+            'rc': 0,
+            'stdout': NAMESPACE_CREATE_HELP_LINES,
+            'test': 'innows'
+        },
         None, True
     ),
     (
         "Verify lines in output of command 'namespace create -h'",
         ['create', '-h'],
-        dict(
-            rc=0,
-            stdout=NAMESPACE_CREATE_HELP_LINES,
-            test='innows'
-        ),
+        {
+            'rc': 0,
+            'stdout': NAMESPACE_CREATE_HELP_LINES,
+            'test': 'innows'
+        },
         None, True
     ),
     (
         "Verify that command 'namespace create foo' succeeds",
         ['create', 'foo'],
-        dict(
-            rc=0,
-            stdout=['Created namespace foo'],
-            test='innows'
-        ),
+        {
+            'rc': 0,
+            'stdout': ['Created namespace foo'],
+            'test': 'innows'
+        },
         TEST_INTEROP_MOCK_FILE, True
     ),
     (
         "Verify that command 'namespace create foo' creates the namespace "
         "(using interactive mode)",
-        dict(stdin=[
+        {'stdin': [
             'namespace create foo',
             'namespace list'
-        ]),
-        dict(
-            rc=0,
-            stdout=[
+        ]},
+        {
+            'rc': 0,
+            'stdout': [
                 'Created namespace foo',
                 'root/cimv2',
                 'interop',
                 'foo',
             ],
-            test='innows'
-        ),
+            'test': 'innows'
+        },
         TEST_INTEROP_MOCK_FILE, True
     ),
     (
         "Verify that command 'namespace create root/cimv2' fails because it "
         "already exists",
         ['create', 'root/cimv2'],
-        dict(
-            rc=1,
-            stderr=['CIMError.*CIM_ERR_ALREADY_EXISTS.*already exists'],
-            test='regex'
-        ),
+        {
+            'rc': 1,
+            'stderr': ['CIMError.*CIM_ERR_ALREADY_EXISTS.*already exists'],
+            'test': 'regex'
+        },
         TEST_INTEROP_MOCK_FILE, True
     ),
     (
         "Verify that command 'namespace create interop' fails when there is no "
         "Interop namespace",
         ['create', 'interop'],
-        dict(
-            rc=1,
-            stderr=['ModelError.*Interop namespace does not exist'],
-            test='regex'
-        ),
+        {
+            'rc': 1,
+            'stderr': ['ModelError.*Interop namespace does not exist'],
+            'test': 'regex'
+        },
         TEST_USER_MOCK_FILE, True
     ),
 
@@ -257,77 +258,80 @@ TEST_CASES = [
     (
         "Verify lines in output of command 'namespace delete --help'",
         ['delete', '--help'],
-        dict(
-            rc=0,
-            stdout=NAMESPACE_DELETE_HELP_LINES,
-            test='innows'
-        ),
+        {
+            'rc': 0,
+            'stdout': NAMESPACE_DELETE_HELP_LINES,
+            'test': 'innows'
+        },
         None, True
     ),
     (
         "Verify lines in output of command 'namespace delete -h'",
         ['delete', '-h'],
-        dict(
-            rc=0,
-            stdout=NAMESPACE_DELETE_HELP_LINES,
-            test='innows'
-        ),
+        {
+            'rc': 0,
+            'stdout': NAMESPACE_DELETE_HELP_LINES,
+            'test': 'innows'
+        },
         None, True
     ),
     (
         "Verify that command 'namespace delete foo' fails because foo does not "
         "exist",
         ['delete', 'foo'],
-        dict(
-            rc=1,
-            stderr=['CIMError.*CIM_ERR_INVALID_NAMESPACE.*Namespace does not '
-                    'exist'],
-            test='regex'
-        ),
+        {
+            'rc': 1,
+            'stderr': [
+                'CIMError.*CIM_ERR_INVALID_NAMESPACE.*Namespace does not exist'
+            ],
+            'test': 'regex'
+        },
         TEST_INTEROP_MOCK_FILE, True
     ),
     (
         "Verify that command 'namespace delete root/cimv2' fails because it "
         "is not empty",
         ['delete', 'root/cimv2'],
-        dict(
-            rc=1,
-            stderr=['Cannot delete namespace .* because it has .* qualifier '
-                    'types and .* top-level classes'],
-            test='regex'
-        ),
+        {
+            'rc': 1,
+            'stderr': [
+                'Cannot delete namespace .* because it has .* qualifier '
+                'types and .* top-level classes'
+            ],
+            'test': 'regex'
+        },
         TEST_INTEROP_MOCK_FILE, True
     ),
     (
         "Verify that command 'namespace delete foo' succeeds when empty "
         "namespace foo exists (using interactive mode)",
-        dict(stdin=[
+        {'stdin': [
             'namespace create foo',
             'namespace delete foo',
             'namespace list'
-        ]),
-        dict(
-            rc=0,
-            stdout=[
+        ]},
+        {
+            'rc': 0,
+            'stdout': [
                 'Created namespace foo',
                 'Deleted namespace foo',
                 'root/cimv2',
                 'interop',
             ],
-            test='innows'
-        ),
+            'test': 'innows'
+        },
         TEST_INTEROP_MOCK_FILE, True
     ),
     (
         "Verify that command 'namespace delete' succeeds for non-empty "
         "namespace with --include-objects",
-        dict(stdin=[
+        {'stdin': [
             'namespace delete root/cimv2 --include-objects',
             'namespace list'
-        ]),
-        dict(
-            rc=0,
-            stdout=[
+        ]},
+        {
+            'rc': 0,
+            'stdout': [
                 # Only a subset of output lines is verified
                 'Deleted instance root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
                 'Deleted class CIM_Foo',
@@ -335,22 +339,22 @@ TEST_CASES = [
                 'Deleted namespace root/cimv2',
                 'interop',
             ],
-            test='innows'
-        ),
+            'test': 'innows'
+        },
         TEST_INTEROP_MOCK_FILE, True
     ),
     (
         "Verify that command 'namespace delete' succeeds for non-empty "
         "namespace with --include-objects and --dry-run",
-        dict(stdin=[
+        {'stdin': [
             'namespace delete root/cimv2 --include-objects --dry-run',
             'namespace list',
             'class get CIM_Foo',
             'instance count CIM_Foo',
-        ]),
-        dict(
-            rc=0,
-            stdout=[
+        ]},
+        {
+            'rc': 0,
+            'stdout': [
                 # Only a subset of output lines is verified
                 'Dry run: Deleted instance root/cimv2:CIM_Foo.InstanceID='
                 '"CIM_Foo1"',
@@ -361,20 +365,20 @@ TEST_CASES = [
                 'class CIM_Foo {',
                 'root/cimv2 CIM_Foo 5',
             ],
-            test='innows'
-        ),
+            'test': 'innows'
+        },
         TEST_INTEROP_MOCK_FILE, True
     ),
     (
         "Verify that command 'namespace delete' fails when deleting the "
         "Interop namespace",
         ['delete', 'interop'],
-        dict(
-            rc=1,
-            stderr=['Cannot delete namespace .* because it is the Interop '
-                    'namespace'],
-            test='regex'
-        ),
+        {
+            'rc': 1,
+            'stderr': ['Cannot delete namespace .* because it is the Interop '
+                       'namespace'],
+            'test': 'regex'
+        },
         TEST_INTEROP_MOCK_FILE, True
     ),
 
@@ -384,44 +388,44 @@ TEST_CASES = [
     (
         "Verify lines in output of command 'namespace interop --help'",
         ['interop', '--help'],
-        dict(
-            rc=0,
-            stdout=NAMESPACE_INTEROP_HELP_LINES,
-            test='innows'
-        ),
+        {
+            'rc': 0,
+            'stdout': NAMESPACE_INTEROP_HELP_LINES,
+            'test': 'innows'
+        },
         None, True
     ),
     (
         "Verify lines in output of command 'namespace interop -h'",
         ['interop', '-h'],
-        dict(
-            rc=0,
-            stdout=NAMESPACE_INTEROP_HELP_LINES,
-            test='innows'
-        ),
+        {
+            'rc': 0,
+            'stdout': NAMESPACE_INTEROP_HELP_LINES,
+            'test': 'innows'
+        },
         None, True
     ),
     (
         "Verify that command 'namespace interop' shows the expected namespace",
         ['interop'],
-        dict(
-            rc=0,
-            stdout=[
+        {
+            'rc': 0,
+            'stdout': [
                 'interop',
             ],
-            test='innows'
-        ),
+            'test': 'innows'
+        },
         TEST_INTEROP_MOCK_FILE, True
     ),
     (
         "Verify that command 'namespace interop' fails when there is no "
         "Interop namespace",
         ['interop'],
-        dict(
-            rc=1,
-            stderr=['ModelError.*Interop namespace does not exist'],
-            test='regex'
-        ),
+        {
+            'rc': 1,
+            'stderr': ['ModelError.*Interop namespace does not exist'],
+            'test': 'regex'
+        },
         TEST_USER_MOCK_FILE, True
     ),
 ]

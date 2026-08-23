@@ -52,48 +52,48 @@ SHOW_TESTCASES = [
 
     (
         "Verify output of 'show --help'",
-        dict(
-            args=['show', '--help'],
-        ),
-        dict(
-            stdout=SHOW_HELP_PATTERNS,
-            test='contains',
-        ),
+        {
+            "args": ['show', '--help'],
+        },
+        {
+            "stdout": SHOW_HELP_PATTERNS,
+            "test": 'contains',
+        },
         RUN,
     ),
     (
         "Verify output of 'show -h'",
-        dict(
-            args=['show', '-h'],
-        ),
-        dict(
-            stdout=SHOW_HELP_PATTERNS,
-            test='contains',
-        ),
+        {
+            "args": ['show', '-h'],
+        },
+        {
+            "stdout": SHOW_HELP_PATTERNS,
+            "test": 'contains',
+        },
         RUN,
     ),
     (
         "Verify output of 'show' on non-existing listener",
-        dict(
-            args=['show', 'lis1'],
-        ),
-        dict(
-            rc=1,
-            stderr=SHOW_NOTFOUND_PATTERNS,
-            test='all',
-        ),
+        {
+            "args": ['show', 'lis1'],
+        },
+        {
+            "rc": 1,
+            "stderr": SHOW_NOTFOUND_PATTERNS,
+            "test": 'all',
+        },
         RUN,
     ),
     (
         "Verify output of 'show' on existing listener",
-        dict(
-            args=['-o', 'plain', 'show', 'lis1'],
-            listeners=[
+        {
+            "args": ['-o', 'plain', 'show', 'lis1'],
+            "listeners": [
                 ['lis1', '--scheme', 'http', '--port', '50001'],
             ]
-        ),
-        dict(
-            stdout=[
+        },
+        {
+            "stdout": [
                 r"^Attribute +Value$",
                 r"^Name +lis1$",
                 r"^Port +50001$",
@@ -108,21 +108,21 @@ SHOW_TESTCASES = [
                 r"^Start PID +[0-9]+$",
                 r"^Created +[0-9\- :\.]+$",
             ],
-            test='all',
-        ),
+            "test": 'all',
+        },
         RUN_NO_WIN,
     ),
     (
         "Verify output of 'show' on existing listener with bind-addr set",
-        dict(
-            args=['-o', 'plain', 'show', 'lis1'],
-            listeners=[
+        {
+            "args": ['-o', 'plain', 'show', 'lis1'],
+            "listeners": [
                 ['lis1', '--scheme', 'http', '--port', '50001',
                  '--bind-addr', 'localhost'],
             ]
-        ),
-        dict(
-            stdout=[
+        },
+        {
+            "stdout": [
                 r"^Attribute +Value$",
                 r"^Name +lis1$",
                 r"^Port +50001$",
@@ -137,8 +137,8 @@ SHOW_TESTCASES = [
                 r"^Start PID +[0-9]+$",
                 r"^Created +[0-9\- :\.]+$",
             ],
-            test='all',
-        ),
+            "test": 'all',
+        },
         RUN_NO_WIN,
     ),
 ]

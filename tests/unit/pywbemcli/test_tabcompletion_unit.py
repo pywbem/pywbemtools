@@ -107,68 +107,91 @@ TESTCASES_CONNECTION_NAME_COMPLETE = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('Verify with connections file, valid incomplete completes name',
-     dict(ctx=CONNECTION_REPO_TEST_FILE_PATH,
-          yaml=TEST_CONNECTION_YAML,
-          file=CONNECTION_REPO_TEST_FILE_PATH,
-          file_exists=True,
-          incomplete="testco",
-          exp_rtn=["testconn"]),
-     None, None, OK),
-
-    ('Verify with connections file, invalid incomplete returns empty list',
-     dict(ctx=CONNECTION_REPO_TEST_FILE_PATH,
-          yaml=TEST_CONNECTION_YAML,
-          file=CONNECTION_REPO_TEST_FILE_PATH,
-          file_exists=True,
-          incomplete="mock",
-          exp_rtn=[]),
-     None, None, OK),
-
-    ('Verify with connections file, complete is complete returns name',
-     dict(ctx=CONNECTION_REPO_TEST_FILE_PATH,
-          yaml=TEST_CONNECTION_YAML,
-          file=CONNECTION_REPO_TEST_FILE_PATH,
-          file_exists=True,
-          incomplete="testconn",
-          exp_rtn=["testconn"]),
-     None, None, OK),
-
-    ('Verify with connections file, single char incomplete returns name',
-     dict(ctx=CONNECTION_REPO_TEST_FILE_PATH,
-          yaml=TEST_CONNECTION_YAML,
-          file=CONNECTION_REPO_TEST_FILE_PATH,
-          file_exists=True,
-          incomplete="t",
-          exp_rtn=["testconn", 'tmp1']),
-     None, None, OK),
-
-    ('Verify with connections file, empty incomplete incomplete returns name',
-     dict(ctx=CONNECTION_REPO_TEST_FILE_PATH,
-          yaml=TEST_CONNECTION_YAML,
-          file=CONNECTION_REPO_TEST_FILE_PATH,
-          file_exists=True,
-          incomplete="",
-          exp_rtn=["testconn", 'tmp1']),
-     None, None, OK),
-
-    ('Verify with connections file, incomplete too big fails',
-     dict(ctx=CONNECTION_REPO_TEST_FILE_PATH,
-          yaml=TEST_CONNECTION_YAML,
-          file=CONNECTION_REPO_TEST_FILE_PATH,
-          file_exists=True,
-          incomplete="testconnextra",
-          exp_rtn=[]),
-     None, None, OK),
-
-    ('Verify with non-existing connections file',
-     dict(ctx="CONNECTION_REPO_TEST_FILE_PATH",
-          yaml=TEST_CONNECTION_YAML,
-          file=CONNECTION_REPO_TEST_FILE_PATH,
-          file_exists=False,
-          incomplete="",
-          exp_rtn=[]),
-     None, None, OK),
+    (
+        'Verify with connections file, valid incomplete completes name',
+        {
+            'ctx': CONNECTION_REPO_TEST_FILE_PATH,
+            'yaml': TEST_CONNECTION_YAML,
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'file_exists': True,
+            'incomplete': "testco",
+            'exp_rtn': ["testconn"]
+        },
+        None, None, OK
+    ),
+    (
+        'Verify with connections file, invalid incomplete returns empty list',
+        {
+            'ctx': CONNECTION_REPO_TEST_FILE_PATH,
+            'yaml': TEST_CONNECTION_YAML,
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'file_exists': True,
+            'incomplete': "mock",
+            'exp_rtn': []
+        },
+        None, None, OK
+    ),
+    (
+        'Verify with connections file, complete is complete returns name',
+        {
+            'ctx': CONNECTION_REPO_TEST_FILE_PATH,
+            'yaml': TEST_CONNECTION_YAML,
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'file_exists': True,
+            'incomplete': "testconn",
+            'exp_rtn': ["testconn"]
+        },
+        None, None, OK
+    ),
+    (
+        'Verify with connections file, single char incomplete returns name',
+        {
+            'ctx': CONNECTION_REPO_TEST_FILE_PATH,
+            'yaml': TEST_CONNECTION_YAML,
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'file_exists': True,
+            'incomplete': "t",
+            'exp_rtn': ["testconn", 'tmp1']
+        },
+        None, None, OK
+    ),
+    (
+        'Verify with connections file, empty incomplete incomplete returns '
+        'name',
+        {
+            'ctx': CONNECTION_REPO_TEST_FILE_PATH,
+            'yaml': TEST_CONNECTION_YAML,
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'file_exists': True,
+            'incomplete': "",
+            'exp_rtn': ["testconn", 'tmp1']
+        },
+        None, None, OK
+    ),
+    (
+        'Verify with connections file, incomplete too big fails',
+        {
+            'ctx': CONNECTION_REPO_TEST_FILE_PATH,
+            'yaml': TEST_CONNECTION_YAML,
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'file_exists': True,
+            'incomplete': "testconnextra",
+            'exp_rtn': []
+        },
+        None, None, OK
+    ),
+    (
+        'Verify with non-existing connections file',
+        {
+            'ctx': "CONNECTION_REPO_TEST_FILE_PATH",
+            'yaml': TEST_CONNECTION_YAML,
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'file_exists': False,
+            'incomplete': "",
+            'exp_rtn': []
+        },
+        None, None, OK
+    ),
 ]
 
 
@@ -221,24 +244,38 @@ TESTCASES_HELP_ARG_SUBJECT_SHELL_COMPLETE = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('Verify correct completion with last character missing',
-     dict(incomplete="act",
-          exp_rtn=["activate"]),
-     None, None, OK),
-
-    ('Verify correct completion with complete input',
-     dict(incomplete="activate",
-          exp_rtn=["activate"]),
-     None, None, OK),
-
-    ('Verify correct whe incomplete is empty.',
-     dict(incomplete="",
-          exp_rtn=["repl", "activate", "instancename", "tab-completion"]),
-     None, None, OK),
-
-    ('Verify empty rtn when invalid incomplete input, i.e. no match',
-     dict(incomplete="blah", exp_rtn=[]),
-     None, None, OK),
+    (
+        'Verify correct completion with last character missing',
+        {
+            'incomplete': "act",
+            'exp_rtn': ["activate"]
+        },
+        None, None, OK
+    ),
+    (
+        'Verify correct completion with complete input',
+        {
+            'incomplete': "activate",
+            'exp_rtn': ["activate"]
+        },
+        None, None, OK
+    ),
+    (
+        'Verify correct whe incomplete is empty.',
+        {
+            'incomplete': "",
+            'exp_rtn': ["repl", "activate", "instancename", "tab-completion"]
+        },
+        None, None, OK
+    ),
+    (
+        'Verify empty rtn when invalid incomplete input, i.e. no match',
+        {
+            'incomplete': "blah",
+            'exp_rtn': []
+        },
+        None, None, OK
+    ),
 ]
 
 

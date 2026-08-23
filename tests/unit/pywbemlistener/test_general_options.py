@@ -68,105 +68,105 @@ GENERAL_OPTIONS_TESTCASES = [
 
     (
         "Verify output of '--help'",
-        dict(
-            args=['--help'],
-        ),
-        dict(
-            stdout=HELP_PATTERNS,
-            test='contains',
-        ),
+        {
+            "args": ['--help'],
+        },
+        {
+            "stdout": HELP_PATTERNS,
+            "test": 'contains',
+        },
         RUN,
     ),
     (
         "Verify output of '-h'",
-        dict(
-            args=['-h'],
-        ),
-        dict(
-            stdout=HELP_PATTERNS,
-            test='contains',
-        ),
+        {
+            "args": ['-h'],
+        },
+        {
+            "stdout": HELP_PATTERNS,
+            "test": 'contains',
+        },
         RUN,
     ),
     (
         "Verify that '--warn' option is valid",
-        dict(
-            args=['--warn', 'list'],
-        ),
-        dict(
-            stdout=LIST_NONE_PATTERNS,
-            test='all',
-        ),
+        {
+            "args": ['--warn', 'list'],
+        },
+        {
+            "stdout": LIST_NONE_PATTERNS,
+            "test": 'all',
+        },
         RUN,
     ),
     (
         "Verify '--warn' option with warning for Python <= 3.4",
-        dict(
-            args=['--warn', 'list'],
-        ),
-        dict(
-            rc=0,
-            stderr=[r"Pywbemlistener support for Python .* is deprecated"],
-            test='contains',
-        ),
+        {
+            "args": ['--warn', 'list'],
+        },
+        {
+            "rc": 0,
+            "stderr": [r"Pywbemlistener support for Python .* is deprecated"],
+            "test": 'contains',
+        },
         sys.version_info[0:2] == (2, 7),
     ),
     (
         "Verify that '--verbose' option is valid",
-        dict(
-            args=['--verbose', 'list'],
-        ),
-        dict(
-            stdout=LIST_NONE_PATTERNS,
-            test='all',
-        ),
+        {
+            "args": ['--verbose', 'list'],
+        },
+        {
+            "stdout": LIST_NONE_PATTERNS,
+            "test": 'all',
+        },
         RUN,
     ),
     (
         "Verify that '-v' option is valid",
-        dict(
-            args=['-v', 'list'],
-        ),
-        dict(
-            stdout=LIST_NONE_PATTERNS,
-            test='all',
-        ),
+        {
+            "args": ['-v', 'list'],
+        },
+        {
+            "stdout": LIST_NONE_PATTERNS,
+            "test": 'all',
+        },
         RUN,
     ),
     (
         "Verify that '--verbose' option can be specified two times",
-        dict(
-            args=['--verbose', '--verbose', 'list'],
-        ),
-        dict(
-            stdout=LIST_NONE_PATTERNS,
-            test='all',
-        ),
+        {
+            "args": ['--verbose', '--verbose', 'list'],
+        },
+        {
+            "stdout": LIST_NONE_PATTERNS,
+            "test": 'all',
+        },
         RUN,
     ),
     (
         "Verify that '-v' option can be specified two times",
-        dict(
-            args=['-vv', 'list'],
-        ),
-        dict(
-            stdout=LIST_NONE_PATTERNS,
-            test='all',
-        ),
+        {
+            "args": ['-vv', 'list'],
+        },
+        {
+            "stdout": LIST_NONE_PATTERNS,
+            "test": 'all',
+        },
         RUN,
     ),
     (
         "Verify '--version' option",
-        dict(
-            args=['--version'],
-        ),
-        dict(
-            stdout=[
+        {
+            "args": ['--version'],
+        },
+        {
+            "stdout": [
                 r"^pywbemlistener, version [0-9]+\.[0-9]+\.[0-9]+",
                 r"^pywbem, version [0-9]+\.[0-9]+\.[0-9]+",
             ],
-            test='all',
-        ),
+            "test": 'all',
+        },
         RUN,
     ),
 ]

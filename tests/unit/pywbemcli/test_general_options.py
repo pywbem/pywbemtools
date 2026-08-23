@@ -1760,7 +1760,7 @@ class TestGeneralOptions(CLITestsBase):
                 sys.platform in inputs.get('skip_platforms', []):
             pytest.skip(f"Issues (to be fixed) on platform {sys.platform}")
 
-        cmd_grp = inputs['cmdgrp'] if 'cmdgrp' in inputs else ''
+        cmd_grp = inputs.get('cmdgrp', '')
 
         self.command_test(desc, cmd_grp, inputs, exp_response,
                           mock, condition)
