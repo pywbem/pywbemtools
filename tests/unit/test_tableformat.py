@@ -72,10 +72,10 @@ TESTCASES_FORMAT_TABLE = [
 
     (
         "Table 1 without title, default format",
-        dict(
-            rows=TABLE1_ROWS,
-            headers=TABLE1_HEADERS,
-        ),
+        {
+            'rows': TABLE1_ROWS,
+            'headers': TABLE1_HEADERS,
+        },
         (
             'col1       col2        col3',
             '---------  ----------  -----------',
@@ -89,11 +89,11 @@ TESTCASES_FORMAT_TABLE = [
     ),
     (
         "Table 1 with title, default format",
-        dict(
-            rows=TABLE1_ROWS,
-            headers=TABLE1_HEADERS,
-            title='simple table',
-        ),
+        {
+            'rows': TABLE1_ROWS,
+            'headers': TABLE1_HEADERS,
+            'title': 'simple table',
+        },
         (
             'simple table',
             'col1       col2        col3',
@@ -108,11 +108,11 @@ TESTCASES_FORMAT_TABLE = [
     ),
     (
         "Table 1 without title, simple format",
-        dict(
-            rows=TABLE1_ROWS,
-            headers=TABLE1_HEADERS,
-            table_format='simple',
-        ),
+        {
+            'rows': TABLE1_ROWS,
+            'headers': TABLE1_HEADERS,
+            'table_format': 'simple',
+        },
         (
             'col1       col2        col3',
             '---------  ----------  -----------',
@@ -126,12 +126,12 @@ TESTCASES_FORMAT_TABLE = [
     ),
     (
         "Table 1 with title, simple format",
-        dict(
-            rows=TABLE1_ROWS,
-            headers=TABLE1_HEADERS,
-            title='simple table',
-            table_format='simple',
-        ),
+        {
+            'rows': TABLE1_ROWS,
+            'headers': TABLE1_HEADERS,
+            'title': 'simple table',
+            'table_format': 'simple',
+        },
         (
             'simple table',
             'col1       col2        col3',
@@ -146,11 +146,11 @@ TESTCASES_FORMAT_TABLE = [
     ),
     (
         "Table 1 without title, plain format",
-        dict(
-            rows=TABLE1_ROWS,
-            headers=TABLE1_HEADERS,
-            table_format='plain',
-        ),
+        {
+            'rows': TABLE1_ROWS,
+            'headers': TABLE1_HEADERS,
+            'table_format': 'plain',
+        },
         (
             'col1       col2        col3',
             'row1col1   row1col2    row1col3',
@@ -163,12 +163,12 @@ TESTCASES_FORMAT_TABLE = [
     ),
     (
         "Table 1 with title, plain format",
-        dict(
-            rows=TABLE1_ROWS,
-            headers=TABLE1_HEADERS,
-            title='simple table',
-            table_format='plain',
-        ),
+        {
+            'rows': TABLE1_ROWS,
+            'headers': TABLE1_HEADERS,
+            'title': 'simple table',
+            'table_format': 'plain',
+        },
         (
             'simple table',
             'col1       col2        col3',
@@ -182,11 +182,11 @@ TESTCASES_FORMAT_TABLE = [
     ),
     (
         "Table 1 without title, table format",
-        dict(
-            rows=TABLE1_ROWS,
-            headers=TABLE1_HEADERS,
-            table_format='table',
-        ),
+        {
+            'rows': TABLE1_ROWS,
+            'headers': TABLE1_HEADERS,
+            'table_format': 'table',
+        },
         (
             '+-----------+------------+-------------+',
             '| col1      | col2       | col3        |',
@@ -202,12 +202,12 @@ TESTCASES_FORMAT_TABLE = [
     ),
     (
         "Table 1 with title, table format",
-        dict(
-            rows=TABLE1_ROWS,
-            headers=TABLE1_HEADERS,
-            title='simple table',
-            table_format='table',
-        ),
+        {
+            'rows': TABLE1_ROWS,
+            'headers': TABLE1_HEADERS,
+            'title': 'simple table',
+            'table_format': 'table',
+        },
         (
             'simple table',
             '+-----------+------------+-------------+',
@@ -224,11 +224,11 @@ TESTCASES_FORMAT_TABLE = [
     ),
     (
         "Table 1 without title, psql format",
-        dict(
-            rows=TABLE1_ROWS,
-            headers=TABLE1_HEADERS,
-            table_format='psql',
-        ),
+        {
+            'rows': TABLE1_ROWS,
+            'headers': TABLE1_HEADERS,
+            'table_format': 'psql',
+        },
         (
             '+-----------+------------+-------------+',
             '| col1      | col2       | col3        |',
@@ -244,12 +244,12 @@ TESTCASES_FORMAT_TABLE = [
     ),
     (
         "Table 1 with title, psql format",
-        dict(
-            rows=TABLE1_ROWS,
-            headers=TABLE1_HEADERS,
-            title='simple table',
-            table_format='psql',
-        ),
+        {
+            'rows': TABLE1_ROWS,
+            'headers': TABLE1_HEADERS,
+            'title': 'simple table',
+            'table_format': 'psql',
+        },
         (
             'simple table',
             '+-----------+------------+-------------+',
@@ -266,11 +266,11 @@ TESTCASES_FORMAT_TABLE = [
     ),
     (
         "Table 1 without title, grid format",
-        dict(
-            rows=TABLE1_ROWS,
-            headers=TABLE1_HEADERS,
-            table_format='grid',
-        ),
+        {
+            'rows': TABLE1_ROWS,
+            'headers': TABLE1_HEADERS,
+            'table_format': 'grid',
+        },
         (
             '+-----------+------------+-------------+',
             '| col1      | col2       | col3        |',
@@ -290,12 +290,12 @@ TESTCASES_FORMAT_TABLE = [
     ),
     (
         "Table 1 with title, grid format",
-        dict(
-            rows=TABLE1_ROWS,
-            headers=TABLE1_HEADERS,
-            title='simple table',
-            table_format='grid',
-        ),
+        {
+            'rows': TABLE1_ROWS,
+            'headers': TABLE1_HEADERS,
+            'title': 'simple table',
+            'table_format': 'grid',
+        },
         (
             'simple table',
             '+-----------+------------+-------------+',
@@ -316,11 +316,11 @@ TESTCASES_FORMAT_TABLE = [
     ),
     (
         "Table 1 without title, rst format",
-        dict(
-            rows=TABLE1_ROWS,
-            headers=TABLE1_HEADERS,
-            table_format='rst',
-        ),
+        {
+            'rows': TABLE1_ROWS,
+            'headers': TABLE1_HEADERS,
+            'table_format': 'rst',
+        },
         (
             '=========  ==========  ===========',
             'col1       col2        col3',
@@ -336,12 +336,12 @@ TESTCASES_FORMAT_TABLE = [
     ),
     (
         "Table 1 with title, rst format",
-        dict(
-            rows=TABLE1_ROWS,
-            headers=TABLE1_HEADERS,
-            title='simple table',
-            table_format='rst',
-        ),
+        {
+            'rows': TABLE1_ROWS,
+            'headers': TABLE1_HEADERS,
+            'title': 'simple table',
+            'table_format': 'rst',
+        },
         (
             'simple table',
             '=========  ==========  ===========',
@@ -358,11 +358,11 @@ TESTCASES_FORMAT_TABLE = [
     ),
     (
         "Table 1 without title, html format",
-        dict(
-            rows=TABLE1_ROWS,
-            headers=TABLE1_HEADERS,
-            table_format='html',
-        ),
+        {
+            'rows': TABLE1_ROWS,
+            'headers': TABLE1_HEADERS,
+            'table_format': 'html',
+        },
         (
             '<table>',
             '<thead>',
@@ -387,12 +387,12 @@ TESTCASES_FORMAT_TABLE = [
     ),
     (
         "Table 1 with title, html format",
-        dict(
-            rows=TABLE1_ROWS,
-            headers=TABLE1_HEADERS,
-            title='simple table',
-            table_format='html',
-        ),
+        {
+            'rows': TABLE1_ROWS,
+            'headers': TABLE1_HEADERS,
+            'title': 'simple table',
+            'table_format': 'html',
+        },
         (
             '<table>',
             '<caption>simple table</caption>',
@@ -419,13 +419,13 @@ TESTCASES_FORMAT_TABLE = [
 
     (
         "Table 2 with title, simple format, sorted by column 0",
-        dict(
-            rows=TABLE2_ROWS,
-            headers=TABLE2_HEADERS,
-            title='sortable table',
-            table_format='simple',
-            sort_columns=0,
-        ),
+        {
+            'rows': TABLE2_ROWS,
+            'headers': TABLE2_HEADERS,
+            'title': 'sortable table',
+            'table_format': 'simple',
+            'sort_columns': 0,
+        },
         (
             'sortable table',
             'col1        col2           col3',
@@ -440,13 +440,13 @@ TESTCASES_FORMAT_TABLE = [
     ),
     (
         "Table 2 with title, simple format, sorted by columns 1,0",
-        dict(
-            rows=TABLE2_ROWS,
-            headers=TABLE2_HEADERS,
-            title='sortable table',
-            table_format='simple',
-            sort_columns=[1, 0],
-        ),
+        {
+            'rows': TABLE2_ROWS,
+            'headers': TABLE2_HEADERS,
+            'title': 'sortable table',
+            'table_format': 'simple',
+            'sort_columns': [1, 0],
+        },
         (
             'sortable table',
             'col1        col2           col3',
@@ -461,13 +461,13 @@ TESTCASES_FORMAT_TABLE = [
     ),
     (
         "Table 2 with title, simple format, sorted by column 2",
-        dict(
-            rows=TABLE2_ROWS,
-            headers=TABLE2_HEADERS,
-            title='sortable table',
-            table_format='simple',
-            sort_columns=2,
-        ),
+        {
+            'rows': TABLE2_ROWS,
+            'headers': TABLE2_HEADERS,
+            'title': 'sortable table',
+            'table_format': 'simple',
+            'sort_columns': 2,
+        },
         (
             'sortable table',
             'col1        col2           col3',
@@ -483,12 +483,12 @@ TESTCASES_FORMAT_TABLE = [
 
     (
         "Table 3 (folded) with title, plain format",
-        dict(
-            rows=TABLE3_ROWS,
-            headers=TABLE3_HEADERS,
-            title='folded table',
-            table_format='plain',
-        ),
+        {
+            'rows': TABLE3_ROWS,
+            'headers': TABLE3_HEADERS,
+            'title': 'folded table',
+            'table_format': 'plain',
+        },
         (
             'folded table',
             'col1       col2      col3',
@@ -503,12 +503,12 @@ TESTCASES_FORMAT_TABLE = [
     ),
     (
         "Table 3 (folded) with title, simple format",
-        dict(
-            rows=TABLE3_ROWS,
-            headers=TABLE3_HEADERS,
-            title='folded table',
-            table_format='simple',
-        ),
+        {
+            'rows': TABLE3_ROWS,
+            'headers': TABLE3_HEADERS,
+            'title': 'folded table',
+            'table_format': 'simple',
+        },
         (
             'folded table',
             'col1       col2      col3',
@@ -524,12 +524,12 @@ TESTCASES_FORMAT_TABLE = [
     ),
     (
         "Table 3 (folded) with title, grid format",
-        dict(
-            rows=TABLE3_ROWS,
-            headers=TABLE3_HEADERS,
-            title='folded table',
-            table_format='grid',
-        ),
+        {
+            'rows': TABLE3_ROWS,
+            'headers': TABLE3_HEADERS,
+            'title': 'folded table',
+            'table_format': 'grid',
+        },
         (
             'folded table',
             '+-----------+----------+-----------+',

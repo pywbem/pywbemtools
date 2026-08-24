@@ -67,61 +67,61 @@ RUN_TESTCASES = [
 
     (
         "Verify output of 'run --help'",
-        dict(
-            args=['run', '--help'],
-        ),
-        dict(
-            stdout=RUN_HELP_PATTERNS,
-            test='contains',
-        ),
+        {
+            "args": ['run', '--help'],
+        },
+        {
+            "stdout": RUN_HELP_PATTERNS,
+            "test": 'contains',
+        },
         RUN,
     ),
     (
         "Verify output of 'run -h'",
-        dict(
-            args=['run', '-h'],
-        ),
-        dict(
-            stdout=RUN_HELP_PATTERNS,
-            test='contains',
-        ),
+        {
+            "args": ['run', '-h'],
+        },
+        {
+            "stdout": RUN_HELP_PATTERNS,
+            "test": 'contains',
+        },
         RUN,
     ),
     (
         "Verify output of 'run --help-call'",
-        dict(
-            args=['run', '--help-call'],
-        ),
-        dict(
-            stdout=RUN_HELP_CALL_PATTERNS,
-            test='contains',
-        ),
+        {
+            "args": ['run', '--help-call'],
+        },
+        {
+            "stdout": RUN_HELP_CALL_PATTERNS,
+            "test": 'contains',
+        },
         RUN,
     ),
     (
         "Verify output of 'run --help-format'",
-        dict(
-            args=['run', '--help-format'],
-        ),
-        dict(
-            stdout=RUN_HELP_FORMAT_PATTERNS,
-            test='contains',
-        ),
+        {
+            "args": ['run', '--help-format'],
+        },
+        {
+            "stdout": RUN_HELP_FORMAT_PATTERNS,
+            "test": 'contains',
+        },
         RUN,
     ),
     (
         "Verify output of 'run' on existing listener",
-        dict(
-            args=['run', 'lis1', '--scheme', 'http', '--port', '50001'],
-            listeners=[
+        {
+            "args": ['run', 'lis1', '--scheme', 'http', '--port', '50001'],
+            "listeners": [
                 ['lis1', '--scheme', 'http', '--port', '50000'],
             ]
-        ),
-        dict(
-            rc=1,
-            stderr=RUN_EXISTS_PATTERNS,
-            test='all',
-        ),
+        },
+        {
+            "rc": 1,
+            "stderr": RUN_EXISTS_PATTERNS,
+            "test": 'all',
+        },
         RUN_NO_WIN,
     ),
 ]

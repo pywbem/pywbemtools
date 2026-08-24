@@ -280,117 +280,125 @@ def open_text_file_read_fails(filename, file_mode):
 TESTCASES_CREATE_CONNECTION_REPOSITORY = [
     (
         "Verify creation of good repo with no conn def, no default",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            svrs=[],
-            default=None,
-            exp_rtn=dict(
-                keys=[],
-                default=None
-            ),
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'svrs': [],
+            'default': None,
+            'exp_rtn': {
+                'keys': [],
+                'default': None
+            },
+        },
         None, None, OK,
     ),
     (
         "Verify creation of good repo with 1 conn def, no default",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            svrs=[PywbemServer('http://blah', name="tst1")],
-            default=None,
-            exp_rtn=dict(
-                keys=['tst1'],
-                default=None
-            ),
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'svrs': [PywbemServer('http://blah', name="tst1")],
+            'default': None,
+            'exp_rtn': {
+                'keys': ['tst1'],
+                'default': None
+            },
+        },
         None, None, OK,
     ),
     (
         "Verify creation of good repo with 1 conn def and 1st as default",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            svrs=[PywbemServer('http://blah', name="tst1")],
-            default='tst1',
-            exp_rtn=dict(
-                keys=['tst1'],
-                default='tst1'
-            ),
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'svrs': [PywbemServer('http://blah', name="tst1")],
+            'default': 'tst1',
+            'exp_rtn': {
+                'keys': ['tst1'],
+                'default': 'tst1'
+            },
+        },
         None, None, OK,
     ),
     (
         "Verify creation of good repo with 2 conn defs, no default",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            svrs=[PywbemServer('http://blah', name="tst1"),
-                  PywbemServer('http://blah2', name="tst2")],
-            default=None,
-            exp_rtn=dict(
-                keys=['tst1', 'tst2'],
-                default=None
-            ),
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'svrs': [
+                PywbemServer('http://blah', name="tst1"),
+                PywbemServer('http://blah2', name="tst2")
+            ],
+            'default': None,
+            'exp_rtn': {
+                'keys': ['tst1', 'tst2'],
+                'default': None
+            },
+        },
         None, None, OK,
     ),
     (
         "Verify creation of good repo with 2 conn defs and 1st as default",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            svrs=[PywbemServer('http://blah', name="tst1"),
-                  PywbemServer('http://blah2', name="tst2")],
-            default='tst1',
-            exp_rtn=dict(
-                keys=['tst1', 'tst2'],
-                default='tst1'
-            ),
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'svrs': [
+                PywbemServer('http://blah', name="tst1"),
+                PywbemServer('http://blah2', name="tst2")
+            ],
+            'default': 'tst1',
+            'exp_rtn': {
+                'keys': ['tst1', 'tst2'],
+                'default': 'tst1'
+            },
+        },
         None, None, OK,
     ),
     (
         "Verify creation of good repo with 2 conn defs and 2nd as default",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            svrs=[PywbemServer('http://blah', name="tst1"),
-                  PywbemServer('http://blah2', name="tst2")],
-            default='tst2',
-            exp_rtn=dict(
-                keys=['tst1', 'tst2'],
-                default='tst2'
-            ),
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'svrs': [
+                PywbemServer('http://blah', name="tst1"),
+                PywbemServer('http://blah2', name="tst2")
+            ],
+            'default': 'tst2',
+            'exp_rtn': {
+                'keys': ['tst1', 'tst2'],
+                'default': 'tst2'
+            },
+        },
         None, None, OK,
     ),
     (
         "Verify creation of good repo with no conn def, but setting "
         "non-existing as default (fails)",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            svrs=[],
-            default='non_existing',
-            exp_rtn=None
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'svrs': [],
+            'default': 'non_existing',
+            'exp_rtn': None
+        },
         KeyError, None, OK,
     ),
     (
         "Verify creation of good repo with 1 conn def, but setting "
         "non-existing as default (fails)",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            svrs=[PywbemServer('http://blah', name="tst1")],
-            default='non_existing',
-            exp_rtn=None
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'svrs': [PywbemServer('http://blah', name="tst1")],
+            'default': 'non_existing',
+            'exp_rtn': None
+        },
         KeyError, None, OK,
     ),
     (
         "Verify creation of good repo with 2 conn defs, but setting "
         "non-existing as default (fails).",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            svrs=[PywbemServer('http://blah', name="tst1"),
-                  PywbemServer('http://blah2', name="tst2")],
-            default='non_existing',
-            exp_rtn=None
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'svrs': [
+                PywbemServer('http://blah', name="tst1"),
+                PywbemServer('http://blah2', name="tst2")
+            ],
+            'default': 'non_existing',
+            'exp_rtn': None
+        },
         KeyError, None, OK,
     ),
 ]
@@ -450,9 +458,7 @@ def test_create_connection_repository(testcase, file, svrs, default, exp_rtn):
         assert key in repo
 
     # validate __iter__()
-    rtn_keys = []
-    for name in repo:
-        rtn_keys.append(name)
+    rtn_keys = list(repo.keys())
     assert sorted(rtn_keys) == sorted(exp_rtn['keys'])
 
     # validate iterkeys()
@@ -469,13 +475,13 @@ def test_create_connection_repository(testcase, file, svrs, default, exp_rtn):
 
     # validate keys()
     rtn_keys = []
-    for name in repo.keys():
+    for name in repo:
         rtn_keys.append(name)
     assert sorted(rtn_keys) == sorted(exp_rtn['keys'])
 
     # validate items()
     rtn_keys = []
-    for name, _ in repo.items():
+    for name in repo:
         rtn_keys.append(name)
     assert sorted(rtn_keys) == sorted(exp_rtn['keys'])
 
@@ -496,86 +502,86 @@ def test_create_connection_repository(testcase, file, svrs, default, exp_rtn):
 TESTCASES_CONNECTION_FILE_LOAD_ERROR = [
     (
         "Verify good file with 2 conn defs and no default set",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=YAML_GOOD_TWO_DEFS,
-            exp_rtn=dict(
-                keys=['tst1', 'tst2'],
-                default=None
-            ),
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'yaml': YAML_GOOD_TWO_DEFS,
+            'exp_rtn': {
+                'keys': ['tst1', 'tst2'],
+                'default': None
+            },
+        },
         None, None, OK,
     ),
     (
         "Verify load fails when file misses top-level property for default",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=YAML_MISSING_DEFAULT,
-            exp_rtn=None,
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'yaml': YAML_MISSING_DEFAULT,
+            'exp_rtn': None,
+        },
         ConnectionsFileLoadError, None, OK,
     ),
     (
         "Verify load fails when file misses top-level property for conn defs",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=YAML_MISSING_CONNDEFS,
-            exp_rtn=None,
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'yaml': YAML_MISSING_CONNDEFS,
+            'exp_rtn': None,
+        },
         ConnectionsFileLoadError, None, OK,
     ),
     (
         "Verify load fails when file is completely empty",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml='',
-            exp_rtn=None,
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'yaml': '',
+            'exp_rtn': None,
+        },
         ConnectionsFileLoadError, None, OK,
     ),
     (
         "Verify load fails when a conn def attribute has unknown name",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=YAML_INVALID_ATTR_NAME,
-            exp_rtn=None,
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'yaml': YAML_INVALID_ATTR_NAME,
+            'exp_rtn': None,
+        },
         ConnectionsFileLoadError, None, OK,
     ),
     (
         "Verify load fails when YAML syntax is invalid",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=YAML_INVALID_SYNTAX,
-            exp_rtn=None,
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'yaml': YAML_INVALID_SYNTAX,
+            'exp_rtn': None,
+        },
         ConnectionsFileLoadError, None, OK,
     ),
     (
         "Verify load fails when conn def mock-server attr has invalid type",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=YAML_INVALID_MOCKSERVER_TYPE,
-            exp_rtn=None,
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'yaml': YAML_INVALID_MOCKSERVER_TYPE,
+            'exp_rtn': None,
+        },
         ConnectionsFileLoadError, None, OK,
     ),
     (
         "Verify load fails when conn def timeout attr has invalid value",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=YAML_INVALID_TIMEOUT_VALUE,
-            exp_rtn=None,
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'yaml': YAML_INVALID_TIMEOUT_VALUE,
+            'exp_rtn': None,
+        },
         ConnectionsFileLoadError, None, OK,
     ),
     (
         "Verify load fails when conn def has both server and mock-server",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=YAML_SERVER_AND_MOCKSERVER,
-            exp_rtn=None,
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'yaml': YAML_SERVER_AND_MOCKSERVER,
+            'exp_rtn': None,
+        },
         ConnectionsFileLoadError, None, OK,
     ),
 ]
@@ -626,71 +632,71 @@ def test_connection_file_load_error(testcase, file, yaml, exp_rtn):
 TESTCASES_CONNECTION_REPOSITORY_ADD = [
     (
         "Verify add with existing name replaces the existing name",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=YAML_GOOD_TWO_DEFS,
-            svrs=[PywbemServer('http://args', name="tst1")],
-            default=None,
-            exp_rtn=dict(
-                keys=['tst1', 'tst2'],
-                default=None
-            ),
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'yaml': YAML_GOOD_TWO_DEFS,
+            'svrs': [PywbemServer('http://args', name="tst1")],
+            'default': None,
+            'exp_rtn': {
+                'keys': ['tst1', 'tst2'],
+                'default': None
+            },
+        },
         None, None, OK,
     ),
     (
         "Verify add with new name adds the new name",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=YAML_GOOD_TWO_DEFS,
-            svrs=[PywbemServer('http://args', name="tst3")],
-            default=None,
-            exp_rtn=dict(
-                keys=['tst1', 'tst2', 'tst3'],
-                default=None
-            ),
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'yaml': YAML_GOOD_TWO_DEFS,
+            'svrs': [PywbemServer('http://args', name="tst3")],
+            'default': None,
+            'exp_rtn': {
+                'keys': ['tst1', 'tst2', 'tst3'],
+                'default': None
+            },
+        },
         None, None, OK,
     ),
     (
         "Verify add works to file that has 0 connections",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=YAML_GOOD_NO_DEF,
-            svrs=[PywbemServer('http://blah', name="tst1")],
-            default=None,
-            exp_rtn=dict(
-                keys=['tst1'],
-                default=None
-            ),
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'yaml': YAML_GOOD_NO_DEF,
+            'svrs': [PywbemServer('http://blah', name="tst1")],
+            'default': None,
+            'exp_rtn': {
+                'keys': ['tst1'],
+                'default': None
+            },
+        },
         None, None, OK,
     ),
     (
         "Verify add works to completely empty file that exists",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml="",
-            svrs=[PywbemServer('http://blah', name="tst1")],
-            default=None,
-            exp_rtn=dict(
-                keys=['tst1'],
-                default=None
-            ),
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'yaml': "",
+            'svrs': [PywbemServer('http://blah', name="tst1")],
+            'default': None,
+            'exp_rtn': {
+                'keys': ['tst1'],
+                'default': None
+            },
+        },
         None, None, OK,
     ),
     (
         "Verify add works to non-existent file",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=None,
-            svrs=[PywbemServer('http://blah', name="tst1")],
-            default=None,
-            exp_rtn=dict(
-                keys=['tst1'],
-                default=None),
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'yaml': None,
+            'svrs': [PywbemServer('http://blah', name="tst1")],
+            'default': None,
+            'exp_rtn': {
+                'keys': ['tst1'],
+                'default': None},
+        },
         None, None, OK,
     ),
 ]
@@ -744,30 +750,30 @@ def test_connection_repository_add(testcase, file, yaml, svrs, default,
 TESTCASES_CONNECTION_REPOSITORY_DELETE = [
     (
         "Verify deletion of existing conn in repo with 1 conn and no default",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            svrs=[PywbemServer('http://args', name="tst1")],
-            default=None,
-            del_svr='tst1',
-            exp_rtn=dict(
-                keys=[],
-                default=None
-            ),
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'svrs': [PywbemServer('http://args', name="tst1")],
+            'default': None,
+            'del_svr': 'tst1',
+            'exp_rtn': {
+                'keys': [],
+                'default': None
+            },
+        },
         None, None, OK,
     ),
     (
         "Verify deletion of existing conn in repo with 1 conn and default set",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            svrs=[PywbemServer('http://args', name="tst1")],
-            default='tst1',
-            del_svr='tst1',
-            exp_rtn=dict(
-                keys=[],
-                default=None
-            ),
-        ),
+        {
+            'file': CONNECTION_REPO_TEST_FILE_PATH,
+            'svrs': [PywbemServer('http://args', name="tst1")],
+            'default': 'tst1',
+            'del_svr': 'tst1',
+            'exp_rtn': {
+                'keys': [],
+                'default': None
+            },
+        },
         None, None, OK,
     ),
 ]
@@ -812,10 +818,10 @@ def test_connection_repository_delete(
 TESTCASES_CONNECTION_FILE_LOAD_ERROR_M = [
     (
         "Verify connection file open for writing fails",
-        dict(
-            orig_func_str=REAL_OPEN_TEXT_FILE_STR,
-            patch_func=open_text_file_read_fails,
-        ),
+        {
+            'orig_func_str': REAL_OPEN_TEXT_FILE_STR,
+            'patch_func': open_text_file_read_fails,
+        },
         ConnectionsFileLoadError, None, OK,
     ),
 ]
@@ -862,29 +868,29 @@ def test_connection_file_load_error_m(
 TESTCASES_CONNECTION_FILE_WRITE_ERROR = [
     (
         "Verify connection file open for writing fails",
-        dict(
-            create_file=False,
-            orig_func_str=REAL_OPEN_TEXT_FILE_STR,
-            patch_func=open_text_file_write_fails,
-        ),
+        {
+            'create_file': False,
+            'orig_func_str': REAL_OPEN_TEXT_FILE_STR,
+            'patch_func': open_text_file_write_fails,
+        },
         ConnectionsFileWriteError, None, OK,
     ),
     (
         "Verify connection file rename to .bak fails",
-        dict(
-            create_file=True,
-            orig_func_str=REAL_OS_RENAME_STR,
-            patch_func=rename_to_bak_fails,
-        ),
+        {
+            'create_file': True,
+            'orig_func_str': REAL_OS_RENAME_STR,
+            'patch_func': rename_to_bak_fails,
+        },
         ConnectionsFileWriteError, None, OK,
     ),
     (
         "Verify connection file rename from .tmp fails",
-        dict(
-            create_file=False,
-            orig_func_str=REAL_OS_RENAME_STR,
-            patch_func=rename_from_tmp_fails,
-        ),
+        {
+            'create_file': False,
+            'orig_func_str': REAL_OS_RENAME_STR,
+            'patch_func': rename_from_tmp_fails,
+        },
         ConnectionsFileWriteError, None, OK,
     ),
 ]
@@ -982,13 +988,13 @@ def test_connection_file_migration(desc, failure, exp_exc_type, capsys):
 
         else:
             assert failure == 'rename'
-            with patch(REAL_OS_RENAME_STR, rename_fails):
-                with pytest.raises(exp_exc_type):
+            with patch(REAL_OS_RENAME_STR, rename_fails), \
+                    pytest.raises(exp_exc_type):
 
-                    # The code to be tested.
-                    # This triggers a load which performs the migration.
-                    # We expect an exception.
-                    repo.keys()
+                # The code to be tested.
+                # This triggers a load which performs the migration.
+                # We expect an exception.
+                repo.keys()
 
     finally:
 

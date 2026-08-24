@@ -305,10 +305,10 @@ class CLITestsBase:
         # FUTURE: Can be removed in future because tests exist in conftest.py
         assert PYWBEMCLI_ALT_HOME_DIR_ENVVAR in os.environ
 
-        exp_rc = exp_response['rc'] if 'rc' in exp_response else 0
+        exp_rc = exp_response.get('rc', 0)
         assert_rc(exp_rc, rc, stdout, stderr, desc)
 
-        if 'test' in exp_response and exp_response['test']:
+        if exp_response.get('test'):
             test_definition = exp_response['test']
         else:
             test_definition = None

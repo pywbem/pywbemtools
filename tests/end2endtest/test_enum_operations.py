@@ -111,7 +111,7 @@ class TestOperations(CLITestsBase):  # pylint: disable=too-few-public-methods
         and get the docker URL. Using the fixture name here causes the
         pylint issue.
         """
-        cmd_grp = inputs['cmdgrp'] if 'cmdgrp' in inputs else ''
+        cmd_grp = inputs.get('cmdgrp', '')
 
         # server url acquired from the server_url fixture
         inputs['general'].extend(['-s', server_url, '--no-verify', ])

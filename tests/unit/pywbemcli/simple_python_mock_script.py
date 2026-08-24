@@ -12,7 +12,6 @@ from pywbem import CIMQualifier, CIMClass, CIMProperty, CIMMethod
 assert "CONN" in globals()
 assert 'SERVER' in globals()
 assert 'VERBOSE' in globals()
-global CONN  # pylint: disable=global-at-module-level
 
 
 def build_classes():

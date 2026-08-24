@@ -47,86 +47,86 @@ TESTCASES_ENSURE_BYTES = [
 
     (
         "Input object is None",
-        dict(
-            obj=None,
-            exp_result=None,
-        ),
+        {
+            "obj": None,
+            "exp_result": None,
+        },
         None, None, True
     ),
     (
         "Input object is an integer",
-        dict(
-            obj=42,
-            exp_result=42,
-        ),
+        {
+            "obj": 42,
+            "exp_result": 42,
+        },
         None, None, True
     ),
     (
         "Input object is an empty Byte string",
-        dict(
-            obj=b'',
-            exp_result=b'',
-        ),
+        {
+            "obj": b'',
+            "exp_result": b'',
+        },
         None, None, True
     ),
     (
         "Input object is a Byte string with 7-bit ASCII chars",
-        dict(
-            obj=b'abc',
-            exp_result=b'abc',
-        ),
+        {
+            "obj": b'abc',
+            "exp_result": b'abc',
+        },
         None, None, True
     ),
     (
         "Input object is a Byte string with UCS-2 chars",
-        dict(
+        {
             # UCS-2 char U+00E9: LATIN SMALL LETTER E WITH ACUTE
-            obj=b'a\xC3\xA9b',
-            exp_result=b'a\xC3\xA9b',
-        ),
+            "obj": b'a\xC3\xA9b',
+            "exp_result": b'a\xC3\xA9b',
+        },
         None, None, True
     ),
     (
         "Input object is a Byte string with UCS-4 chars",
-        dict(
+        {
             # UCS-4 char U+010142: GREEK ACROPHONIC ATTIC ONE DRACHMA
-            obj=b'a\xF0\x90\x85\x82b',
-            exp_result=b'a\xF0\x90\x85\x82b',
-        ),
+            "obj": b'a\xF0\x90\x85\x82b',
+            "exp_result": b'a\xF0\x90\x85\x82b',
+        },
         None, None, True
     ),
     (
         "Input object is an empty Unicode string",
-        dict(
-            obj='',
-            exp_result=b'',
-        ),
+        {
+            "obj": '',
+            "exp_result": b'',
+        },
         None, None, True
     ),
     (
         "Input object is a Unicode string with 7-bit ASCII chars",
-        dict(
-            obj='abc',
-            exp_result=b'abc',
-        ),
+        {
+            "obj": 'abc',
+            "exp_result": b'abc',
+        },
         None, None, True
     ),
     (
         "Input object is a Unicode string with UCS-2 chars",
-        dict(
+        {
             # UCS-2 char U+00E9: LATIN SMALL LETTER E WITH ACUTE
-            obj='a\u00E9b',
-            exp_result=b'a\xC3\xA9b',
-        ),
+            "obj": 'a\u00E9b',
+            "exp_result": b'a\xC3\xA9b',
+        },
         None, None, True
     ),
     (
         "Input object is a Unicode string with UCS-4 chars",
-        dict(
+        {
             # UCS-4 char U+010142: GREEK ACROPHONIC ATTIC ONE DRACHMA
-            obj='a\U00010142b',
-            exp_result=b'a\xF0\x90\x85\x82b',
-        ),
+            "obj": 'a\U00010142b',
+            "exp_result": b'a\xF0\x90\x85\x82b',
+        },
         None, None, True
     ),
 ]
@@ -166,86 +166,86 @@ TESTCASES_ENSURE_UNICODE = [
 
     (
         "Input object is None",
-        dict(
-            obj=None,
-            exp_result=None,
-        ),
+        {
+            "obj": None,
+            "exp_result": None,
+        },
         None, None, True
     ),
     (
         "Input object is an integer",
-        dict(
-            obj=42,
-            exp_result=42,
-        ),
+        {
+            "obj": 42,
+            "exp_result": 42,
+        },
         None, None, True
     ),
     (
         "Input object is an empty Byte string",
-        dict(
-            obj=b'',
-            exp_result='',
-        ),
+        {
+            "obj": b'',
+            "exp_result": '',
+        },
         None, None, True
     ),
     (
         "Input object is a Byte string with 7-bit ASCII chars",
-        dict(
-            obj=b'abc',
-            exp_result='abc',
-        ),
+        {
+            "obj": b'abc',
+            "exp_result": 'abc',
+        },
         None, None, True
     ),
     (
         "Input object is a Byte string with UCS-2 chars",
-        dict(
+        {
             # UCS-2 char U+00E9: LATIN SMALL LETTER E WITH ACUTE
-            obj=b'a\xC3\xA9b',
-            exp_result='a\u00E9b',
-        ),
+            "obj": b'a\xC3\xA9b',
+            "exp_result": 'a\u00E9b',
+        },
         None, None, True
     ),
     (
         "Input object is a Byte string with UCS-4 chars",
-        dict(
+        {
             # UCS-4 char U+010142: GREEK ACROPHONIC ATTIC ONE DRACHMA
-            obj=b'a\xF0\x90\x85\x82b',
-            exp_result='a\U00010142b',
-        ),
+            "obj": b'a\xF0\x90\x85\x82b',
+            "exp_result": 'a\U00010142b',
+        },
         None, None, True
     ),
     (
         "Input object is an empty Unicode string",
-        dict(
-            obj='',
-            exp_result='',
-        ),
+        {
+            "obj": '',
+            "exp_result": '',
+        },
         None, None, True
     ),
     (
         "Input object is a Unicode string with 7-bit ASCII chars",
-        dict(
-            obj='abc',
-            exp_result='abc',
-        ),
+        {
+            "obj": 'abc',
+            "exp_result": 'abc',
+        },
         None, None, True
     ),
     (
         "Input object is a Unicode string with UCS-2 chars",
-        dict(
+        {
             # UCS-2 char U+00E9: LATIN SMALL LETTER E WITH ACUTE
-            obj='a\u00E9b',
-            exp_result='a\u00E9b',
-        ),
+            "obj": 'a\u00E9b',
+            "exp_result": 'a\u00E9b',
+        },
         None, None, True
     ),
     (
         "Input object is a Unicode string with UCS-4 chars",
-        dict(
+        {
             # UCS-4 char U+010142: GREEK ACROPHONIC ATTIC ONE DRACHMA
-            obj='a\U00010142b',
-            exp_result='a\U00010142b',
-        ),
+            "obj": 'a\U00010142b',
+            "exp_result": 'a\U00010142b',
+        },
         None, None, True
     ),
 ]
@@ -285,60 +285,60 @@ TESTCASES_TO_UNICODE = [
 
     (
         "Input object is None",
-        dict(
-            obj=None,
-            exp_result=None,
-        ),
+        {
+            "obj": None,
+            "exp_result": None,
+        },
         AttributeError, None, True
     ),
     (
         "Input object is an integer",
-        dict(
-            obj=42,
-            exp_result=None,
-        ),
+        {
+            "obj": 42,
+            "exp_result": None,
+        },
         AttributeError, None, True
     ),
     (
         "Input object is a Unicode string",
-        dict(
-            obj='abc',
-            exp_result='abc',
-        ),
+        {
+            "obj": 'abc',
+            "exp_result": 'abc',
+        },
         AttributeError, None, True
     ),
     (
         "Input object is an empty Byte string",
-        dict(
-            obj=b'',
-            exp_result='',
-        ),
+        {
+            "obj": b'',
+            "exp_result": '',
+        },
         None, None, True
     ),
     (
         "Input object is a Byte string with 7-bit ASCII chars",
-        dict(
-            obj=b'abc',
-            exp_result='abc',
-        ),
+        {
+            "obj": b'abc',
+            "exp_result": 'abc',
+        },
         None, None, True
     ),
     (
         "Input object is a Byte string with UCS-2 chars",
-        dict(
+        {
             # UCS-2 char U+00E9: LATIN SMALL LETTER E WITH ACUTE
-            obj=b'a\xC3\xA9b',
-            exp_result='a\u00E9b',
-        ),
+            "obj": b'a\xC3\xA9b',
+            "exp_result": 'a\u00E9b',
+        },
         None, None, True
     ),
     (
         "Input object is a Byte string with UCS-4 chars",
-        dict(
+        {
             # UCS-4 char U+010142: GREEK ACROPHONIC ATTIC ONE DRACHMA
-            obj=b'a\xF0\x90\x85\x82b',
-            exp_result='a\U00010142b',
-        ),
+            "obj": b'a\xF0\x90\x85\x82b',
+            "exp_result": 'a\U00010142b',
+        },
         None, None, True
     ),
 ]
@@ -387,52 +387,52 @@ TESTCASES_GET_TERMINAL_WIDTH = [
 
     (
         "All defaults",
-        dict(
-            termwidth_env=None,
-            use_terminal_width_conf=None,
-            default_table_width_conf=None,
-            exp_result=ACTUAL_TERMINAL_WIDTH,
-        ),
+        {
+            "termwidth_env": None,
+            "use_terminal_width_conf": None,
+            "default_table_width_conf": None,
+            "exp_result": ACTUAL_TERMINAL_WIDTH,
+        },
         None, None, True
     ),
     (
         "Setting terminal width in environment to an integer",
-        dict(
-            termwidth_env='83',
-            use_terminal_width_conf=None,
-            default_table_width_conf=None,
-            exp_result=83,
-        ),
+        {
+            "termwidth_env": '83',
+            "use_terminal_width_conf": None,
+            "default_table_width_conf": None,
+            "exp_result": 83,
+        },
         None, None, True
     ),
     (
         "Setting terminal width in environment to a string (ignored)",
-        dict(
-            termwidth_env='abc',
-            use_terminal_width_conf=None,
-            default_table_width_conf=None,
-            exp_result=ACTUAL_TERMINAL_WIDTH,
-        ),
+        {
+            "termwidth_env": 'abc',
+            "use_terminal_width_conf": None,
+            "default_table_width_conf": None,
+            "exp_result": ACTUAL_TERMINAL_WIDTH,
+        },
         None, None, True
     ),
     (
         "Configured to use click terminal width",
-        dict(
-            termwidth_env=None,
-            use_terminal_width_conf=True,
-            default_table_width_conf=83,
-            exp_result=ACTUAL_TERMINAL_WIDTH,
-        ),
+        {
+            "termwidth_env": None,
+            "use_terminal_width_conf": True,
+            "default_table_width_conf": 83,
+            "exp_result": ACTUAL_TERMINAL_WIDTH,
+        },
         None, None, True
     ),
     (
         "Configured to use configured default terminal width",
-        dict(
-            termwidth_env=None,
-            use_terminal_width_conf=False,
-            default_table_width_conf=83,
-            exp_result=83,
-        ),
+        {
+            "termwidth_env": None,
+            "use_terminal_width_conf": False,
+            "default_table_width_conf": 83,
+            "exp_result": 83,
+        },
         None, None, True
     ),
 ]
@@ -483,11 +483,10 @@ def test_get_terminal_width(
 
         # pylint: enable=protected-access
 
-        with use_terminal_width_mock:
-            with default_table_width_mock:
+        with use_terminal_width_mock, default_table_width_mock:
 
-                # The code to be tested
-                act_result = get_terminal_width()
+            # The code to be tested
+            act_result = get_terminal_width()
 
         # Ensure that exceptions raised in the remainder of this function
         # are not mistaken as expected exceptions

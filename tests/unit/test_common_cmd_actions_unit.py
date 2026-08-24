@@ -80,27 +80,37 @@ TESTCASES_COMMON_ACTION_HELP = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('Verify correct completion with complete input',
-     dict(subject="activate",
-          exp_rtn="activate - Activating shell tab completion\n"
-                  "HELP for activate message"),
-     None, None, OK),
-
-    ('Verify correct completion with last character missing',
-     dict(subject="act",
-          exp_rtn="""
+    (
+        'Verify correct completion with complete input',
+        {
+            "subject": "activate",
+            "exp_rtn": "activate - Activating shell tab completion\n"
+                       "HELP for activate message"
+        },
+        None, None, OK
+    ),
+    (
+        'Verify correct completion with last character missing',
+        {
+            "subject": "act",
+            "exp_rtn": """
 Help Subjects: Input: `act` matches multiple subjects:` `activate, activate2, activate3`
 Subject name    Subject description
 --------------  --------------------------------
 activate        Activating shell tab completion
 activate2       Activating2 shell tab completion
-activate3       Activating3 shell tab completion"""),  # noqa: E501
-     None, None, OK),
-
-    ('Verify exception for invalid input',
-     dict(subject="blah",
-          exp_rtn=""),
-     click.ClickException, None, OK),
+activate3       Activating3 shell tab completion"""  # noqa: E501
+        },
+        None, None, OK
+    ),
+    (
+        'Verify exception for invalid input',
+        {
+            "subject": "blah",
+            "exp_rtn": ""
+        },
+        click.ClickException, None, OK
+    ),
 ]
 
 

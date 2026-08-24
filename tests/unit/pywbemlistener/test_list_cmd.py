@@ -52,74 +52,74 @@ LIST_TESTCASES = [
 
     (
         "Verify output of 'list --help'",
-        dict(
-            args=['list', '--help'],
-        ),
-        dict(
-            stdout=LIST_HELP_PATTERNS,
-            test='contains',
-        ),
+        {
+            "args": ['list', '--help'],
+        },
+        {
+            "stdout": LIST_HELP_PATTERNS,
+            "test": 'contains',
+        },
         RUN,
     ),
     (
         "Verify output of 'list -h'",
-        dict(
-            args=['list', '-h'],
-        ),
-        dict(
-            stdout=LIST_HELP_PATTERNS,
-            test='contains',
-        ),
+        {
+            "args": ['list', '-h'],
+        },
+        {
+            "stdout": LIST_HELP_PATTERNS,
+            "test": 'contains',
+        },
         RUN,
     ),
     (
         "Verify output of 'list' with no listener running",
-        dict(
-            args=['list'],
-        ),
-        dict(
-            stdout=LIST_NONE_PATTERNS,
-            test='all',
-        ),
+        {
+            "args": ['list'],
+        },
+        {
+            "stdout": LIST_NONE_PATTERNS,
+            "test": 'all',
+        },
         RUN,
     ),
     (
         "Verify output of 'list' with one http listener running",
-        dict(
-            args=['-o', 'plain', 'list'],
-            listeners=[
+        {
+            "args": ['-o', 'plain', 'list'],
+            "listeners": [
                 ['lis1', '--scheme', 'http', '--port', '50001'],
             ]
-        ),
-        dict(
-            stdout=[
+        },
+        {
+            "stdout": [
                 r"^Name +Port +Scheme +Bind addr +PID +Created$",
                 r"^lis1 +50001 +http +\(any\) +[0-9]+ +[0-9\- :\.]+$",
             ],
-            test='all',
-        ),
+            "test": 'all',
+        },
         RUN_NO_WIN,
     ),
     (
         "Verify output of 'list' with two http listeners running",
-        dict(
-            args=['-o', 'plain', 'list'],
-            listeners=[
+        {
+            "args": ['-o', 'plain', 'list'],
+            "listeners": [
                 ['lis1', '--scheme', 'http', '--port', '50001'],
                 ['lis2', '--scheme', 'http', '--port', '50002'],
                 ['lis3', '--scheme', 'http', '--port', '50003',
                  '--bind-addr', 'localhost'],
             ]
-        ),
-        dict(
-            stdout=[
+        },
+        {
+            "stdout": [
                 r"^Name +Port +Scheme +Bind addr +PID +Created$",
                 r"^lis1 +50001 +http +\(any\) +[0-9]+ +[0-9\- :\.]+$",
                 r"^lis2 +50002 +http +\(any\) +[0-9]+ +[0-9\- :\.]+$",
                 r"^lis3 +50003 +http +localhost +[0-9]+ +[0-9\- :\.]+$",
             ],
-            test='all',
-        ),
+            "test": 'all',
+        },
         RUN_NO_WIN,
     ),
 ]

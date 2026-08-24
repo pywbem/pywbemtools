@@ -71,13 +71,20 @@ TESTCASES_ISCLASSNAME = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('Verify is a classname',
-     dict(name="CIM_Blah", exp_rtn=True),
-     None, None, True),
-
-    ('Verify is instance name',
-     dict(name="CIM_Blah.px=3", exp_rtn=True),
-     None, None, True),
+    (
+        'Verify is a classname',
+        {
+            'name': "CIM_Blah", 'exp_rtn': True
+        },
+        None, None, True
+    ),
+    (
+        'Verify is instance name',
+        {
+            'name': "CIM_Blah.px=3", 'exp_rtn': True
+        },
+        None, None, True
+    ),
 ]
 
 
@@ -113,82 +120,116 @@ TESTCASES_SHORTEN_PATH_STR = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('Verify simple keybinding replacement',
-     dict(kb=[('kEY1', 'Ham')],
-          rpl={'kEY1': 'Ham'},
-          fp=False,
-          exp_rtn='/:cln.~'),
-     None, None, True),
-
-    ('Verify multiple keys keybinding, replace all',
-     dict(kb=[('kEY1', 'Ham'), ('key2', 3)],
-          rpl={'kEY1': 'Ham', 'key2': 3},
-          fp=False,
-          exp_rtn='/:cln.~,~'),
-     None, None, True),
-
-    ('Verify multiple keys keybinding, one replacement',
-     dict(kb=[('kEY1', 'Ham'), ('key2', 3)],
-          rpl={'kEY1': 'Ham', },
-          fp=False,
-          exp_rtn='/:cln.~,key2=3'),
-     None, None, True),
-
-    ('Verify multiple keys keybinding, no replacement because value different',
-     dict(kb=[('kEY1', 'Ham'), ('key2', 3)],
-          rpl={'kEY1': 'Hamxxxx', },
-          fp=False,
-          exp_rtn='/:cln.kEY1="Ham",key2=3'),
-     None, None, True),
-
-    ('Verify multiple keys keybinding, replacement because value None',
-     dict(kb=[('kEY1', 'Ham'), ('key2', 3)],
-          rpl={'kEY1': None, },
-          fp=False,
-          exp_rtn='/:cln.~,key2=3'),
-     None, None, True),
-
-    ('Verify multiple keys keybinding, replaced with tilde because values '
-     'match',
-     dict(kb=[('kEY1', 'Ham'), ('key2', 3)],
-          rpl={'kEY1': None, 'key2': None},
-          fp=False,
-          exp_rtn='/:cln.~,~'),
-     None, None, True),
-
-    ('Verify multiple keys keybinding, replaced with tilde because values '
-     'match',
-     dict(kb=[('kEY1', 'Ham'), ('key2', 3)],
-          rpl={'kEY1': 'xxx', 'key2': 3},
-          fp=False,
-          exp_rtn='/:cln.kEY1="Ham",~'),
-     None, None, True),
-
-    ('Verify multiple keys binding with spaces in keys',
-     dict(kb=[('kEY1', 'Ham and eggs'), ('key2', 'More eggs')],
-          rpl={'kEY1': 'Ham and eggs', 'key2': 'More eggs'},
-          fp=False,
-          exp_rtn='/:cln.~,~'),
-     None, None, True),
-
-    ('Verify multiple keys binding with spaces in keys',
-     dict(kb=[('kEY1', 'Ham and eggs'), ('key2', 'More eggs')],
-          rpl={'kEY1': 'Ham and eggs', 'key2': 'More eggs'},
-          fp=True,
-          exp_rtn='/:cln.kEY1="Ham and eggs",key2="More eggs"'),
-     None, None, True),
-
-    ('Verify multiple keys binding multiple key types',
-     dict(kb=[('Boolean', False),
-              ('Name', 'Foo'),
-              ('Number', Uint8(42)),
-              ('Ref', CIMInstanceName('CIM_Bar',
-                                      keybindings={'Chicken': 'Ham'}))],
-          rpl={},
-          fp=False,
-          exp_rtn='/:cln.Boolean=FALSE,Name="Foo",Number=42,'
-          'Ref="/:CIM_Bar.Chicken=\\"Ham\\""'),
-     None, None, True),
+    (
+        'Verify simple keybinding replacement',
+        {
+            'kb': [('kEY1', 'Ham')],
+            'rpl': {'kEY1': 'Ham'},
+            'fp': False,
+            'exp_rtn': '/:cln.~'
+        },
+        None, None, True
+    ),
+    (
+        'Verify multiple keys keybinding, replace all',
+        {
+            'kb': [('kEY1', 'Ham'), ('key2', 3)],
+            'rpl': {'kEY1': 'Ham', 'key2': 3},
+            'fp': False,
+            'exp_rtn': '/:cln.~,~'
+        },
+        None, None, True
+    ),
+    (
+        'Verify multiple keys keybinding, one replacement',
+        {
+            'kb': [('kEY1', 'Ham'), ('key2', 3)],
+            'rpl': {'kEY1': 'Ham'},
+            'fp': False,
+            'exp_rtn': '/:cln.~,key2=3'
+        },
+        None, None, True
+    ),
+    (
+        'Verify multiple keys keybinding, no replacement because value '
+        'different',
+        {
+            'kb': [('kEY1', 'Ham'), ('key2', 3)],
+            'rpl': {'kEY1': 'Hamxxxx'},
+            'fp': False,
+            'exp_rtn': '/:cln.kEY1="Ham",key2=3'
+        },
+        None, None, True
+    ),
+    (
+        'Verify multiple keys keybinding, replacement because value None',
+        {
+            'kb': [('kEY1', 'Ham'), ('key2', 3)],
+            'rpl': {'kEY1': None},
+            'fp': False,
+            'exp_rtn': '/:cln.~,key2=3'
+        },
+        None, None, True
+    ),
+    (
+        'Verify multiple keys keybinding, replaced with tilde because values '
+        'match',
+        {
+            'kb': [('kEY1', 'Ham'), ('key2', 3)],
+            'rpl': {'kEY1': None, 'key2': None},
+            'fp': False,
+            'exp_rtn': '/:cln.~,~'
+        },
+        None, None, True
+    ),
+    (
+        'Verify multiple keys keybinding, replaced with tilde because values '
+        'match',
+        {
+            'kb': [('kEY1', 'Ham'), ('key2', 3)],
+            'rpl': {'kEY1': 'xxx', 'key2': 3},
+            'fp': False,
+            'exp_rtn': '/:cln.kEY1="Ham",~'
+        },
+        None, None, True
+    ),
+    (
+        'Verify multiple keys binding with spaces in keys',
+        {
+            'kb': [('kEY1', 'Ham and eggs'), ('key2', 'More eggs')],
+            'rpl': {'kEY1': 'Ham and eggs', 'key2': 'More eggs'},
+            'fp': False,
+            'exp_rtn': '/:cln.~,~'
+        },
+        None, None, True
+    ),
+    (
+        'Verify multiple keys binding with spaces in keys',
+        {
+            'kb': [('kEY1', 'Ham and eggs'), ('key2', 'More eggs')],
+            'rpl': {'kEY1': 'Ham and eggs', 'key2': 'More eggs'},
+            'fp': True,
+            'exp_rtn': '/:cln.kEY1="Ham and eggs",key2="More eggs"'
+        },
+        None, None, True
+    ),
+    (
+        'Verify multiple keys binding multiple key types',
+        {
+            'kb': [
+                ('Boolean', False),
+                ('Name', 'Foo'),
+                ('Number', Uint8(42)),
+                ('Ref', CIMInstanceName('CIM_Bar',
+                                        keybindings={'Chicken': 'Ham'}))
+            ],
+            'rpl': {},
+            'fp': False,
+            'exp_rtn': '/:cln.Boolean=FALSE,Name="Foo",Number=42,'
+            'Ref="/:CIM_Bar.Chicken=\\"Ham\\""'
+        },
+        None, None, True
+    ),
 ]
 
 
@@ -226,59 +267,87 @@ TESTCASES_SPLIT_STR_W_ESC = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('Verify simple split',
-     dict(input_str="abc,def,ijk",
-          delimiter=',',
-          exp_rtn=['abc', 'def', 'ijk']),
-     None, None, True),
-
-    ('Verify simple split empty entry',
-     dict(input_str="abc,,ijk",
-          delimiter=',',
-          exp_rtn=['abc', '', 'ijk']),
-     None, None, True),
-
-    ('Verify string with escape',
-     dict(input_str="abc,de\\,f,ijk",
-          delimiter=',',
-          exp_rtn=['abc', 'de,f', 'ijk']),
-     None, None, True),
-
-    ('Verify string with double escape',
-     dict(input_str="abc,de\\,f,ijk",
-          delimiter=',',
-          exp_rtn=['abc', 'de,f', 'ijk']),
-     None, None, True),
-
-    ('Verify string with escape that should be ignored',
-     dict(input_str="abc,de\\xf,ijk",
-          delimiter=',',
-          exp_rtn=['abc', 'de\\xf', 'ijk']),
-     None, None, True),
-
-    ('Verify string with trailingescape that should be ignored',
-     dict(input_str="abc,def,ijk\\",
-          delimiter=',',
-          exp_rtn=['abc', 'def', 'ijk\\']),
-     None, None, True),
-
-    ('Verify string with leading escape that should be ignored',
-     dict(input_str="\\abc,def,ijk",
-          delimiter=',',
-          exp_rtn=['\\abc', 'def', 'ijk']),
-     None, None, True),
-
-    ('Verify string with leading escape',
-     dict(input_str="\\,abc,def,ijk",
-          delimiter=',',
-          exp_rtn=[',abc', 'def', 'ijk']),
-     None, None, True),
-
-    ('Verify string with multiple escape',
-     dict(input_str="\\,abc\\,,def,\\,ijk",
-          delimiter=',',
-          exp_rtn=[',abc,', 'def', ',ijk']),
-     None, None, True),
+    (
+        'Verify simple split',
+        {
+            'input_str': "abc,def,ijk",
+            'delimiter': ',',
+            'exp_rtn': ['abc', 'def', 'ijk']
+        },
+        None, None, True
+    ),
+    (
+        'Verify simple split empty entry',
+        {
+            'input_str': "abc,,ijk",
+            'delimiter': ',',
+            'exp_rtn': ['abc', '', 'ijk']
+        },
+        None, None, True
+    ),
+    (
+        'Verify string with escape',
+        {
+            'input_str': "abc,de\\,f,ijk",
+            'delimiter': ',',
+            'exp_rtn': ['abc', 'de,f', 'ijk']
+        },
+        None, None, True
+    ),
+    (
+        'Verify string with double escape',
+        {
+            'input_str': "abc,de\\,f,ijk",
+            'delimiter': ',',
+            'exp_rtn': ['abc', 'de,f', 'ijk']
+        },
+        None, None, True
+    ),
+    (
+        'Verify string with escape that should be ignored',
+        {
+            'input_str': "abc,de\\xf,ijk",
+            'delimiter': ',',
+            'exp_rtn': ['abc', 'de\\xf', 'ijk']
+        },
+        None, None, True
+    ),
+    (
+        'Verify string with trailingescape that should be ignored',
+        {
+            'input_str': "abc,def,ijk\\",
+            'delimiter': ',',
+            'exp_rtn': ['abc', 'def', 'ijk\\']
+        },
+        None, None, True
+    ),
+    (
+        'Verify string with leading escape that should be ignored',
+        {
+            'input_str': "\\abc,def,ijk",
+            'delimiter': ',',
+            'exp_rtn': ['\\abc', 'def', 'ijk']
+        },
+        None, None, True
+    ),
+    (
+        'Verify string with leading escape',
+        {
+            'input_str': "\\,abc,def,ijk",
+            'delimiter': ',',
+            'exp_rtn': [',abc', 'def', 'ijk']
+        },
+        None, None, True
+    ),
+    (
+        'Verify string with multiple escape',
+        {
+            'input_str': "\\,abc\\,,def,\\,ijk",
+            'delimiter': ',',
+            'exp_rtn': [',abc,', 'def', ',ijk']
+        },
+        None, None, True
+    ),
 ]
 
 
@@ -315,52 +384,83 @@ TESTCASES_PICK_ONE_INDEX_FROM_LIST = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('Verify returns correct choice, in this case, ZERO',
-     dict(options=['ZERO', 'ONE', 'TWO'], choices=['0'], pa=False,
-          exp_rtn=0),
-     None, None, OK),
-
-    ('Verify returns correct choice, in this case ONE',
-     dict(options=['ZERO', 'ONE', 'TWO'], choices=['1'], pa=None,
-          exp_rtn=1),
-     None, None, OK),
-
-    ('Verify returns correct choice, in this case TWO',
-     dict(options=['ZERO', 'ONE', 'TWO'], choices=['2'], pa=None,
-          exp_rtn=2),
-     None, None, OK),
-
-    ('Verify returns correct choice, in this case ONE after one error',
-     dict(options=['ZERO', 'ONE', 'TWO'], choices=['9', '1'], pa=False,
-          exp_rtn=1),
-     None, None, OK),
-
-    ('Verify returns correct choice, in this case ONE after one error',
-     dict(options=['ZERO', 'ONE', 'TWO'], choices=['3', '2'], pa=False,
-          exp_rtn=2),
-     None, None, OK),
-
-    ('Verify returns correct choice, in this case ONE after multiple inputs',
-     dict(options=['ZERO', 'ONE', 'TWO'], choices=['9', '-1', 'a', '2'],
-          pa=False, exp_rtn=2),
-     None, None, OK),
-
-    ('Verify returns correct choice with only single choice so no usr request',
-     dict(options=['ZERO'], choices=None, pa=False, exp_rtn=0),
-     None, None, OK),
-
-    ('Verify returns correct choice with only single choice pick_always set',
-     dict(options=['ZERO'], choices=['0'], pa=True, exp_rtn=0),
-     None, None, OK),
-
-    ('Verify exception with empty options',
-     dict(options=[], choices=None, pa=None, exp_rtn=None),
-     None, None, OK),
-
-    ('Verify returns None with None options',
-     dict(options=None, choices=None, pa=None, exp_rtn=None),
-     None, None, OK),
-
+    (
+        'Verify returns correct choice, in this case, ZERO',
+        {
+            'options': ['ZERO', 'ONE', 'TWO'], 'choices': ['0'], 'pa': False,
+            'exp_rtn': 0
+        },
+        None, None, OK
+    ),
+    (
+        'Verify returns correct choice, in this case ONE',
+        {
+            'options': ['ZERO', 'ONE', 'TWO'], 'choices': ['1'], 'pa': None,
+            'exp_rtn': 1
+        },
+        None, None, OK
+    ),
+    (
+        'Verify returns correct choice, in this case TWO',
+        {
+            'options': ['ZERO', 'ONE', 'TWO'], 'choices': ['2'], 'pa': None,
+            'exp_rtn': 2
+        },
+        None, None, OK
+    ),
+    (
+        'Verify returns correct choice, in this case ONE after one error',
+        {
+            'options': ['ZERO', 'ONE', 'TWO'], 'choices': ['9', '1'],
+            'pa': False, 'exp_rtn': 1
+        },
+        None, None, OK
+    ),
+    (
+        'Verify returns correct choice, in this case ONE after one error',
+        {
+            'options': ['ZERO', 'ONE', 'TWO'], 'choices': ['3', '2'],
+            'pa': False, 'exp_rtn': 2
+        },
+        None, None, OK
+    ),
+    (
+        'Verify returns correct choice, in this case ONE after multiple inputs',
+        {
+            'options': ['ZERO', 'ONE', 'TWO'], 'choices': ['9', '-1', 'a', '2'],
+            'pa': False, 'exp_rtn': 2
+        },
+        None, None, OK
+    ),
+    (
+        'Verify returns correct choice with only single choice so no usr '
+        'request',
+        {
+            'options': ['ZERO'], 'choices': None, 'pa': False, 'exp_rtn': 0
+        },
+        None, None, OK
+    ),
+    (
+        'Verify returns correct choice with only single choice pick_always set',
+        {
+            'options': ['ZERO'], 'choices': ['0'], 'pa': True, 'exp_rtn': 0
+        },
+        None, None, OK
+    ),
+    (
+        'Verify exception with empty options',
+        {
+            'options': [], 'choices': None, 'pa': None, 'exp_rtn': None
+        },
+        None, None, OK
+    ),
+    (
+        'Verify returns None with None options',
+        {
+            'options': None, 'choices': None, 'pa': None, 'exp_rtn': None
+        },
+        None, None, OK
+    ),
 ]
 
 
@@ -422,43 +522,69 @@ TESTCASES_PICK_ONE_FROM_LIST = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('Verify returns correct choice, in this case, ZERO',
-     dict(options=['ZERO', 'ONE', 'TWO'], choices=['0'], exp_rtn='ZERO',
-          pa=False),
-     None, None, OK),
-
-    ('Verify returns correct choice, in this case ONE',
-     dict(options=['ZERO', 'ONE', 'TWO'], choices=['1'], exp_rtn='ONE',
-          pa=False),
-     None, None, OK),
-
-    ('Verify returns correct choice, in this case TWO',
-     dict(options=['ZERO', 'ONE', 'TWO'], choices=['2'], exp_rtn='TWO',
-          pa=False),
-     None, None, OK),
-
-    ('Verify returns correct choice, in this case ONE after one error',
-     dict(options=['ZERO', 'ONE', 'TWO'], choices=['9', '1'],
-          exp_rtn='ONE', pa=False),
-     None, None, OK),
-
-    ('Verify returns correct choice, in this case ONE after one error',
-     dict(options=['ZERO', 'ONE', 'TWO'], choices=['3', '2'],
-          exp_rtn='TWO', pa=False),
-     None, None, OK),
-
-    ('Verify returns correct choice, in this case ONE after multiple inputs',
-     dict(options=['ZERO', 'ONE', 'TWO'], choices=['9', '-1', 'a', '2'],
-          exp_rtn='TWO', pa=False),
-     None, None, OK),
-
-    ('Verify returns correct choice with only single choice so no usr request',
-     dict(options=['ZERO'], choices=['0'], exp_rtn='ZERO', pa=True),
-     None, None, OK),
-
-    ('Verify returns None with empty list input',
-     dict(options=[], choices=None, exp_rtn=None, pa=True),
-     None, None, OK),
+    (
+        'Verify returns correct choice, in this case, ZERO',
+        {
+            'options': ['ZERO', 'ONE', 'TWO'], 'choices': ['0'],
+            'exp_rtn': 'ZERO', 'pa': False
+        },
+        None, None, OK
+    ),
+    (
+        'Verify returns correct choice, in this case ONE',
+        {
+            'options': ['ZERO', 'ONE', 'TWO'], 'choices': ['1'],
+            'exp_rtn': 'ONE', 'pa': False},
+        None, None, OK
+    ),
+    (
+        'Verify returns correct choice, in this case TWO',
+        {
+            'options': ['ZERO', 'ONE', 'TWO'], 'choices': ['2'],
+            'exp_rtn': 'TWO', 'pa': False
+        },
+        None, None, OK
+    ),
+    (
+        'Verify returns correct choice, in this case ONE after one error',
+        {
+            'options': ['ZERO', 'ONE', 'TWO'], 'choices': ['9', '1'],
+            'exp_rtn': 'ONE', 'pa': False
+        },
+        None, None, OK
+    ),
+    (
+        'Verify returns correct choice, in this case ONE after one error',
+        {
+            'options': ['ZERO', 'ONE', 'TWO'], 'choices': ['3', '2'],
+            'exp_rtn': 'TWO', 'pa': False
+        },
+        None, None, OK
+    ),
+    (
+        'Verify returns correct choice, in this case ONE after multiple inputs',
+        {
+            'options': ['ZERO', 'ONE', 'TWO'], 'choices': ['9', '-1', 'a', '2'],
+            'exp_rtn': 'TWO', 'pa': False
+        },
+        None, None, OK
+    ),
+    (
+        'Verify returns correct choice with only single choice so no usr '
+        'request',
+        {
+            'options': ['ZERO'], 'choices': ['0'], 'exp_rtn': 'ZERO',
+            'pa': True
+        },
+        None, None, OK
+    ),
+    (
+        'Verify returns None with empty list input',
+        {
+            'options': [], 'choices': None, 'exp_rtn': None, 'pa': True
+        },
+        None, None, OK
+    ),
 ]
 
 
@@ -522,21 +648,31 @@ TESTCASES_PICK_MULTIPLE_FROM_LIST = [
     # NOTE: choises must end with '' element to close the
     #       pick_multiple_from_list function.
 
-    ('Verify good choice ZERO made',
-     dict(options=['ZERO', 'ONE', 'TWO'], choices=['0', ''],
-          exp_rtn=['ZERO']),
-     None, None, OK),
-
-    ('Verify good choice ONE made',
-     dict(options=['ZERO', 'ONE', 'TWO'], choices=['1', ''],
-          exp_rtn=['ONE']),
-     None, None, OK),
-
-    ('Verify good choice TWO after bad choices',
-     dict(options=['ZERO', 'ONE', 'TWO'],
-          choices=['-1', '9', '3', 'a', '2', ''],
-          exp_rtn=['TWO']),
-     None, None, OK),
+    (
+        'Verify good choice ZERO made',
+        {
+            'options': ['ZERO', 'ONE', 'TWO'], 'choices': ['0', ''],
+            'exp_rtn': ['ZERO']
+        },
+        None, None, OK
+    ),
+    (
+        'Verify good choice ONE made',
+        {
+            'options': ['ZERO', 'ONE', 'TWO'], 'choices': ['1', ''],
+            'exp_rtn': ['ONE']
+        },
+        None, None, OK
+    ),
+    (
+        'Verify good choice TWO after bad choices',
+        {
+            'options': ['ZERO', 'ONE', 'TWO'],
+            'choices': ['-1', '9', '3', 'a', '2', ''],
+            'exp_rtn': ['TWO']
+        },
+        None, None, OK
+    ),
 ]
 
 
@@ -584,39 +720,65 @@ TESTCASES_RESOLVE_PROPERTYLIST = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('Verify simple property list with 2 entries',
-     dict(pl_str=("abc,def",), exp_pl=['abc', 'def']),
-     None, None, OK),
-
-    ('Verify propertylist with single property entry',
-     dict(pl_str=("abc",), exp_pl=['abc']),
-     None, None, OK),
-
-    ('Verify multiple properties',
-     dict(pl_str=("abc", "def"), exp_pl=['abc', 'def']),
-     None, None, OK),
-
-    ('Verify multiple properties and both multiple in one option and multiple '
-     'options.',
-     dict(pl_str=None, exp_pl=None),
-     None, None, OK),
-
-    ('Verify multiple properties and both multiple in on option and multiple '
-     'options.',
-     dict(pl_str=("ab", "def", "xyz,rst"), exp_pl=['ab', 'def', 'xyz', 'rst']),
-     None, None, OK),
-
-    ('Verify empty propertylist',
-     dict(pl_str=(""), exp_pl=None),
-     None, None, OK),
-
-    ('Verify propertylist with commas and spaces fails',
-     dict(pl_str=("a, b,c",), exp_pl=[]),
-     click.ClickException, None, OK),
-
-    ('Verify propertylist with commas and spaces fails',
-     dict(pl_str=("a, b,c", "abc"), exp_pl=[]),
-     click.ClickException, None, OK),
+    (
+        'Verify simple property list with 2 entries',
+        {
+            'pl_str': ("abc,def",), 'exp_pl': ['abc', 'def']
+        },
+        None, None, OK
+    ),
+    (
+        'Verify propertylist with single property entry',
+        {
+            'pl_str': ("abc",), 'exp_pl': ['abc']
+        },
+        None, None, OK
+    ),
+    (
+        'Verify multiple properties',
+        {
+            'pl_str': ("abc", "def"), 'exp_pl': ['abc', 'def']
+        },
+        None, None, OK
+    ),
+    (
+        'Verify multiple properties and both multiple in one option and '
+        'multiple options.',
+        {
+            'pl_str': None, 'exp_pl': None
+        },
+        None, None, OK
+    ),
+    (
+        'Verify multiple properties and both multiple in on option and '
+        'multiple options.',
+        {
+            'pl_str': ("ab", "def", "xyz,rst"),
+            'exp_pl': ['ab', 'def', 'xyz', 'rst']
+        },
+        None, None, OK
+    ),
+    (
+        'Verify empty propertylist',
+        {
+            'pl_str': (""), 'exp_pl': None
+        },
+        None, None, OK
+    ),
+    (
+        'Verify propertylist with commas and spaces fails',
+        {
+            'pl_str': ("a, b,c",), 'exp_pl': []
+        },
+        click.ClickException, None, OK
+    ),
+    (
+        'Verify propertylist with commas and spaces fails',
+        {
+            'pl_str': ("a, b,c", "abc"), 'exp_pl': []
+        },
+        click.ClickException, None, OK
+    ),
 ]
 
 
@@ -652,90 +814,125 @@ TESTCASES_COMPARE_INSTANCES = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('Verify instances match',
-     dict(inst1=CIMInstance('CIM_Foo',
-                            properties={'Name': 'Foo', 'Chicken': 'Ham'},
-                            qualifiers={'Key': CIMQualifier('Key', True)},
-                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
-          inst2=CIMInstance('CIM_Foo',
-                            properties={'Name': 'Foo', 'Chicken': 'Ham'},
-                            qualifiers={'Key': CIMQualifier('Key', True)},
-                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
-          result=True),
-     None, None, True),
-
-    ('Verify classnames do not match',
-     dict(inst1=CIMInstance('CIM_Foo',
-                            properties={'Name': 'Foo', 'Chicken': 'Ham'},
-                            qualifiers={'Key': CIMQualifier('Key', True)},
-                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
-          inst2=CIMInstance('CIM_Foo1',
-                            properties={'Name': 'Foo', 'Chicken': 'Ham'},
-                            qualifiers={'Key': CIMQualifier('Key', True)},
-                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
-          result=False),
-     None, None, True),
-
-    ('Verify property values do not match',
-     dict(inst1=CIMInstance('CIM_Foo',
-                            properties={'Name': 'Foo', 'Chicken': 'Ham'},
-                            qualifiers={'Key': CIMQualifier('Key', True)},
-                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
-          inst2=CIMInstance('CIM_Foo',
-                            properties={'Name': 'Foo1', 'Chicken': 'Ham'},
-                            qualifiers={'Key': CIMQualifier('Key', True)},
-                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo1'})),
-          result=False),
-     None, None, True),
-
-    ('Verify property names do not match',
-     dict(inst1=CIMInstance('CIM_Foo',
-                            properties={'Name': 'Foo', 'Chicken': 'Ham'},
-                            qualifiers={'Key': CIMQualifier('Key', True)},
-                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
-          inst2=CIMInstance('CIM_Foo',
-                            properties={'Name1': 'Foo', 'Chicken': 'Ham'},
-                            qualifiers={'Key': CIMQualifier('Key', True)},
-                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
-          result=False),
-     None, None, True),
-
-    ('Verify classnames qualifiers do not match',
-     dict(inst1=CIMInstance('CIM_Foo',
-                            properties={'Name': 'Foo', 'Chicken': 'Ham'},
-                            qualifiers={'Key': CIMQualifier('Key', True)},
-                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
-          inst2=CIMInstance('CIM_Foo1',
-                            properties={'Name': 'Foo', 'Chicken': 'Ham'},
-                            qualifiers={},
-                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
-          result=False),
-     None, None, True),
-
-    ('Verify instances do not match diff  in number of properties',
-     dict(inst1=CIMInstance('CIM_Foo',
-                            properties={'Name': 'Foo', 'Chicken': 'Ham'},
-                            qualifiers={'Key': CIMQualifier('Key', True)},
-                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
-          inst2=CIMInstance('CIM_Foo',
-                            properties={'Name': 'Foo'},
-                            qualifiers={'Key': CIMQualifier('Key', True)},
-                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
-          result=False),
-     None, None, True),
-
-    ('Verify instances values do not match',
-     dict(inst1=CIMInstance('CIM_Foo',
-                            properties={'Name': 'Foo', 'Chicken': 'Ham'},
-                            qualifiers={'Key': CIMQualifier('Key', True)},
-                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
-          inst2=CIMInstance('CIM_Foo',
-                            properties={'Name': 'Foo', 'Chicken': 'Ham1'},
-                            qualifiers={'Key': CIMQualifier('Key', True)},
-                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
-          result=False),
-     None, None, True),
-
+    (
+        'Verify instances match',
+        {
+            'inst1': CIMInstance(
+                'CIM_Foo',
+                properties={'Name': 'Foo', 'Chicken': 'Ham'},
+                qualifiers={'Key': CIMQualifier('Key', True)},
+                path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+            'inst2': CIMInstance(
+                'CIM_Foo',
+                properties={'Name': 'Foo', 'Chicken': 'Ham'},
+                qualifiers={'Key': CIMQualifier('Key', True)},
+                path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+            'result': True
+        },
+        None, None, True
+    ),
+    (
+        'Verify classnames do not match',
+        {
+            'inst1': CIMInstance(
+                'CIM_Foo',
+                properties={'Name': 'Foo', 'Chicken': 'Ham'},
+                qualifiers={'Key': CIMQualifier('Key', True)},
+                path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+            'inst2': CIMInstance(
+                'CIM_Foo1',
+                properties={'Name': 'Foo', 'Chicken': 'Ham'},
+                qualifiers={'Key': CIMQualifier('Key', True)},
+                path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+            'result': False
+        },
+        None, None, True
+    ),
+    (
+        'Verify property values do not match',
+        {
+            'inst1': CIMInstance(
+                'CIM_Foo',
+                properties={'Name': 'Foo', 'Chicken': 'Ham'},
+                qualifiers={'Key': CIMQualifier('Key', True)},
+                path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+            'inst2': CIMInstance(
+                'CIM_Foo',
+                properties={'Name': 'Foo1', 'Chicken': 'Ham'},
+                qualifiers={'Key': CIMQualifier('Key', True)},
+                path=CIMInstanceName('CIM_Foo', {'Name': 'Foo1'})),
+            'result': False
+        },
+        None, None, True
+    ),
+    (
+        'Verify property names do not match',
+        {
+            'inst1': CIMInstance(
+                'CIM_Foo',
+                properties={'Name': 'Foo', 'Chicken': 'Ham'},
+                qualifiers={'Key': CIMQualifier('Key', True)},
+                path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+            'inst2': CIMInstance(
+                'CIM_Foo',
+                properties={'Name1': 'Foo', 'Chicken': 'Ham'},
+                qualifiers={'Key': CIMQualifier('Key', True)},
+                path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+            'result': False
+        },
+        None, None, True
+    ),
+    (
+        'Verify classnames qualifiers do not match',
+        {
+            'inst1': CIMInstance(
+                'CIM_Foo',
+                properties={'Name': 'Foo', 'Chicken': 'Ham'},
+                qualifiers={'Key': CIMQualifier('Key', True)},
+                path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+            'inst2': CIMInstance(
+                'CIM_Foo1',
+                properties={'Name': 'Foo', 'Chicken': 'Ham'},
+                qualifiers={},
+                path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+            'result': False
+        },
+        None, None, True
+    ),
+    (
+        'Verify instances do not match diff  in number of properties',
+        {
+            'inst1': CIMInstance(
+                'CIM_Foo',
+                properties={'Name': 'Foo', 'Chicken': 'Ham'},
+                qualifiers={'Key': CIMQualifier('Key', True)},
+                path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+            'inst2': CIMInstance(
+                'CIM_Foo',
+                properties={'Name': 'Foo'},
+                qualifiers={'Key': CIMQualifier('Key', True)},
+                path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+            'result': False
+        },
+        None, None, True
+    ),
+    (
+        'Verify instances values do not match',
+        {
+            'inst1': CIMInstance(
+                'CIM_Foo',
+                properties={'Name': 'Foo', 'Chicken': 'Ham'},
+                qualifiers={'Key': CIMQualifier('Key', True)},
+                path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+            'inst2': CIMInstance(
+                'CIM_Foo',
+                properties={'Name': 'Foo', 'Chicken': 'Ham1'},
+                qualifiers={'Key': CIMQualifier('Key', True)},
+                path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+            'result': False
+        },
+        None, None, True
+    ),
 ]
 
 
@@ -774,26 +971,36 @@ TESTCASES_VERIFY_OPERATION = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('Verify response y',
-     dict(txt="blah",
-          clickconfirm=True,
-          abort_msg=None,
-          result=True),
-     None, None, True),
-
-    ('Verify response n',
-     dict(txt="blahno",
-          clickconfirm=False,
-          abort_msg=None,
-          result=False),
-     None, None, True),
-
-    ('Verify response n with msg',
-     dict(txt="blahno",
-          clickconfirm=False,
-          abort_msg=True,
-          result=False),
-     None, None, True),
+    (
+        'Verify response y',
+        {
+            'txt': "blah",
+            'clickconfirm': True,
+            'abort_msg': None,
+            'result': True
+        },
+        None, None, True
+    ),
+    (
+        'Verify response n',
+        {
+            'txt': "blahno",
+            'clickconfirm': False,
+            'abort_msg': None,
+            'result': False
+        },
+        None, None, True
+    ),
+    (
+        'Verify response n with msg',
+        {
+            'txt': "blahno",
+            'clickconfirm': False,
+            'abort_msg': True,
+            'result': False
+        },
+        None, None, True
+    ),
 ]
 
 
@@ -848,53 +1055,50 @@ TESTCASES_PARSE_WBEMURI_STR = [
 
     (
         "class and keys only case",
-        dict(
-            url='/root/cimv2:CIM_Foo.k1="v1"',
-            exp_result=dict(
-                classname='CIM_Foo',
-                namespace='root/cimv2',
-                keys={'k1': 'v1'},
-                host=None),
-        ),
+        {
+            'url': '/root/cimv2:CIM_Foo.k1="v1"',
+            'exp_result': {
+                'classname': 'CIM_Foo',
+                'namespace': 'root/cimv2',
+                'keys': {'k1': 'v1'},
+                'host': None},
+        },
         None, None, True
     ),
-
     (
         "all components, normal case",
-        dict(
-            url='https://10.11.12.13:5989/root/cimv2:CIM_Foo.k1="v1"',
-            exp_result=dict(
-                classname='CIM_Foo',
-                namespace='root/cimv2',
-                keys={'k1': 'v1'},
-                host='10.11.12.13:5989'),
-        ),
+        {
+            'url': 'https://10.11.12.13:5989/root/cimv2:CIM_Foo.k1="v1"',
+            'exp_result': {
+                'classname': 'CIM_Foo',
+                'namespace': 'root/cimv2',
+                'keys': {'k1': 'v1'},
+                'host': '10.11.12.13:5989'},
+        },
         None, None, True
     ),
-
     (
         "class and keybinding only",
-        dict(
-            url='CIM_Foo.k1="v1"',
-            exp_result=dict(
-                classname='CIM_Foo',
-                namespace=None,
-                keys={'k1': 'v1'},
-                host=None,),
-        ),
+        {
+            'url': 'CIM_Foo.k1="v1"',
+            'exp_result': {
+                'classname': 'CIM_Foo',
+                'namespace': None,
+                'keys': {'k1': 'v1'},
+                'host': None},
+        },
         None, None, True
     ),
-
     (
         "all components, But wbem uri invalid",
-        dict(
-            url='https://10.11.12.13:5989/root/cimv2:CIM_Foo.k1=v1',
-            exp_result=dict(
-                classname='CIM_Foo',
-                namespace='root/cimv2',
-                keys={'k1': 'v1'},
-                host='10.11.12.13:5989'),
-        ),
+        {
+            'url': 'https://10.11.12.13:5989/root/cimv2:CIM_Foo.k1=v1',
+            'exp_result': {
+                'classname': 'CIM_Foo',
+                'namespace': 'root/cimv2',
+                'keys': {'k1': 'v1'},
+                'host': '10.11.12.13:5989'},
+        },
         click.ClickException, None, True
     ),
 ]
@@ -951,102 +1155,102 @@ TESTCASES_FILTER_NAMELIST = [
 
     (
         "Verify TST_ case insensitive 1",
-        dict(
-            nl=['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
-            regex='TST_*',
-            ign_case=True,
-            exp_result=['TST_abc'],
-        ),
+        {
+            'nl': ['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
+            'regex': 'TST_*',
+            'ign_case': True,
+            'exp_result': ['TST_abc'],
+        },
         None, None, OK),
     (
         "Verify TST_ case insensitive 2. Returns nothing",
-        dict(
-            nl=['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
-            regex='TSt_*',
-            ign_case=True,
-            exp_result=['TST_abc'],
-        ),
+        {
+            'nl': ['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
+            'regex': 'TSt_*',
+            'ign_case': True,
+            'exp_result': ['TST_abc'],
+        },
         None, None, OK),
     (
         "Verify TST_ case insensitive . Returns match to *abc",
-        dict(
-            nl=['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
-            regex='*abc',
-            ign_case=True,
-            exp_result=['CIM_abc', 'TST_abc'],
-        ),
+        {
+            'nl': ['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
+            'regex': '*abc',
+            'ign_case': True,
+            'exp_result': ['CIM_abc', 'TST_abc'],
+        },
         None, None, OK),
     (
         "Verify TST_ case insensitive returns nothing",
-        dict(
-            nl=['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
-            regex='TSTX_*',
-            ign_case=True,
-            exp_result=[],
-        ),
+        {
+            'nl': ['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
+            'regex': 'TSTX_*',
+            'ign_case': True,
+            'exp_result': [],
+        },
         None, None, OK),
     (
         "Verify TST_ case insensitive 3",
-        dict(
-            nl=['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
-            regex='CIM_*',
-            ign_case=True,
-            exp_result=['CIM_abc', 'CIM_def', 'CIM_123'],
-        ),
+        {
+            'nl': ['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
+            'regex': 'CIM_*',
+            'ign_case': True,
+            'exp_result': ['CIM_abc', 'CIM_def', 'CIM_123'],
+        },
         None, None, OK),
     (
         "Verify TST_ case sensitive 1",
-        dict(
-            nl=['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
-            regex='TSt_*',
-            ign_case=False,
-            exp_result=[],
-        ),
+        {
+            'nl': ['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
+            'regex': 'TSt_*',
+            'ign_case': False,
+            'exp_result': [],
+        },
         None, None, FAIL),  # Failing with regex compile error
     (
         "Verify wildcard * filters",
-        dict(
-            nl=['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
-            regex='*def',
-            ign_case=True,
-            exp_result=['CIM_def'],
-        ),
+        {
+            'nl': ['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
+            'regex': '*def',
+            'ign_case': True,
+            'exp_result': ['CIM_def'],
+        },
         None, None, OK),
     (
         "Verify wildcard * filters 2",
-        dict(
-            nl=['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
-            regex='*abc',
-            ign_case=True,
-            exp_result=['CIM_abc', 'TST_abc'],
-        ),
+        {
+            'nl': ['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
+            'regex': '*abc',
+            'ign_case': True,
+            'exp_result': ['CIM_abc', 'TST_abc'],
+        },
         None, None, OK),
     (
         "Verify ? wildcard",
-        dict(
-            nl=['CIM_abc', 'CIM_abd', 'CIM_abe', 'TST_abc'],
-            regex='CIM_ab?',
-            ign_case=True,
-            exp_result=['CIM_abc', 'CIM_abd', 'CIM_abe'],
-        ),
+        {
+            'nl': ['CIM_abc', 'CIM_abd', 'CIM_abe', 'TST_abc'],
+            'regex': 'CIM_ab?',
+            'ign_case': True,
+            'exp_result': ['CIM_abc', 'CIM_abd', 'CIM_abe'],
+        },
         None, None, OK),
     (
         "Verify ? wildcard 2",
-        dict(
-            nl=['CIM_abc', 'CIM_abd', 'CIM_abe', 'TST_abc'],
-            regex='???_ab?',
-            ign_case=True,
-            exp_result=['CIM_abc', 'CIM_abd', 'CIM_abe', 'TST_abc'],
-        ),
+        {
+            'nl': ['CIM_abc', 'CIM_abd', 'CIM_abe', 'TST_abc'],
+            'regex': '???_ab?',
+            'ign_case': True,
+            'exp_result': ['CIM_abc', 'CIM_abd', 'CIM_abe', 'TST_abc'],
+        },
         None, None, OK),
     (
         "Verify ? and *wildcard ",
-        dict(
-            nl=['CIM_abc', 'CIM_abd', 'CIM_abe', 'TST_abc'],
-            regex='*_ab?',
-            ign_case=True,
-            exp_result=['CIM_abc', 'CIM_abd', 'CIM_abe', 'TST_abc'],
-        ),
+        {
+            'nl': ['CIM_abc', 'CIM_abd', 'CIM_abe', 'TST_abc'],
+            'regex': '*_ab?',
+            'ign_case': True,
+            'exp_result': ['CIM_abc', 'CIM_abd', 'CIM_abe', 'TST_abc'],
+        },
         None, None, OK),
 ]
 
@@ -1083,56 +1287,96 @@ TESTCASES_PARSE_KV_PAIR = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ("Verify unquoted text value",
-     dict(kvpair='abc=test',
-          exp_name='abc',
-          exp_value='test'),
-     None, None, True),
-    ("Verify 'name='' without value",
-     dict(kvpair='abc=',
-          exp_name='abc',
-          exp_value=None),
-     None, None, True),
-    ("Verify 'name' without = or value",
-     dict(kvpair='abc',
-          exp_name='abc',
-          exp_value=None),
-     None, None, True),
-    ("Verify numeric value",
-     dict(kvpair='abc=12345',
-          exp_name='abc',
-          exp_value='12345'),
-     None, None, True),
-    ("Verify value in quotes works",
-     dict(kvpair='abc="Fred"',
-          exp_name='abc',
-          exp_value='"Fred"'),
-     None, None, True),
-    ("Verify quoted value with space",
-     dict(kvpair='abc="Fr ed"',
-          exp_name='abc',
-          exp_value='"Fr ed"'),
-     None, None, True),
-    ("Verify quoted value with escaped quote",
-     dict(kvpair='abc="fre\\"d"',
-          exp_name='abc',
-          exp_value='"fre\\"d"'),
-     None, None, True),
-    ("Verify value without name",
-     dict(kvpair='=def',
-          exp_name='',
-          exp_value='def'),
-     None, None, True),
-    ("Verify pair, integer value",
-     dict(kvpair='prop_name=91999',
-          exp_name='prop_name',
-          exp_value='91999'),
-     None, None, True),
-    ("Verify just '=', no name or value",
-     dict(kvpair='=',
-          exp_name='',
-          exp_value=None),
-     None, None, True),
+    (
+        "Verify unquoted text value",
+        {
+            'kvpair': 'abc=test',
+            'exp_name': 'abc',
+            'exp_value': 'test'
+        },
+        None, None, True
+    ),
+    (
+        "Verify 'name='' without value",
+        {
+            'kvpair': 'abc=',
+            'exp_name': 'abc',
+            'exp_value': None
+        },
+        None, None, True
+    ),
+    (
+        "Verify 'name' without = or value",
+        {
+            'kvpair': 'abc',
+            'exp_name': 'abc',
+            'exp_value': None
+        },
+        None, None, True
+    ),
+    (
+        "Verify numeric value",
+        {
+            'kvpair': 'abc=12345',
+            'exp_name': 'abc',
+            'exp_value': '12345'
+        },
+        None, None, True
+    ),
+    (
+        "Verify value in quotes works",
+        {
+            'kvpair': 'abc="Fred"',
+            'exp_name': 'abc',
+            'exp_value': '"Fred"'
+        },
+        None, None, True
+    ),
+    (
+        "Verify quoted value with space",
+        {
+            'kvpair': 'abc="Fr ed"',
+            'exp_name': 'abc',
+            'exp_value': '"Fr ed"'
+        },
+        None, None, True
+    ),
+    (
+        "Verify quoted value with escaped quote",
+        {
+            'kvpair': 'abc="fre\\"d"',
+            'exp_name': 'abc',
+            'exp_value': '"fre\\"d"'
+        },
+        None, None, True
+    ),
+    (
+        "Verify value without name",
+        {
+            'kvpair': '=def',
+            'exp_name': '',
+            'exp_value': 'def'
+        },
+        None, None, True
+    ),
+    (
+        "Verify pair, integer value",
+        {
+            'kvpair': 'prop_name=91999',
+            'exp_name': 'prop_name',
+            'exp_value': '91999'
+        },
+        None, None, True
+    ),
+    (
+        "Verify just '=', no name or value",
+        {
+            'kvpair': '=',
+            'exp_name': '',
+            'exp_value': None
+        },
+        None, None, True
+    ),
 ]
 
 
@@ -1170,47 +1414,47 @@ TESTCASES_SORT_CIMOBJECTS = [
 
     (
         "Empty list of objects",
-        dict(
-            objects=[],
-            exp_indexes=[]
-        ),
+        {
+            'objects': [],
+            'exp_indexes': []
+        },
         None, None, OK
     ),
     (
         "string: One object",
-        dict(
-            objects=['abc'],
-            exp_indexes=[0]
-        ),
+        {
+            'objects': ['abc'],
+            'exp_indexes': [0]
+        },
         None, None, OK
     ),
     (
         "string: Two objects, opposite sort order",
-        dict(
-            objects=['xyz', 'abc'],
-            exp_indexes=[1, 0]
-        ),
+        {
+            'objects': ['xyz', 'abc'],
+            'exp_indexes': [1, 0]
+        },
         None, None, OK
     ),
     (
         "CIMClass: One object",
-        dict(
-            objects=[
+        {
+            'objects': [
                 CIMClass(
                     'CIM_Foo',
                     properties=[
                         CIMProperty('InstanceID', None, type='string'),
                     ]),
             ],
-            exp_indexes=[0]
-        ),
+            'exp_indexes': [0]
+        },
         None, None, OK
     ),
     (
         "CIMClass: Verify that equal sort keys are supported and sort is "
         "stable",
-        dict(
-            objects=[
+        {
+            'objects': [
                 CIMClass(
                     'CIM_Foo',
                     properties=[
@@ -1227,15 +1471,15 @@ TESTCASES_SORT_CIMOBJECTS = [
                         CIMProperty('InstanceID', None, type='string'),
                     ]),
             ],
-            exp_indexes=[1, 2, 0]
-        ),
+            'exp_indexes': [1, 2, 0]
+        },
         None, None, OK
     ),
     (
         "CIMClass: Verify that sort key is only by class name and does not "
         "also include the name of properties",
-        dict(
-            objects=[
+        {
+            'objects': [
                 CIMClass(
                     'CIM_Foo',
                     properties=[
@@ -1252,65 +1496,65 @@ TESTCASES_SORT_CIMOBJECTS = [
                         CIMProperty('InstanceID1', None, type='string'),
                     ]),
             ],
-            exp_indexes=[1, 2, 0]
-        ),
+            'exp_indexes': [1, 2, 0]
+        },
         None, None, OK
     ),
     (
         "CIMClassName: One object",
-        dict(
-            objects=[
+        {
+            'objects': [
                 CIMClassName(host="fred", namespace="cimv2", classname="foo"),
             ],
-            exp_indexes=[0]
-        ),
+            'exp_indexes': [0]
+        },
         None, None, OK
     ),
     (
         "CIMClassName: Verify that equal sort keys are supported and sort is "
         "stable",
-        dict(
-            objects=[
+        {
+            'objects': [
                 CIMClassName(host="fred", namespace="cimv3", classname="bla"),
                 CIMClassName(host="fred", namespace="cimv2", classname="foo"),
                 CIMClassName(host="fred", namespace="cimv2", classname="foo"),
             ],
-            exp_indexes=[1, 2, 0]
-        ),
+            'exp_indexes': [1, 2, 0]
+        },
         None, None, OK
     ),
     (
         "CIMClassName: Verify sort precedence of host, namespace, classname",
-        dict(
-            objects=[
+        {
+            'objects': [
                 CIMClassName(host="fred", namespace="cimv2", classname="foo"),
                 CIMClassName(host="fred", namespace="cimv2", classname="bla"),
                 CIMClassName(host="john", namespace="cimv2", classname="bla"),
                 CIMClassName(host="fred", namespace="cimv3", classname="bla"),
             ],
-            exp_indexes=[1, 0, 3, 2]
-        ),
+            'exp_indexes': [1, 0, 3, 2]
+        },
         None, None, OK
     ),
     (
         "CIMInstanceName: One object",
-        dict(
-            objects=[
+        {
+            'objects': [
                 CIMInstanceName(
                     host='fred',
                     namespace='root/cimv2',
                     classname='CIM_Foo',
                     keybindings={'Chicken': 'Ham', 'Beans': 42}),
             ],
-            exp_indexes=[0]
-        ),
+            'exp_indexes': [0]
+        },
         None, None, OK
     ),
     (
         "CIMInstanceName: Verify that equal sort keys are supported and sort "
         "is stable",
-        dict(
-            objects=[
+        {
+            'objects': [
                 CIMInstanceName(
                     host='fred',
                     namespace='root/cimv3',
@@ -1327,15 +1571,15 @@ TESTCASES_SORT_CIMOBJECTS = [
                     classname='CIM_Foo',
                     keybindings={'Chicken': 'Ham', 'Beans': 42}),
             ],
-            exp_indexes=[1, 2, 0]
-        ),
+            'exp_indexes': [1, 2, 0]
+        },
         None, None, OK
     ),
     (
         "CIMInstanceName: Verify sort precedence of host, namespace, "
         "classname, keybindings",
-        dict(
-            objects=[
+        {
+            'objects': [
                 CIMInstanceName(
                     host='john',
                     namespace='root/cimv2',
@@ -1357,27 +1601,27 @@ TESTCASES_SORT_CIMOBJECTS = [
                     classname='CIM_Foo',
                     keybindings={'AChicken': 'Ham', 'Beans': 42}),
             ],
-            exp_indexes=[3, 2, 1, 0]
-        ),
+            'exp_indexes': [3, 2, 1, 0]
+        },
         None, None, OK
     ),
     (
         "CIMInstance: One object",
-        dict(
-            objects=[
+        {
+            'objects': [
                 CIMInstance(
                     'CIM_Foo',
                     path=CIMInstanceName('CIM_Foo', {'Chicken': 'Ham'})),
             ],
-            exp_indexes=[0]
-        ),
+            'exp_indexes': [0]
+        },
         None, None, OK
     ),
     (
         "CIMInstance: Verify that equal sort keys are supported and sort "
         "is stable",
-        dict(
-            objects=[
+        {
+            'objects': [
                 CIMInstance(
                     'CIM_Foo',
                     path=CIMInstanceName('CIM_Foo', {'Chicken': 'Ham'})),
@@ -1388,15 +1632,15 @@ TESTCASES_SORT_CIMOBJECTS = [
                     'CIM_Boo',
                     path=CIMInstanceName('CIM_Boo', {'Chicken': 'Ham'})),
             ],
-            exp_indexes=[2, 0, 1]
-        ),
+            'exp_indexes': [2, 0, 1]
+        },
         None, None, OK
     ),
     (
         "CIMInstance: Verify that sort is by instance path, and does not also"
         "include class name",
-        dict(
-            objects=[
+        {
+            'objects': [
                 CIMInstance(
                     'CIM_Foo',
                     path=CIMInstanceName('CIM_Foo', {'Chicken': 'Ham'})),
@@ -1407,62 +1651,62 @@ TESTCASES_SORT_CIMOBJECTS = [
                     'CIM_Foo',  # intentionally inconsistent with path
                     path=CIMInstanceName('CIM_Boo', {'Chicken': 'Ham'})),
             ],
-            exp_indexes=[2, 0, 1]
-        ),
+            'exp_indexes': [2, 0, 1]
+        },
         None, None, OK
     ),
     (
         "CIMInstance: Invalid objects without path set",
-        dict(
-            objects=[
+        {
+            'objects': [
                 CIMInstance('CIM_Foo'),
                 CIMInstance('CIM_Boo'),
             ],
-            exp_indexes=None
-        ),
+            'exp_indexes': None
+        },
         ValueError, None, OK
     ),
     (
         "CIMQualifierDeclaration: One object",
-        dict(
-            objects=[
+        {
+            'objects': [
                 CIMQualifierDeclaration('FooQualDecl1', 'uint32'),
             ],
-            exp_indexes=[0]
-        ),
+            'exp_indexes': [0]
+        },
         None, None, OK
     ),
     (
         "CIMQualifierDeclaration: Verify that equal sort keys are supported "
         "and sort is stable",
-        dict(
-            objects=[
+        {
+            'objects': [
                 CIMQualifierDeclaration('FooQualDecl2', 'uint32'),
                 CIMQualifierDeclaration('FooQualDecl2', 'uint32'),
                 CIMQualifierDeclaration('FooQualDecl1', 'uint32'),
             ],
-            exp_indexes=[2, 0, 1]
-        ),
+            'exp_indexes': [2, 0, 1]
+        },
         None, None, OK
     ),
     (
         "CIMQualifierDeclaration: Verify that sort key is by qualifier name, "
         "and does not also include qualifier value",
-        dict(
-            objects=[
+        {
+            'objects': [
                 CIMQualifierDeclaration('FooQualDecl2', 'string', 'abc'),
                 CIMQualifierDeclaration('FooQualDecl1', 'string', 'xyz'),
                 CIMQualifierDeclaration('FooQualDecl1', 'string', 'abc'),
             ],
-            exp_indexes=[1, 2, 0]
-        ),
+            'exp_indexes': [1, 2, 0]
+        },
         None, None, OK
     ),
     (
         "tuple(CIMClassName, CIMClass): Three objects in opposite sort order "
         "(return from class references/associators)",
-        dict(
-            objects=[
+        {
+            'objects': [
                 (
                     CIMClassName(
                         'CIM_Foo', host="fred", namespace="root/cimv2"),
@@ -1491,14 +1735,14 @@ TESTCASES_SORT_CIMOBJECTS = [
                         ]),
                 ),
             ],
-            exp_indexes=[1, 0, 2]
-        ),
+            'exp_indexes': [1, 0, 2]
+        },
         None, None, OK
     ),
     (
         "Invalid type: single tuple(CIMClass, CIMClassName)",
-        dict(
-            objects=[
+        {
+            'objects': [
                 (
                     CIMClass(
                         'CIM_Foo',
@@ -1509,14 +1753,14 @@ TESTCASES_SORT_CIMOBJECTS = [
                         'CIM_Foo', host="fred", namespace="root/cimv2"),
                 ),
             ],
-            exp_indexes=None
-        ),
+            'exp_indexes': None
+        },
         TypeError, None, OK
     ),
     (
         "Invalid type: single tuple(CIMInstanceName, CIMClass)",
-        dict(
-            objects=[
+        {
+            'objects': [
                 (
                     CIMInstanceName(
                         'CIM_Foo', host="fred", namespace="root/cimv2"),
@@ -1527,45 +1771,45 @@ TESTCASES_SORT_CIMOBJECTS = [
                         ]),
                 ),
             ],
-            exp_indexes=None
-        ),
+            'exp_indexes': None
+        },
         TypeError, None, OK
     ),
     (
         "Invalid type: single int object",
-        dict(
-            objects=[42],
-            exp_indexes=None
-        ),
+        {
+            'objects': [42],
+            'exp_indexes': None
+        },
         TypeError, None, OK
     ),
     (
         "Invalid type: two int objects",
-        dict(
-            objects=[42, 43],
-            exp_indexes=None
-        ),
+        {
+            'objects': [42, 43],
+            'exp_indexes': None
+        },
         TypeError, None, OK
     ),
     (
         "Invalid type: Single CIMQualifier object",
-        dict(
-            objects=[
+        {
+            'objects': [
                 CIMQualifier('Key', value=OK),
             ],
-            exp_indexes=None
-        ),
+            'exp_indexes': None
+        },
         TypeError, None, OK
     ),
     (
         "Invalid type: Two CIMQualifier objects",
-        dict(
-            objects=[
+        {
+            'objects': [
                 CIMQualifier('Key', value=True),
                 CIMQualifier('Units', value='Bytes'),
             ],
-            exp_indexes=None
-        ),
+            'exp_indexes': None
+        },
         TypeError, None, OK
     ),
 ]
@@ -1609,35 +1853,54 @@ TESTCASES_SPLIT_ARRAY_VALUE = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ("Verify simple numeric array",
-     dict(input_='0,1,2,3,4,5,6',
-          exp_rslt=['0', '1', '2', '3', '4', '5', '6']),
-     None, None, 'OK'),
-
-    ("Verify simple non-numeric array",
-     dict(input_='abc,def,jhi,klm,nop',
-          exp_rslt=['abc', 'def', 'jhi', 'klm', 'nop']),
-     None, None, OK),
-
-    ("Verify split array with escape for ,",
-     dict(input_='abc,def,jhi,klm,n\\,op',
-          exp_rslt=['abc', 'def', 'jhi', 'klm', 'n,op']),
-     None, None, OK),
-
-    ("Verify split array with space ,",
-     dict(input_='abc,de f',
-          exp_rslt=['abc', 'de f']),
-     None, None, OK),
-
-    ("Verify split single string with space ,",
-     dict(input_='abcde f',
-          exp_rslt=['abcde f']),
-     None, None, OK),
-
-    ("Verify split empty string ,",
-     dict(input_='',
-          exp_rslt=['']),
-     None, None, OK),
+    (
+        "Verify simple numeric array",
+        {
+            'input_': '0,1,2,3,4,5,6',
+            'exp_rslt': ['0', '1', '2', '3', '4', '5', '6']
+        },
+        None, None, OK
+    ),
+    (
+        "Verify simple non-numeric array",
+        {
+            'input_': 'abc,def,jhi,klm,nop',
+            'exp_rslt': ['abc', 'def', 'jhi', 'klm', 'nop']
+        },
+        None, None, OK
+    ),
+    (
+        "Verify split array with escape for ,",
+        {
+            'input_': 'abc,def,jhi,klm,n\\,op',
+            'exp_rslt': ['abc', 'def', 'jhi', 'klm', 'n,op']
+        },
+        None, None, OK
+    ),
+    (
+        "Verify split array with space ,",
+        {
+            'input_': 'abc,de f',
+            'exp_rslt': ['abc', 'de f']
+        },
+        None, None, OK
+    ),
+    (
+        "Verify split single string with space ,",
+        {
+            'input_': 'abcde f',
+            'exp_rslt': ['abcde f']
+        },
+        None, None, OK
+    ),
+    (
+        "Verify split empty string ,",
+        {
+            'input_': '',
+            'exp_rslt': ['']
+        },
+        None, None, OK
+    ),
 ]
 
 
@@ -1723,59 +1986,59 @@ TESTCASES_CREATE_CIMINSTANCE = [
 
     (
         "Test instance of scalar class with string property",
-        dict(
-            cls=CLASS_SCALAR,
-            kv_properties=['ID=Testid'],
-            exp_inst=CIMInstance(
+        {
+            'cls': CLASS_SCALAR,
+            'kv_properties': ['ID=Testid'],
+            'exp_inst': CIMInstance(
                 classname='CIM_Foo',
                 properties=[
                     CIMProperty('ID', 'Testid', type='string'),
                 ]
             ),
-        ),
+        },
         None, None, True
     ),
     (
         "Test instance of scalar class with string+bool properties",
-        dict(
-            cls=CLASS_SCALAR,
-            kv_properties=['ID=Testid', 'Boolp=false'],
-            exp_inst=CIMInstance(
+        {
+            'cls': CLASS_SCALAR,
+            'kv_properties': ['ID=Testid', 'Boolp=false'],
+            'exp_inst': CIMInstance(
                 classname='CIM_Foo',
                 properties=[
                     CIMProperty('ID', 'Testid', type='string'),
                     CIMProperty('Boolp', False),
                 ],
             ),
-        ),
+        },
         None, None, True
     ),
     (
         "Test instance of scalar class with string+real32 properties",
-        dict(
-            cls=CLASS_SCALAR,
-            kv_properties=['ID=Testid', 'Real32p=1.99'],
-            exp_inst=CIMInstance(
+        {
+            'cls': CLASS_SCALAR,
+            'kv_properties': ['ID=Testid', 'Real32p=1.99'],
+            'exp_inst': CIMInstance(
                 classname='CIM_Foo',
                 properties=[
                     CIMProperty('ID', 'Testid', type='string'),
                     CIMProperty('Real32p', 1.99, type='real32'),
                 ],
             ),
-        ),
+        },
         None, None, True
     ),
     (
         "Test instance of scalar class with most properties",
-        dict(
-            cls=CLASS_SCALAR,
-            kv_properties=[
+        {
+            'cls': CLASS_SCALAR,
+            'kv_properties': [
                 'ID=Testid', 'Boolp=true', 'Uint8p=220', 'Sint8p=-120',
                 'Uint32p=999', 'Sint32p=-99', 'Uint64p=999',
                 'Sint64p=-99', 'Strp=hoho',
                 'Dtp=19991224120000.000000+360',
             ],
-            exp_inst=CIMInstance(
+            'exp_inst': CIMInstance(
                 classname='CIM_Foo',
                 properties=[
                     CIMProperty('ID', 'Testid', type='string'),
@@ -1791,180 +2054,180 @@ TESTCASES_CREATE_CIMINSTANCE = [
                     CIMProperty('Strp', 'hoho', type='string'),
                 ],
             ),
-        ),
+        },
         None, None, True
     ),
     (
         "Test instance of scalar class with empty property list",
-        dict(
-            cls=CLASS_SCALAR,
-            kv_properties=[],
-            exp_inst=CIMInstance(classname='CIM_Foo'),
-        ),
+        {
+            'cls': CLASS_SCALAR,
+            'kv_properties': [],
+            'exp_inst': CIMInstance(classname='CIM_Foo'),
+        },
         None, None, True
     ),
     (
         "Test instance of scalar class with no value (NULL) for string "
         "property",
-        dict(
-            cls=CLASS_SCALAR,
-            kv_properties=['Strp='],
-            exp_inst=CIMInstance(
+        {
+            'cls': CLASS_SCALAR,
+            'kv_properties': ['Strp='],
+            'exp_inst': CIMInstance(
                 classname='CIM_Foo',
                 properties=[
                     CIMProperty('Strp', None, type='string'),
                 ],
             ),
-        ),
+        },
         None, None, True
     ),
     (
         "Test instance of scalar class with no =value (NULL) for string "
         "property",
-        dict(
-            cls=CLASS_SCALAR,
-            kv_properties=['Strp'],
-            exp_inst=CIMInstance(
+        {
+            'cls': CLASS_SCALAR,
+            'kv_properties': ['Strp'],
+            'exp_inst': CIMInstance(
                 classname='CIM_Foo',
                 properties=[
                     CIMProperty('Strp', None, type='string'),
                 ],
             ),
-        ),
+        },
         None, None, True
     ),
     (
         "Test instance of scalar class with no value (NULL) for uint32 "
         "property",
-        dict(
-            cls=CLASS_SCALAR,
-            kv_properties=['Uint32p='],
-            exp_inst=CIMInstance(
+        {
+            'cls': CLASS_SCALAR,
+            'kv_properties': ['Uint32p='],
+            'exp_inst': CIMInstance(
                 classname='CIM_Foo',
                 properties=[
                     CIMProperty('Uint32p', None, type='uint32'),
                 ],
             ),
-        ),
+        },
         None, None, True
     ),
     (
         "Test instance of scalar class with no =value (NULL) for uint32 "
         "property",
-        dict(
-            cls=CLASS_SCALAR,
-            kv_properties=['Uint32p'],
-            exp_inst=CIMInstance(
+        {
+            'cls': CLASS_SCALAR,
+            'kv_properties': ['Uint32p'],
+            'exp_inst': CIMInstance(
                 classname='CIM_Foo',
                 properties=[
                     CIMProperty('Uint32p', None, type='uint32'),
                 ],
             ),
-        ),
+        },
         None, None, True
     ),
     (
         "Test instance of scalar class with no value (NULL) for bool property",
-        dict(
-            cls=CLASS_SCALAR,
-            kv_properties=['Boolp='],
-            exp_inst=CIMInstance(
+        {
+            'cls': CLASS_SCALAR,
+            'kv_properties': ['Boolp='],
+            'exp_inst': CIMInstance(
                 classname='CIM_Foo',
                 properties=[
                     CIMProperty('Boolp', None, type='boolean'),
                 ],
             ),
-        ),
+        },
         None, None, True
     ),
     (
         "Test instance of scalar class with no =value (NULL) for bool property",
-        dict(
-            cls=CLASS_SCALAR,
-            kv_properties=['Boolp'],
-            exp_inst=CIMInstance(
+        {
+            'cls': CLASS_SCALAR,
+            'kv_properties': ['Boolp'],
+            'exp_inst': CIMInstance(
                 classname='CIM_Foo',
                 properties=[
                     CIMProperty('Boolp', None, type='boolean'),
                 ],
             ),
-        ),
+        },
         None, None, True
     ),
     (
         "Test instance of scalar class with invalid property name",
-        dict(
-            cls=CLASS_SCALAR,
-            kv_properties=['DoesNotExist'],
-            exp_inst=None,
-        ),
+        {
+            'cls': CLASS_SCALAR,
+            'kv_properties': ['DoesNotExist'],
+            'exp_inst': None,
+        },
         click.ClickException, None, True
     ),
     (
         "Test instance of scalar class with incorrect int value for bool "
         "property",
-        dict(
-            cls=CLASS_SCALAR,
-            kv_properties=['Boolp=123'],
-            exp_inst=None,
-        ),
+        {
+            'cls': CLASS_SCALAR,
+            'kv_properties': ['Boolp=123'],
+            'exp_inst': None,
+        },
         click.ClickException, None, True
     ),
     (
         "Test instance of scalar class with incorrect string value for uint32 "
         "property",
-        dict(
-            cls=CLASS_SCALAR,
-            kv_properties=['Uint32p=shouldnotbestring'],
-            exp_inst=None,
-        ),
+        {
+            'cls': CLASS_SCALAR,
+            'kv_properties': ['Uint32p=shouldnotbestring'],
+            'exp_inst': None,
+        },
         click.ClickException, None, True
     ),
     (
         "Test instance of scalar class with incorrect bool value for uint32 "
         "property",
-        dict(
-            cls=CLASS_SCALAR,
-            kv_properties=['Uint32p=true'],
-            exp_inst=None,
-        ),
+        {
+            'cls': CLASS_SCALAR,
+            'kv_properties': ['Uint32p=true'],
+            'exp_inst': None,
+        },
         click.ClickException, None, True
     ),
     (
         "Test instance of scalar class with incorrect bool value for real32 "
         "property",
-        dict(
-            cls=CLASS_SCALAR,
-            kv_properties=['Real32p=true'],
-            exp_inst=None,
-        ),
+        {
+            'cls': CLASS_SCALAR,
+            'kv_properties': ['Real32p=true'],
+            'exp_inst': None,
+        },
         click.ClickException, None, True
     ),
     (
         "Test instance of scalar class with two-char value for char16 property "
         "(pywbem.cimvalue() does not reject that)",
-        dict(
-            cls=CLASS_SCALAR,
-            kv_properties=['Char16p=ab'],
-            exp_inst=CIMInstance(
+        {
+            'cls': CLASS_SCALAR,
+            'kv_properties': ['Char16p=ab'],
+            'exp_inst': CIMInstance(
                 classname='CIM_Foo',
                 properties=[
                     CIMProperty('Char16p', 'ab', type='char16'),
                 ],
             ),
-        ),
+        },
         None, None, True
     ),
     (
         "Test instance of array class with most properties",
-        dict(
-            cls=CLASS_ARRAY,
-            kv_properties=[
+        {
+            'cls': CLASS_ARRAY,
+            'kv_properties': [
                 'ID=Testid', 'Boolp=true,false', 'Uint8p=0,12,120',
                 'Sint8p=-120,0,119', 'Uint32p=0,999', 'Sint32p=-99,0,9999',
                 'Uint64p=0,999,99999', 'Sint64p=-99,0,12345', 'Strp=hoho,haha',
             ],
-            exp_inst=CIMInstance(
+            'exp_inst': CIMInstance(
                 classname='CIM_Foo',
                 properties=[
                     CIMProperty('ID', 'Testid', type='string'),
@@ -1978,168 +2241,168 @@ TESTCASES_CREATE_CIMINSTANCE = [
                     CIMProperty('Strp', ['hoho', 'haha'], type='string'),
                 ],
             ),
-        ),
+        },
         None, None, True
     ),
     (
         "Test instance of array class with empty property list",
-        dict(
-            cls=CLASS_ARRAY,
-            kv_properties=[],
-            exp_inst=CIMInstance(classname='CIM_Foo'),
-        ),
+        {
+            'cls': CLASS_ARRAY,
+            'kv_properties': [],
+            'exp_inst': CIMInstance(classname='CIM_Foo'),
+        },
         None, None, True
     ),
     (
         "Test instance of array class with no value (NULL) for string "
         "property",
-        dict(
-            cls=CLASS_ARRAY,
-            kv_properties=['Strp='],
-            exp_inst=CIMInstance(
+        {
+            'cls': CLASS_ARRAY,
+            'kv_properties': ['Strp='],
+            'exp_inst': CIMInstance(
                 classname='CIM_Foo',
                 properties=[
                     CIMProperty('Strp', None, is_array=True, type='string'),
                 ],
             ),
-        ),
+        },
         None, None, True
     ),
     (
         "Test instance of array class with no =value (NULL) for string "
         "property",
-        dict(
-            cls=CLASS_ARRAY,
-            kv_properties=['Strp'],
-            exp_inst=CIMInstance(
+        {
+            'cls': CLASS_ARRAY,
+            'kv_properties': ['Strp'],
+            'exp_inst': CIMInstance(
                 classname='CIM_Foo',
                 properties=[
                     CIMProperty('Strp', None, is_array=True, type='string'),
                 ],
             ),
-        ),
+        },
         None, None, True
     ),
     (
         "Test instance of array class with no value (NULL) for uint32 "
         "property",
-        dict(
-            cls=CLASS_ARRAY,
-            kv_properties=['Uint32p='],
-            exp_inst=CIMInstance(
+        {
+            'cls': CLASS_ARRAY,
+            'kv_properties': ['Uint32p='],
+            'exp_inst': CIMInstance(
                 classname='CIM_Foo',
                 properties=[
                     CIMProperty('Uint32p', None, is_array=True, type='uint32'),
                 ],
             ),
-        ),
+        },
         None, None, True
     ),
     (
         "Test instance of array class with no =value (NULL) for uint32 "
         "property",
-        dict(
-            cls=CLASS_ARRAY,
-            kv_properties=['Uint32p'],
-            exp_inst=CIMInstance(
+        {
+            'cls': CLASS_ARRAY,
+            'kv_properties': ['Uint32p'],
+            'exp_inst': CIMInstance(
                 classname='CIM_Foo',
                 properties=[
                     CIMProperty('Uint32p', None, is_array=True, type='uint32'),
                 ],
             ),
-        ),
+        },
         None, None, True
     ),
     (
         "Test instance of array class with no value (NULL) for bool property",
-        dict(
-            cls=CLASS_ARRAY,
-            kv_properties=['Boolp='],
-            exp_inst=CIMInstance(
+        {
+            'cls': CLASS_ARRAY,
+            'kv_properties': ['Boolp='],
+            'exp_inst': CIMInstance(
                 classname='CIM_Foo',
                 properties=[
                     CIMProperty('Boolp', None, is_array=True, type='boolean'),
                 ],
             ),
-        ),
+        },
         None, None, True
     ),
     (
         "Test instance of array class with no =value (NULL) for bool property",
-        dict(
-            cls=CLASS_ARRAY,
-            kv_properties=['Boolp'],
-            exp_inst=CIMInstance(
+        {
+            'cls': CLASS_ARRAY,
+            'kv_properties': ['Boolp'],
+            'exp_inst': CIMInstance(
                 classname='CIM_Foo',
                 properties=[
                     CIMProperty('Boolp', None, is_array=True, type='boolean'),
                 ],
             ),
-        ),
+        },
         None, None, True
     ),
     (
         "Test instance of array class with invalid property name",
-        dict(
-            cls=CLASS_ARRAY,
-            kv_properties=['DoesNotExist'],
-            exp_inst=None,
-        ),
+        {
+            'cls': CLASS_ARRAY,
+            'kv_properties': ['DoesNotExist'],
+            'exp_inst': None,
+        },
         click.ClickException, None, True
     ),
     (
         "Test instance of array class with incorrect int value for bool "
         "property",
-        dict(
-            cls=CLASS_ARRAY,
-            kv_properties=['Boolp=123'],
-            exp_inst=None,
-        ),
+        {
+            'cls': CLASS_ARRAY,
+            'kv_properties': ['Boolp=123'],
+            'exp_inst': None,
+        },
         click.ClickException, None, True
     ),
     (
         "Test instance of array class with incorrect string value for uint32 "
         "property",
-        dict(
-            cls=CLASS_ARRAY,
-            kv_properties=['Uint32p=shouldnotbestring'],
-            exp_inst=None,
-        ),
+        {
+            'cls': CLASS_ARRAY,
+            'kv_properties': ['Uint32p=shouldnotbestring'],
+            'exp_inst': None,
+        },
         click.ClickException, None, True
     ),
     (
         "Test instance of array class with incorrect bool value for uint32 "
         "property",
-        dict(
-            cls=CLASS_ARRAY,
-            kv_properties=['Uint32p=true'],
-            exp_inst=None,
-        ),
+        {
+            'cls': CLASS_ARRAY,
+            'kv_properties': ['Uint32p=true'],
+            'exp_inst': None,
+        },
         click.ClickException, None, True
     ),
     (
         "Test instance of array class with incorrect bool value for real32 "
         "property",
-        dict(
-            cls=CLASS_ARRAY,
-            kv_properties=['Real32p=true'],
-            exp_inst=None,
-        ),
+        {
+            'cls': CLASS_ARRAY,
+            'kv_properties': ['Real32p=true'],
+            'exp_inst': None,
+        },
         click.ClickException, None, True
     ),
     (
         "Test instance of array class with two-char value for char16 property "
         "(pywbem.cimvalue() does not reject that)",
-        dict(
-            cls=CLASS_ARRAY,
-            kv_properties=['Char16p=ab'],
-            exp_inst=CIMInstance(
+        {
+            'cls': CLASS_ARRAY,
+            'kv_properties': ['Char16p=ab'],
+            'exp_inst': CIMInstance(
                 classname='CIM_Foo',
                 properties=[
                     CIMProperty('Char16p', ['ab'], type='char16'),
                 ],
             ),
-        ),
+        },
         None, None, True
     ),
 ]
@@ -2200,56 +2463,79 @@ TESTCASES_GET_SUBCLASS_NAMES = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('Verify list of subclasses for TST_L1',
-     dict(classes=SUBCLASS_LIST,
-          classname="TST_L1",
-          deep_inheritance=True,
-          exp_rtn=['TST_L11', 'TST_L111', 'TST_L1111', 'TST_L1112',
-                   'TST_L1113']),
-     None, None, OK, ),
-
-    ('Verify list of subclasses for TST_L21',
-     dict(classes=SUBCLASS_LIST,
-          classname="TST_L21",
-          deep_inheritance=True,
-          exp_rtn=['TST_L211', 'TST_L2111', 'TST_L2112', 'TST_L2113',
-                   'TST_L2114']),
-     None, None, OK, ),
-    ('Verify list of subclasses for TST_L211',
-     dict(classes=SUBCLASS_LIST,
-          classname="TST_L21",
-          deep_inheritance=True,
-          exp_rtn=['TST_L211', 'TST_L2111', 'TST_L2112', 'TST_L2113',
-                   'TST_L2114']),
-     None, None, OK, ),
-
-    ('Verify list of subclasses for TST_L2111',
-     dict(classes=SUBCLASS_LIST,
-          classname="TST_L2111",
-          deep_inheritance=True,
-          exp_rtn=[]),
-     None, None, OK, ),
-
-    ('Verify list of subclasses for TST_L2111',
-     dict(classes=SUBCLASS_LIST,
-          classname="blah",
-          deep_inheritance=True,
-          exp_rtn=[]),
-     ValueError, None, OK, ),
-
-    ('Verify list of subclasses for TST_L1',
-     dict(classes=SUBCLASS_LIST,
-          classname="TST_L1",
-          deep_inheritance=False,
-          exp_rtn=['TST_L11']),
-     None, None, OK, ),
-
-    ('Verify list of subclasses for TST_L21',
-     dict(classes=SUBCLASS_LIST,
-          classname="TST_L21",
-          deep_inheritance=False,
-          exp_rtn=['TST_L211']),
-     None, None, OK, ),
+    (
+        'Verify list of subclasses for TST_L1',
+        {
+            'classes': SUBCLASS_LIST,
+            'classname': "TST_L1",
+            'deep_inheritance': True,
+            'exp_rtn': ['TST_L11', 'TST_L111', 'TST_L1111', 'TST_L1112',
+                        'TST_L1113']
+        },
+        None, None, True
+    ),
+    (
+        'Verify list of subclasses for TST_L21',
+        {
+            'classes': SUBCLASS_LIST,
+            'classname': "TST_L21",
+            'deep_inheritance': True,
+            'exp_rtn': ['TST_L211', 'TST_L2111', 'TST_L2112', 'TST_L2113',
+                        'TST_L2114']
+        },
+        None, None, True
+    ),
+    (
+        'Verify list of subclasses for TST_L211',
+        {
+            'classes': SUBCLASS_LIST,
+            'classname': "TST_L21",
+            'deep_inheritance': True,
+            'exp_rtn': ['TST_L211', 'TST_L2111', 'TST_L2112', 'TST_L2113',
+                        'TST_L2114']
+        },
+        None, None, True
+    ),
+    (
+        'Verify list of subclasses for TST_L2111',
+        {
+            'classes': SUBCLASS_LIST,
+            'classname': "TST_L2111",
+            'deep_inheritance': True,
+            'exp_rtn': []
+        },
+        None, None, True
+    ),
+    (
+        'Verify list of subclasses for TST_L2111',
+        {
+            'classes': SUBCLASS_LIST,
+            'classname': "blah",
+            'deep_inheritance': True,
+            'exp_rtn': []
+        },
+        ValueError, None, OK
+    ),
+    (
+        'Verify list of subclasses for TST_L1',
+        {
+            'classes': SUBCLASS_LIST,
+            'classname': "TST_L1",
+            'deep_inheritance': False,
+            'exp_rtn': ['TST_L11']
+        },
+        None, None, True
+    ),
+    (
+        'Verify list of subclasses for TST_L21',
+        {
+            'classes': SUBCLASS_LIST,
+            'classname': "TST_L21",
+            'deep_inheritance': False,
+            'exp_rtn': ['TST_L211']
+        },
+        None, None, OK
+    ),
 ]
 
 
@@ -2290,53 +2576,53 @@ TESTCASES_DEPENDENT_CLASSNAMES = [
 
     (
         'Verify class with no dependent classes',
-        dict(
-            cls_obj=CIMClass('Foo'),
-            exp_rtn=NocaseList(),
-        ),
+        {
+            'cls_obj': CIMClass('Foo'),
+            'exp_rtn': NocaseList(),
+        },
         None, None, True
     ),
     (
         'Verify class with a superclass',
-        dict(
-            cls_obj=CIMClass('Foo', superclass='Super'),
-            exp_rtn=NocaseList(['Super']),
-        ),
+        {
+            'cls_obj': CIMClass('Foo', superclass='Super'),
+            'exp_rtn': NocaseList(['Super']),
+        },
         None, None, True
     ),
     (
         'Verify class with a reference property to another class',
-        dict(
-            cls_obj=CIMClass(
+        {
+            'cls_obj': CIMClass(
                 'Foo',
                 properties=[
                     CIMProperty('P1', value=None, type='reference',
                                 reference_class='Ref'),
                 ],
             ),
-            exp_rtn=NocaseList(['Ref']),
-        ),
+            'exp_rtn': NocaseList(['Ref']),
+        },
         None, None, True
     ),
     (
         'Verify class with a reference property to the same class',
-        dict(
-            cls_obj=CIMClass(
+        {
+            'cls_obj': CIMClass(
                 'Foo',
                 properties=[
                     CIMProperty('P1', value=None, type='reference',
                                 reference_class='Foo'),
                 ],
             ),
-            exp_rtn=NocaseList(),
-        ),
+            'exp_rtn': NocaseList(),
+        },
         None, None, True
     ),
     (
         'Verify class with a method with a reference parameter to another '
         'class',
-        dict(
-            cls_obj=CIMClass(
+        {
+            'cls_obj': CIMClass(
                 'Foo',
                 methods=[
                     CIMMethod(
@@ -2348,14 +2634,14 @@ TESTCASES_DEPENDENT_CLASSNAMES = [
                     ),
                 ],
             ),
-            exp_rtn=NocaseList(['Ref']),
-        ),
+            'exp_rtn': NocaseList(['Ref']),
+        },
         None, None, True
     ),
     (
         'Verify class with a method with a reference parameter to same class',
-        dict(
-            cls_obj=CIMClass(
+        {
+            'cls_obj': CIMClass(
                 'Foo',
                 methods=[
                     CIMMethod(
@@ -2367,14 +2653,14 @@ TESTCASES_DEPENDENT_CLASSNAMES = [
                     ),
                 ],
             ),
-            exp_rtn=NocaseList(),
-        ),
+            'exp_rtn': NocaseList(),
+        },
         None, None, True
     ),
     (
         'Verify class with a embedded instance property to another class',
-        dict(
-            cls_obj=CIMClass(
+        {
+            'cls_obj': CIMClass(
                 'Foo',
                 properties=[
                     CIMProperty(
@@ -2385,14 +2671,14 @@ TESTCASES_DEPENDENT_CLASSNAMES = [
                     ),
                 ],
             ),
-            exp_rtn=NocaseList(['Emb']),
-        ),
+            'exp_rtn': NocaseList(['Emb']),
+        },
         None, None, True
     ),
     (
         'Verify class with a embedded instance property to same class',
-        dict(
-            cls_obj=CIMClass(
+        {
+            'cls_obj': CIMClass(
                 'Foo',
                 properties=[
                     CIMProperty(
@@ -2403,15 +2689,15 @@ TESTCASES_DEPENDENT_CLASSNAMES = [
                     ),
                 ],
             ),
-            exp_rtn=NocaseList(),
-        ),
+            'exp_rtn': NocaseList(),
+        },
         None, None, True
     ),
     (
         'Verify class with a method that returns an embedded instance to '
         'another class',
-        dict(
-            cls_obj=CIMClass(
+        {
+            'cls_obj': CIMClass(
                 'Foo',
                 methods=[
                     CIMMethod(
@@ -2422,15 +2708,15 @@ TESTCASES_DEPENDENT_CLASSNAMES = [
                     ),
                 ],
             ),
-            exp_rtn=NocaseList(['Emb']),
-        ),
+            'exp_rtn': NocaseList(['Emb']),
+        },
         None, None, True
     ),
     (
         'Verify class with a method that returns an embedded instance to '
         'same class',
-        dict(
-            cls_obj=CIMClass(
+        {
+            'cls_obj': CIMClass(
                 'Foo',
                 methods=[
                     CIMMethod(
@@ -2441,15 +2727,15 @@ TESTCASES_DEPENDENT_CLASSNAMES = [
                     ),
                 ],
             ),
-            exp_rtn=NocaseList(),
-        ),
+            'exp_rtn': NocaseList(),
+        },
         None, None, True
     ),
     (
         'Verify class with a method with a embedded instance parameter to '
         'another class',
-        dict(
-            cls_obj=CIMClass(
+        {
+            'cls_obj': CIMClass(
                 'Foo',
                 methods=[
                     CIMMethod(
@@ -2466,15 +2752,15 @@ TESTCASES_DEPENDENT_CLASSNAMES = [
                     ),
                 ],
             ),
-            exp_rtn=NocaseList(['Emb']),
-        ),
+            'exp_rtn': NocaseList(['Emb']),
+        },
         None, None, True
     ),
     (
         'Verify class with a method with a embedded instance parameter to '
         'same class',
-        dict(
-            cls_obj=CIMClass(
+        {
+            'cls_obj': CIMClass(
                 'Foo',
                 methods=[
                     CIMMethod(
@@ -2491,14 +2777,14 @@ TESTCASES_DEPENDENT_CLASSNAMES = [
                     ),
                 ],
             ),
-            exp_rtn=NocaseList(),
-        ),
+            'exp_rtn': NocaseList(),
+        },
         None, None, True
     ),
     (
         'Verify class with all possible dependent classes to different classes',
-        dict(
-            cls_obj=CIMClass(
+        {
+            'cls_obj': CIMClass(
                 'Foo',
                 superclass='Super',
                 properties=[
@@ -2536,16 +2822,16 @@ TESTCASES_DEPENDENT_CLASSNAMES = [
                     ),
                 ],
             ),
-            exp_rtn=NocaseList(['Super', 'RefP1', 'EmbP2', 'EmbM1',
-                                'RefM1Pa1', 'EmbM1Pa2']),
-        ),
+            'exp_rtn': NocaseList(
+                ['Super', 'RefP1', 'EmbP2', 'EmbM1', 'RefM1Pa1', 'EmbM1Pa2']),
+        },
         None, None, True
     ),
     (
         'Verify class with all possible dependent classes to partly the same '
         'classes, also referencing itself',
-        dict(
-            cls_obj=CIMClass(
+        {
+            'cls_obj': CIMClass(
                 'Foo',
                 superclass='Super',
                 properties=[
@@ -2591,8 +2877,8 @@ TESTCASES_DEPENDENT_CLASSNAMES = [
                     ),
                 ],
             ),
-            exp_rtn=NocaseList(['Super', 'Ref', 'EmbP2', 'EmbM1']),
-        ),
+            'exp_rtn': NocaseList(['Super', 'Ref', 'EmbP2', 'EmbM1']),
+        },
         None, None, True
     ),
 ]
@@ -2634,56 +2920,56 @@ TESTCASES_DEPENDING_CLASSNAMES = [
 
     (
         'Verify class CIM_Foo in simple mock model',
-        dict(
-            mock_items=[SIMPLE_MOCK_FILE],
-            classname='CIM_Foo',
-            exp_rtn=['CIM_Foo_sub', 'CIM_Foo_sub2'],
-        ),
+        {
+            'mock_items': [SIMPLE_MOCK_FILE],
+            'classname': 'CIM_Foo',
+            'exp_rtn': ['CIM_Foo_sub', 'CIM_Foo_sub2'],
+        },
         None, None, True
     ),
     (
         'Verify class CIM_Foo_sub in simple mock model',
-        dict(
-            mock_items=[SIMPLE_MOCK_FILE],
-            classname='CIM_Foo_sub',
-            exp_rtn=['CIM_Foo_sub_sub'],
-        ),
+        {
+            'mock_items': [SIMPLE_MOCK_FILE],
+            'classname': 'CIM_Foo_sub',
+            'exp_rtn': ['CIM_Foo_sub_sub'],
+        },
         None, None, True
     ),
     (
         'Verify class CIM_Foo_sub2 in simple mock model',
-        dict(
-            mock_items=[SIMPLE_MOCK_FILE],
-            classname='CIM_Foo_sub2',
-            exp_rtn=[],
-        ),
+        {
+            'mock_items': [SIMPLE_MOCK_FILE],
+            'classname': 'CIM_Foo_sub2',
+            'exp_rtn': [],
+        },
         None, None, True
     ),
     (
         'Verify class CIM_FooRef1 in simple mock model',
-        dict(
-            mock_items=[SIMPLE_MOCK_FILE],
-            classname='CIM_FooRef1',
-            exp_rtn=['CIM_Foo', 'CIM_FooAssoc'],
-        ),
+        {
+            'mock_items': [SIMPLE_MOCK_FILE],
+            'classname': 'CIM_FooRef1',
+            'exp_rtn': ['CIM_Foo', 'CIM_FooAssoc'],
+        },
         None, None, True
     ),
     (
         'Verify class CIM_FooEmb1 in simple mock model',
-        dict(
-            mock_items=[SIMPLE_MOCK_FILE],
-            classname='CIM_FooEmb1',
-            exp_rtn=['CIM_Foo'],
-        ),
+        {
+            'mock_items': [SIMPLE_MOCK_FILE],
+            'classname': 'CIM_FooEmb1',
+            'exp_rtn': ['CIM_Foo'],
+        },
         None, None, True
     ),
     (
         'Verify class CIM_FooAssoc in simple mock model',
-        dict(
-            mock_items=[SIMPLE_MOCK_FILE],
-            classname='CIM_FooAssoc',
-            exp_rtn=[],
-        ),
+        {
+            'mock_items': [SIMPLE_MOCK_FILE],
+            'classname': 'CIM_FooAssoc',
+            'exp_rtn': [],
+        },
         None, None, True
     ),
 ]
@@ -2727,9 +3013,9 @@ TESTCASES_ALL_CLASSNAMES_DEPSORTED = [
 
     (
         'Verify simple mock model',
-        dict(
-            mock_items=[SIMPLE_MOCK_FILE],
-            exp_rtn=[
+        {
+            'mock_items': [SIMPLE_MOCK_FILE],
+            'exp_rtn': [
                 'CIM_Foo_sub_sub',
                 'CIM_Foo_sub2',
                 'CIM_Foo_sub',
@@ -2743,7 +3029,7 @@ TESTCASES_ALL_CLASSNAMES_DEPSORTED = [
                 'CIM_BaseRef',
                 'CIM_BaseEmb',
             ],
-        ),
+        },
         None, None, True
     ),
 ]
@@ -2783,51 +3069,78 @@ TESTCASES_PARSE_VERSION_VALUE = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('Verify valid version string 1',
-     dict(ver="2.41.1",
-          exp_rtn=[2, 41, 1]),
-     None, None, OK, ),
-
-    ('Verify valid version string 2',
-     dict(ver="1.1.1",
-          exp_rtn=[1, 1, 1]),
-     None, None, OK, ),
-
-    ('Verify valid version string 3',
-     dict(ver="99.99.99",
-          exp_rtn=[99, 99, 99]),
-     None, None, OK, ),
-
-    ('Verify invalid string with only two items returns 3 items',
-     dict(ver="2.41",
-          exp_rtn=[2, 41, 0]),
-     None, ToleratedSchemaIssueWarning, OK, ),
-
-    ('Verify invalid string with 4 items returns 3 items',
-     dict(ver="2.41.1.1",
-          exp_rtn=[2, 41, 1]),
-     None, ToleratedSchemaIssueWarning, OK, ),
-
-    ('Verify invalid string with alphabetic characters returns 0.0.0',
-     dict(ver="a.41.1",
-          exp_rtn=[0, 0, 0]),
-     None, ToleratedSchemaIssueWarning, OK, ),
-
-    ('Verify invalid string with alphabetic characters returns 0.0.0',
-     dict(ver="2.abcdef.1",
-          exp_rtn=[0, 0, 0]),
-     None, ToleratedSchemaIssueWarning, OK, ),
-
-
-    ('Verify invalid string with alphabetic characters returns 0.0.0',
-     dict(ver="xyz.abcdef.jkl",
-          exp_rtn=[0, 0, 0]),
-     None, ToleratedSchemaIssueWarning, OK, ),
-
-    ('Verify invalid string empty returns 3 items',
-     dict(ver="",
-          exp_rtn=[0, 0, 0]),
-     None, ToleratedSchemaIssueWarning, OK, ),
+    (
+        'Verify valid version string 1',
+        {
+            'ver': "2.41.1",
+            'exp_rtn': [2, 41, 1]
+        },
+        None, None, True
+    ),
+    (
+        'Verify valid version string 2',
+        {
+            'ver': "1.1.1",
+            'exp_rtn': [1, 1, 1]
+        },
+        None, None, True
+    ),
+    (
+        'Verify valid version string 3',
+        {
+            'ver': "99.99.99",
+            'exp_rtn': [99, 99, 99]
+        },
+        None, None, True
+    ),
+    (
+        'Verify invalid string with only two items returns 3 items',
+        {
+            'ver': "2.41",
+            'exp_rtn': [2, 41, 0]
+        },
+        None, ToleratedSchemaIssueWarning, OK
+    ),
+    (
+        'Verify invalid string with 4 items returns 3 items',
+        {
+            'ver': "2.41.1.1",
+            'exp_rtn': [2, 41, 1]
+        },
+        None, ToleratedSchemaIssueWarning, OK
+    ),
+    (
+        'Verify invalid string with alphabetic characters returns 0.0.0',
+        {
+            'ver': "a.41.1",
+            'exp_rtn': [0, 0, 0]
+        },
+        None, ToleratedSchemaIssueWarning, OK
+    ),
+    (
+        'Verify invalid string with alphabetic characters returns 0.0.0',
+        {
+            'ver': "2.abcdef.1",
+            'exp_rtn': [0, 0, 0]
+        },
+        None, ToleratedSchemaIssueWarning, OK
+    ),
+    (
+        'Verify invalid string with alphabetic characters returns 0.0.0',
+        {
+            'ver': "xyz.abcdef.jkl",
+            'exp_rtn': [0, 0, 0]
+        },
+        None, ToleratedSchemaIssueWarning, OK
+    ),
+    (
+        'Verify invalid string empty returns 3 items',
+        {
+            'ver': "",
+            'exp_rtn': [0, 0, 0]
+        },
+        None, ToleratedSchemaIssueWarning, OK
+    ),
 ]
 
 
@@ -2860,22 +3173,27 @@ TESTCASES_IS_EXPERIMENTAL = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('Verify experimintal in class qualifiers',
-     dict(klass="""
-[Version ( "2.6.0" ), Experimental]
-class TST_Exp{
-    string p;
-    uint32 counter;
-    string M1;
-    uint32 M2(
-      string P1);
-};
-""",
-          exp_rtn=True),
-     None, None, OK, ),
-
-    ('Verify experimental in property quaifier',
-     dict(klass="""
+    (
+        'Verify experimintal in class qualifiers',
+        {
+            'klass': """
+                [Version ( "2.6.0" ), Experimental]
+                class TST_Exp{
+                    string p;
+                    uint32 counter;
+                    string M1;
+                    uint32 M2(
+                      string P1);
+                };
+                """,
+            'exp_rtn': True
+        },
+        None, None, True
+    ),
+    (
+        'Verify experimental in property quaifier',
+        {
+            'klass': """
                 [Version ( "2.6.0" )]
                 class TST_Exp{
                     [Experimental] string p;
@@ -2885,11 +3203,14 @@ class TST_Exp{
                       string P1);
                 };
                 """,
-          exp_rtn=True),
-     None, None, OK, ),
-
-    ('Verify experimental in method qualifiers',
-     dict(klass="""
+            'exp_rtn': True
+        },
+        None, None, True
+    ),
+    (
+        'Verify experimental in method qualifiers',
+        {
+            'klass': """
                 [Version ( "2.6.0" )]
                 class TST_Exp{
                     string p;
@@ -2899,12 +3220,14 @@ class TST_Exp{
                       string P1);
                 };
                 """,
-          exp_rtn=True),
-     None, None, OK, ),
-
-
-    ('Verify experimental in first method qualifiers',
-     dict(klass="""
+            'exp_rtn': True
+        },
+        None, None, OK
+    ),
+    (
+        'Verify experimental in first method qualifiers',
+        {
+            'klass': """
                 [Version ( "2.6.0" )]
                 class TST_Exp{
                     string p;
@@ -2914,11 +3237,14 @@ class TST_Exp{
                       string P1);
                 };
                 """,
-          exp_rtn=True),
-     None, None, OK, ),
-
-    ('Verify experimental in parameter qualifiers',
-     dict(klass="""
+            'exp_rtn': True
+        },
+        None, None, True
+    ),
+    (
+        'Verify experimental in parameter qualifiers',
+        {
+            'klass': """
                 [Version ( "2.6.0" )]
                 class TST_Exp{
                     string p;
@@ -2928,11 +3254,14 @@ class TST_Exp{
                       [ Experimental] string P1);
                 };
                 """,
-          exp_rtn=True),
-     None, None, OK, ),
-
-    ('Verify no experimental qualifiers',
-     dict(klass="""
+            'exp_rtn': True
+        },
+        None, None, True
+    ),
+    (
+        'Verify no experimental qualifiers',
+        {
+            'klass': """
                 [Version ( "2.6.0" )]
                 class TST_Exp{
                     string p;
@@ -2942,11 +3271,14 @@ class TST_Exp{
                       string P1);
                 };
                 """,
-          exp_rtn=False),
-     None, None, OK, ),
-
-    ('Verify experimental with value False',
-     dict(klass="""
+            'exp_rtn': False
+        },
+        None, None, True
+    ),
+    (
+        'Verify experimental with value False',
+        {
+            'klass': """
                 [Version ( "2.6.0" ), Experimental(false)]
                 class TST_Exp{
                     string p;
@@ -2956,9 +3288,10 @@ class TST_Exp{
                       string P1);
                 };
                 """,
-          exp_rtn=False),
-     None, None, OK, ),
-
+            'exp_rtn': False
+        },
+        None, None, OK
+    ),
 ]
 
 
@@ -3023,47 +3356,65 @@ TESTCASES_TO_WBEMURI_FOLDED = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
     # TODO: Remove the first two tests.
-    ('Verify simple sucessful format without  fold',
-     dict(path=CIMInstanceName(classname='CIM_Foo',
-                               keybindings=dict(InstanceID='1234'),
-                               namespace='root/cimv2',
-                               host='fred'),
-          uri_format=None,
-          max_lens=60,
-          exp_rtns='//fred/root/cimv2:CIM_Foo.InstanceID="1234"'),
-     None, None, OK, ),
 
-    ('Verify simple sucessful format with  fold',
-     dict(path=CIMInstanceName(classname='CIM_Foo',
-                               keybindings=dict(InstanceID='1234'),
-                               namespace='root/cimv2',
-                               host='fred'),
-          uri_format=None,
-          max_lens=30,
-          exp_rtns='//fred/root/cimv2:CIM_Foo.InstanceID=\n"1234"'),
-     None, None, OK, ),
-
-    ('Verify simple sucessful format with fold and no fold',
-     dict(path=CIMInstanceName(classname='CIM_Foo',
-                               keybindings=dict(InstanceID='1234'),
-                               namespace='root/cimv2',
-                               host='fred'),
-          uri_format=None,
-          max_lens=[60, 30],
-          exp_rtns=['//fred/root/cimv2:CIM_Foo.InstanceID="1234"',
-                    '//fred/root/cimv2:CIM_Foo.InstanceID=\n"1234"']),
-     None, None, OK, ),
-
-    ('Verify simple sucessful format with vers small fold int',
-     dict(path=CIMInstanceName(classname='CIM_Foo',
-                               keybindings=dict(InstanceID='1234'),
-                               namespace='root/cimv2',
-                               host='fred'),
-          uri_format=None,
-          max_lens=[5, 10],
-          exp_rtns=['//fred/\nroot/cimv2:\nCIM_Foo.\nInstanceID=\n"1234"',
-                    '//fred/root/cimv2:\nCIM_Foo.InstanceID=\n"1234"']),
-     None, None, OK, ),
+    (
+        'Verify simple sucessful format without  fold',
+        {
+            'path': CIMInstanceName(
+                classname='CIM_Foo',
+                keybindings={'InstanceID': '1234'},
+                namespace='root/cimv2',
+                host='fred'),
+            'uri_format': None,
+            'max_lens': 60,
+            'exp_rtns': '//fred/root/cimv2:CIM_Foo.InstanceID="1234"'
+        },
+        None, None, True
+    ),
+    (
+        'Verify simple sucessful format with  fold',
+        {
+            'path': CIMInstanceName(
+                classname='CIM_Foo',
+                keybindings={'InstanceID': '1234'},
+                namespace='root/cimv2',
+                host='fred'),
+            'uri_format': None,
+            'max_lens': 30,
+            'exp_rtns': '//fred/root/cimv2:CIM_Foo.InstanceID=\n"1234"'
+        },
+        None, None, True
+    ),
+    (
+        'Verify simple sucessful format with fold and no fold',
+        {
+            'path': CIMInstanceName(
+                classname='CIM_Foo',
+                keybindings={'InstanceID': '1234'},
+                namespace='root/cimv2',
+                host='fred'),
+            'uri_format': None,
+            'max_lens': [60, 30],
+            'exp_rtns': ['//fred/root/cimv2:CIM_Foo.InstanceID="1234"',
+                         '//fred/root/cimv2:CIM_Foo.InstanceID=\n"1234"']
+        },
+        None, None, True
+    ),
+    (
+        'Verify simple sucessful format with vers small fold int',
+        {
+            'path': CIMInstanceName(
+                classname='CIM_Foo',
+                keybindings={'InstanceID': '1234'},
+                namespace='root/cimv2',
+                host='fred'),
+            'uri_format': None,
+            'max_lens': [5, 10],
+            'exp_rtns': ['//fred/\nroot/cimv2:\nCIM_Foo.\nInstanceID=\n"1234"',
+                         '//fred/root/cimv2:\nCIM_Foo.InstanceID=\n"1234"']
+        },
+        None, None, OK
+    ),
     # TODO: Add more test values to cover multiple keys more complex keys and
     # keys with very long name and values.
 ]

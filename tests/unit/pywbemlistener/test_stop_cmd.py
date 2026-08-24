@@ -57,51 +57,51 @@ STOP_TESTCASES = [
 
     (
         "Verify output of 'stop --help'",
-        dict(
-            args=['stop', '--help'],
-        ),
-        dict(
-            stdout=STOP_HELP_PATTERNS,
-            test='contains',
-        ),
+        {
+            "args": ['stop', '--help'],
+        },
+        {
+            "stdout": STOP_HELP_PATTERNS,
+            "test": 'contains',
+        },
         RUN,
     ),
     (
         "Verify output of 'stop -h'",
-        dict(
-            args=['stop', '-h'],
-        ),
-        dict(
-            stdout=STOP_HELP_PATTERNS,
-            test='contains',
-        ),
+        {
+            "args": ['stop', '-h'],
+        },
+        {
+            "stdout": STOP_HELP_PATTERNS,
+            "test": 'contains',
+        },
         RUN,
     ),
     (
         "Verify output of 'stop' on non-existing listener",
-        dict(
-            args=['stop', 'lis1'],
-        ),
-        dict(
-            rc=1,
-            stderr=STOP_NOTFOUND_PATTERNS,
-            test='all',
-        ),
+        {
+            "args": ['stop', 'lis1'],
+        },
+        {
+            "rc": 1,
+            "stderr": STOP_NOTFOUND_PATTERNS,
+            "test": 'all',
+        },
         RUN,
     ),
     (
         "Verify output of 'stop' on existing listener",
-        dict(
-            args=['stop', 'lis1'],
-            listeners=[
+        {
+            "args": ['stop', 'lis1'],
+            "listeners": [
                 ['lis1', '--scheme', 'http', '--port', '50001'],
             ]
-        ),
-        dict(  # pylint:disable=use-dict-literal
+        },
+        {  # pylint:disable=use-dict-literal
             # TODO: Output goes neither on stdout nor on stderr
             # stdout=STOP_SUCCESS_PATTERNS,
             # test='all',
-        ),
+        },
         RUN_NO_WIN,
     ),
 ]

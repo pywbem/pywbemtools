@@ -466,6 +466,6 @@ class TestSubcmd(CLITestsBase):  # pylint: disable=too-few-public-methods
         """
         Execute pybemcli with the defined input and test output.
         """
-        cmd_grp = inputs['cmdgrp'] if 'cmdgrp' in inputs else ''
+        cmd_grp = inputs.get('cmdgrp', '')
         self.command_test(desc, cmd_grp, inputs, exp_response,
                           mock, condition)
