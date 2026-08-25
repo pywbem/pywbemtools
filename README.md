@@ -1,5 +1,7 @@
 # pywbemtools: Python tools for communicating with WBEM servers
 
+xx
+
 [![Version on Pypi](https://img.shields.io/pypi/v/pywbemtools.svg)](https://pypi.python.org/pypi/pywbemtools/)
 [![Test status (master)](https://github.com/pywbem/pywbemtools/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/pywbem/pywbemtools/actions/workflows/test.yml?query=branch%3Amaster)
 [![Docs status (master)](https://readthedocs.org/projects/pywbemtools/badge/?version=latest)](https://readthedocs.org/projects/pywbemtools/builds/)
