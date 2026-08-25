@@ -4,7 +4,8 @@
 # in the Pypi package metadata.
 
 
-# Direct dependencies for install (must be consistent with minimum-constraints-install.txt)
+# Direct dependencies for install
+# (must be consistent with minimum-constraints-install.txt)
 
 # TODO(RELEASE): Enable when using a released pywbem version:
 pywbem>=1.9.0
@@ -15,8 +16,6 @@ pywbem>=1.9.0
 # TODO(RELEASE): Disable when using a released pywbem version:
 # pywbem@git+https://github.com/pywbem/pywbem.git@master
 
-nocaselist>=1.0.3
-nocasedict>=1.0.1
 # Click 7.0 has issue #1231 on Windows which we circumvent in the test code
 # Click 7.1 has a bug with output capturing
 # Click 8.0 is incompatible with python <3.0. See issues #816 (python 2.7 not
@@ -27,8 +26,6 @@ nocasedict>=1.0.1
 # Click 8.2 made some attributes read-only and click-repl 0.3.0 does not support
 #   that yet, see https://github.com/click-contrib/click-repl/issues/128
 Click>=8.0.2,<8.2
-click-spinner>=0.1.8; python_version <= '3.11'
-click-spinner>=0.1.10; python_version >= '3.12'
 
 # click-repl 0.2.0 is needed for compatibility with Click 8.0.
 # click-repl 0.3.0 causes test failures, see https://github.com/pywbem/pywbemtools/issues/1312
@@ -37,19 +34,6 @@ click-spinner>=0.1.10; python_version >= '3.12'
 #   click-repl@git+https://github.com/pywbem/click-repl.git@allow-general-options
 click-repl>=0.2.0,<0.3.0
 
-asciitree>=0.3.3
-# tabulate 0.8.8 fixes ImportError on Python 3.10.
-tabulate>=0.8.2; python_version <= '3.9'
-tabulate>=0.8.8; python_version >= '3.10'
-
-toposort>=1.6
-# psutil 6.0.0 fixes an install error on Python 3.13 on Windows
-# safety 3.6.2 depends on psutil>=6.1.0
-psutil>=6.1.0
-
-# version 3.0.36 requirement for click-repl
-prompt-toolkit>=3.0.36
-
 # PyYAML is also pulled in by dparse and python-coveralls
 # PyYAML 6.0 has wheel archives for Python 3.6 - 3.11
 # PyYAML 6.0.0 fails install since Cython 3 was released, see issue
@@ -57,19 +41,17 @@ prompt-toolkit>=3.0.36
 # PyYAML 6.0.2 provides wheel archives for Python 3.13 on Windows
 PyYAML>=6.0.2
 
+asciitree>=0.3.3
+click-spinner>=0.1.10
+nocasedict>=1.0.1
+nocaselist>=1.0.3
+packaging>=25.0
+prompt-toolkit>=3.0.36
+psutil>=6.1.0
+tabulate>=0.8.8
+toposort>=1.6
 yamlloader>=0.5.5
 
-# setuptools>=77.0.0 requires packaging>=24.2 to work properly
-packaging>=24.2
 
-# See issue #822 about issue in mock 4.0.3.
-mock>=3.0.0
-
-
-# Indirect dependencies for install that are needed for some reason (must be
-# consistent with minimum-constraints-install.txt)
-
-pyparsing>=2.3.1
-
-urllib3>=2.6.3; python_version == '3.9'
-urllib3>=2.7.0; python_version >= '3.10'
+# Indirect dependencies for install that are needed for some reason
+# (must be consistent with minimum-constraints-install.txt)
