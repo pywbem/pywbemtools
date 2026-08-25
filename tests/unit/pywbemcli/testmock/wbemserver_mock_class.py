@@ -341,7 +341,7 @@ class WbemServerMock:
                f"system_name={self.server_mock_data['system_name']!r}, " \
                f"dmtf_schema_ver={self.server_mock_data['dmtf_schema']['version']!r}, " \
                f"schema_dir={self.server_mock_data['dmtf_schema']['dir']!r}, " \
-               f"wbem_server={getattr(self, 'wbem_server', None)}"  # noqa=E501
+               f"wbem_server={getattr(self, 'wbem_server', None)}"  # noqa: E501
         # pylint: enable=line-too-long
 
     def __repr__(self):
@@ -356,7 +356,7 @@ class WbemServerMock:
                f"dmtf_schema_ver={self.server_mock_data['dmtf_schema']['version']!r}, " \
                f"schema_dir={self.server_mock_data['dmtf_schema']['dir']!r}, " \
                f"wbem_server={getattr(self, 'wbem_server', None)!r}, " \
-               f"registered_profiles={self.server_mock_data['registered_profiles']!r})"  # noqa=E501
+               f"registered_profiles={self.server_mock_data['registered_profiles']!r})"  # noqa: E501
         # pylint: enable=line-too-long
 
     def display(self, txt):

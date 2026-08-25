@@ -1059,7 +1059,7 @@ TEST_CASES = [
     ['Verify add dest, filter, subscrip & list-* handles --permanent, remove-server OK.',  # noqa: E501
      {'general': ['-m', MOCK_SERVER_MODEL_PATH],
       'stdin': ['subscription add-destination pdest1 -l http://blah:50000 --permanent',  # noqa: E501
-                'subscription add-destination odest1 -l http://blah:50000 --owned',  # noqa: E501'
+                'subscription add-destination odest1 -l http://blah:50000 --owned',  # noqa: E501
                 'subscription add-filter pfilter1 -q "SELECT" --permanent',  # noqa: E501
                 'subscription add-filter ofilter1 -q "SELECT" --owned',  # noqa: E501
                 'subscription add-subscription pdest1 pfilter1 --permanent',
