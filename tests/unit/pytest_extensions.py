@@ -160,7 +160,7 @@ def simplified_test_function(test_func):
                         lines = []
                         for w in rec_warnings:
                             # pylint: disable=line-too-long
-                            line = f"{w.filename}:{w.lineno}: {w.category.__name__}: {str(w.message)}"  # noqa=E501
+                            line = f"{w.filename}:{w.lineno}: {w.category.__name__}: {str(w.message)}"  # noqa: E501
                             if line not in lines:
                                 lines.append(line)
                             # pylint: enable=line-too-long
