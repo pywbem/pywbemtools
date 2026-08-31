@@ -15,6 +15,16 @@ Change log
    .. include:: tmp_changes.rst
 
 .. towncrier start
+pywbemtools 1.4.1
+^^^^^^^^^^^^^^^^^
+
+Released: 2026-08-31
+
+**Bug fixes:**
+
+* Fixed safety issues up to 2026-08-25.
+
+
 pywbemtools 1.4.0
 ^^^^^^^^^^^^^^^^^
 
