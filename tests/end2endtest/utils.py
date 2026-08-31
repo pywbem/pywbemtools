@@ -21,6 +21,7 @@ functions.
 import os
 import re
 from subprocess import call, check_call, DEVNULL
+import socket
 
 import pytest
 
@@ -30,9 +31,21 @@ from ..unit.utils import execute_command
 TEST_SERVER_IMAGE = os.getenv('TEST_SERVER_IMAGE', None)
 
 
+def get_free_port():
+    """
+    Return an unused TCP port on the local system.
+
+    Returns:
+      int: Port number of a free port
+    """
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(('', 0))  # port 0 means that the OS uses a free port
+        return s.getsockname()[1]
+
+
 @pytest.fixture(
     params=[TEST_SERVER_IMAGE],
-    scope='module'
+    scope='function'
 )
 def server_url(request):
     """

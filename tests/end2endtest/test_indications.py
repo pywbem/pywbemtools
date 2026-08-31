@@ -32,7 +32,7 @@ import time
 from .utils import server_url, validate_namespace_exists, \
     validate_indication_profile, validate_required_classes, \
     create_indication_subscription, remove_subscription, \
-    exec_pywbemcli_cmd   # noqa: F401
+    exec_pywbemcli_cmd, get_free_port   # noqa: F401
 # pylint: enable=unused-import
 
 from ..unit.utils import execute_command
@@ -282,7 +282,7 @@ def test_indications(server_url):  # noqa: F811
     listener_bind_addr_wc = "0.0.0.0"
 
     # listener and indication_dest port are the same
-    listener_port = 5000
+    listener_port = get_free_port()
 
     # Sending only a single indication because we have issues with losing
     # indications. They get stuck in the WBEM Server See pywbem issue.
