@@ -125,6 +125,7 @@ nab-resolver==0.0.17; python_version >= '3.10'
 nab==0.0.17; python_version >= '3.10'
 nltk==3.10.0; python_version >= '3.10'
 nltk==3.9.2; python_version == '3.9'
+pathspec==1.1.1
 platformdirs==4.3.6
 pluggy==1.5.0
 pycodestyle==2.11.0
