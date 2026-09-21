@@ -60,6 +60,6 @@ bandit>=1.7.8
 
 # Dependencies from install that are needed for consistency (e.g. because pinned)
 
-# Click 8.2 made some attributes read-only and click-repl 0.2.0/0.3.0 does not
-#   support that yet, see https://github.com/click-contrib/click-repl/issues/128
-Click>=8.0.2,<8.2
+# Click is covered by requirements.txt but needs to be repeated here because it is used by safety.
+click>=8.1.8; python_version == '3.9'
+click>=8.4.2; python_version >= '3.10'
