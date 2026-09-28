@@ -16,23 +16,10 @@ pywbem>=1.9.0
 # TODO(RELEASE): Disable when using a released pywbem version:
 # pywbem@git+https://github.com/pywbem/pywbem.git@master
 
-# Click 7.0 has issue #1231 on Windows which we circumvent in the test code
-# Click 7.1 has a bug with output capturing
-# Click 8.0 is incompatible with python <3.0. See issues #816 (python 2.7 not
-#     supported) and #819 (click-repl incompatible)
-# The Click requirements were copied into dev-requirements.txt in order not to
-# have the safety package upgrade it. Keep them in sync.
-# Safety package requires click 8.0.2 minimum
-# Click 8.2 made some attributes read-only and click-repl 0.3.0 does not support
-#   that yet, see https://github.com/click-contrib/click-repl/issues/128
-Click>=8.0.2,<8.2
+click>=8.1.8; python_version == '3.9'
+click>=8.4.2; python_version >= '3.10'
 
-# click-repl 0.2.0 is needed for compatibility with Click 8.0.
-# click-repl 0.3.0 causes test failures, see https://github.com/pywbem/pywbemtools/issues/1312
-# click-repl 0.3.0 does not support global options in repl session, see
-#   https://github.com/pywbem/pywbemtools/issues/1441. For development, we can use
-#   click-repl@git+https://github.com/pywbem/click-repl.git@allow-general-options
-click-repl>=0.2.0,<0.3.0
+click-repl>=0.4.0
 
 # PyYAML is also pulled in by dparse and python-coveralls
 # PyYAML 6.0 has wheel archives for Python 3.6 - 3.11

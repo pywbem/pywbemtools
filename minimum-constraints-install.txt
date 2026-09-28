@@ -27,9 +27,10 @@ pywbem==1.9.0
 # above, since links are not allowed in constraint files - the minimum will be
 # ensured by requirements.txt then.
 
-Click==8.0.2
+click==8.1.8; python_version == '3.9'
+click==8.4.2; python_version >= '3.10'
 
-click-repl==0.2.0
+click-repl==0.4.0
 
 PyYAML==6.0.2
 
