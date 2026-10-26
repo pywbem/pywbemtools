@@ -827,7 +827,7 @@ def cmd_connection_delete(context, name):
     connections_repo.delete(name)
 
     default = 'default ' if current_name and current_name == name else ''
-    click.echo(f'Deleted {default} connection "{name}".')
+    click.echo(f'Deleted {default}connection "{name}".')
 
 
 def cmd_connection_save(context, name, options):
@@ -838,7 +838,7 @@ def cmd_connection_save(context, name, options):
     """
     current_connection = context.pywbem_server
     if not current_connection:
-        raise click.ClickException('No current connection connection. Use '
+        raise click.ClickException('No current connection. Use '
                                    '"connection list" to see more connection '
                                    'information')
     save_connection = deepcopy(current_connection)

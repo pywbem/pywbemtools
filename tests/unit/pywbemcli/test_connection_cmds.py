@@ -1236,7 +1236,7 @@ ca-certs
                 'connection select testconn',
                 'connection delete testconn',
                 'connection delete mocktest3']},
-     {'stdout': ['Deleted connection "mocktest3"'],
+     {'stdout': ['Deleted default connection "mocktest3"'],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'None'}},
      None, OK],
